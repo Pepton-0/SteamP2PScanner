@@ -17,9 +17,13 @@ namespace SpsLogic.Utils
 
         public static bool TryGetClassicStunTransactionId(
             Packet packet,
-            out ClassicStunTransactionId transactionId)
+            out ClassicStunTransactionId transactionId,
+            out bool isRequestPacket,
+            out bool isResponsePacket)
         {
             transactionId = default;
+            isRequestPacket = false;
+            isResponsePacket = false;
 
             UdpPacket udp = packet.Extract<UdpPacket>();
             if (udp == null)
@@ -45,6 +49,9 @@ namespace SpsLogic.Utils
             bool isRequest = payload.Length == 56;
             bool isResponse = payload.Length == 68;
 
+            isRequestPacket = isRequest;
+            isResponsePacket = isResponse;
+
             if (!isRequest && !isResponse)
             {
                 return false;
@@ -60,6 +67,9 @@ namespace SpsLogic.Utils
                 return false;
             }
 #else
+            isRequestPacket = messageType == 0x0000;
+            isresponsePacket = messageType == 0x0100;
+
             if (!IsDebugClassicStunMessageType(messageType))
             {
                 return false;
