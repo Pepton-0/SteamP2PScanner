@@ -158,7 +158,7 @@ namespace SpsLogic
             }
 
             /// <summary>
-            /// Report a classicstun send packet from my computer to the opponent computer.
+            /// Report a classicstun request packet from my computer to the opponent computer.
             /// In some network environment, duplication occures so we respect the first packet.
             /// </summary>
             /// <param name="id"></param>
@@ -187,6 +187,8 @@ namespace SpsLogic
                 else
                 {
                     Logger.Log("Unexpected classicstun response packet received without sending any send classicstun packet. Maybe internet error?", true);
+                    Logger.Log("   Current packet: " + id.ToString());
+                    Logger.Log("   Current unmatched packets: " + string.Join(", ", UnmatchedPackets.Keys.Select(k => k.ToString())));
                 }
             }
 
@@ -302,6 +304,7 @@ namespace SpsLogic
                 if (found = Registries.TryGetValue(srcNetId, out history))
                 {
                     opponentNetId = srcNetId;
+                    // sendPacketFromMe = false; default
                 }
                 else if (found = Registries.TryGetValue(destNetId, out history))
                 {
@@ -317,14 +320,16 @@ namespace SpsLogic
                     // if its send from me or receive from opponent.
                     if (ClassicStunPacketUtil.TryGetClassicStunTransactionId(
                         packet,
-                        out ClassicStunTransactionId id))
+                        out ClassicStunTransactionId id,
+                        out bool isRequestPacket,
+                        out bool isResponsePacket))
                     {
-                        if (sendPacketFromMe)
+                        if (sendPacketFromMe && isRequestPacket)
                         {
                             Logger.DebugLog("Packet send detected: " + id.ToString());
                             history.ReportSend(id, raw.Timeval);
                         }
-                        else
+                        else if(!sendPacketFromMe && isResponsePacket)
                         {
                             Logger.DebugLog("Packet recv detected: " + id.ToString());
                             history.ReportReceive(id, raw.Timeval);
