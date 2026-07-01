@@ -30,11 +30,14 @@ classicstunƒpƒPƒbƒg‚ð‚»‚ÌƒTƒCƒY‚©‚ç„‘ª‚µ‚ÄA‚»‚Ì‘—ŽóMƒ^ƒCƒ~ƒ“ƒO‚©‚çŒvŽZ‚·‚é•û–
 
 Mvvm‚É]‚Á‚Ä‚­‚¾‚³‚¢B
 CommunityToolkit.Mvvm, Microsoft.Windows.SDK.Contracts, Microsoft.Xaml.Behaviors.Wpf, Microsoft.Extensions.DependencyInjection‚ðŽg—p‚µ‚Ä‚­‚¾‚³‚¢B
-C:\Users\Kent2\Desktop\MyProgram\WPF\WinAutoTyper\‚ð“Ç‚ÝŽæ‚è‚Å‚Ì‚ÝŽQl‚É‚·‚é‚±‚Æ‚ð‹–‰Â‚µ‚Ü‚·B
+Mvvm‚Ì—Œ`‚Æ‚µ‚ÄAC:\Users\Kent2\Desktop\MyProgram\WPF\WinAutoTyper\‚ð“Ç‚ÝŽæ‚è‚Å‚Ì‚ÝŽQl‚É‚·‚é‚±‚Æ‚ð‹–‰Â‚µ‚Ü‚·B
 
 s‚ÌI‚í‚è‚ÍCR LF‚É“ˆê‚µ‚Ä‚­‚¾‚³‚¢B
 ŠeŠÖ”‚ÍƒRƒƒ“ƒg‚ðs‚¢AŠÖ”‚Ì’[“I‚ÈŠT—vAˆø”‚Í‚»‚Ì—p“r‚ÆŽó‚¯‚é‚×‚«§–ñA–ß‚è’l‚Í‚Ç‚ñ‚È‰ÁH‚ðŽó‚¯‚½‚©‚ð‘‚«‚Ü‚µ‚å‚¤B‹M•û‚ªApi‚ð—˜—p‚·‚éƒV[ƒ“‚ð‘z’è‚µA‚Ç‚ñ‚Èà–¾‚È‚ç‚·‚®‚³‚ÜŠˆ—p•û–@‚ðŒ©‚¢‚¾‚¹‚é‚©‚ð‘z’è‚µ‚Ü‚µ‚å‚¤B
 ‘¼‚ÌŒöŠJƒƒ“ƒo[‚à’[“I‚ÈŠT—v‚ð‘‚«‚Ü‚µ‚å‚¤B
+
+[SteamP2PInfo](https://github.com/tremwil/SteamP2PInfo)‚ª‘å–{‚È‚Ì‚ÅA‚±‚ê‚àŽQl‚É‚µ‚Ä‚æ‚¢‚Å‚·B
+‚à‚µŽ„‚©‚ç‚ÌŽwŽ¦‚ª•s–¾—Ä‚Èê‡A‚±‚¿‚ç‚ÌUI\‘¢‚ÆƒƒWƒbƒN‚ðŽQl‚É‚·‚ê‚ÎŠÔˆá‚¢‚È‚¢‚Å‚µ‚å‚¤B
 
 # UIÝŒv‚Ìƒ‹[ƒ‹
 

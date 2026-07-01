@@ -170,6 +170,8 @@ namespace SpsGui
                 return;
             }
 
+            Environment.SetEnvironmentVariable("SteamAppId", 1888160.ToString());
+
             if (!SteamAPI.IsSteamRunning())
             {
                 throw new InvalidOperationException("Steam is not running.");

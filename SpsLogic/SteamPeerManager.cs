@@ -35,7 +35,6 @@ namespace SpsLogic
                 .Select(t => new Func<CSteamID, IPacketScan, SteamPeerBase>((CSteamID sid, IPacketScan pc) => Activator.CreateInstance(t, sid, pc) as SteamPeerBase))
                 .ToArray();
 
-
         /// <summary>
         /// List of peers mapped by Steam ID.
         /// </summary>
@@ -103,6 +102,7 @@ namespace SpsLogic
 
         public async void UpdatePeerList()
         {
+            Logger.DebugLog("Updating peer list");
             // Make sure we're constantly writing to the IPC log to force Steam to eventually flush
             // This call was chosen because it's not something a game will call often
             // Thus we avoid blowing up the IPC log with dummy calls
@@ -110,6 +110,7 @@ namespace SpsLogic
 
             if (mustReopenLog)
             {
+                Logger.DebugLog("Reopened ipc log file");
                 sr?.Dispose();
                 fs?.Close();
                 fs?.Dispose();
@@ -136,6 +137,9 @@ namespace SpsLogic
             while (!mustReopenLog)
             {
                 string line = await sr.ReadLineAsync();
+
+                if (!string.IsNullOrEmpty(line))
+                    Logger.DebugLog("read a line: " + line);
 
                 // ログの終端に到達したら終了
                 if (line == null)
