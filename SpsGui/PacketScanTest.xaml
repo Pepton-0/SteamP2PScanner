@@ -201,7 +201,7 @@
                                 <GridViewColumn Header="Loss" Width="80" DisplayMemberBinding="{Binding LossText}" />
                                 <GridViewColumn Header="Min" Width="70" DisplayMemberBinding="{Binding MinText}" />
                                 <GridViewColumn Header="Q1" Width="70" DisplayMemberBinding="{Binding Q1Text}" />
-                                <GridViewColumn Header="Mid" Width="70" DisplayMemberBinding="{Binding MedText}" />
+                                <GridViewColumn Header="Med" Width="70" DisplayMemberBinding="{Binding MedText}" />
                                 <GridViewColumn Header="Q3" Width="70" DisplayMemberBinding="{Binding Q3Text}" />
                                 <GridViewColumn Header="Max" Width="70" DisplayMemberBinding="{Binding MaxText}" />
                                 <GridViewColumn Header="Latest" Width="80" DisplayMemberBinding="{Binding Latest}" />
@@ -226,7 +226,7 @@
                                 <GridViewColumn Header="Loss" Width="80" DisplayMemberBinding="{Binding LossText}" />
                                 <GridViewColumn Header="Min" Width="70" DisplayMemberBinding="{Binding MinText}" />
                                 <GridViewColumn Header="Q1" Width="70" DisplayMemberBinding="{Binding Q1Text}" />
-                                <GridViewColumn Header="Mid" Width="70" DisplayMemberBinding="{Binding MedText}" />
+                                <GridViewColumn Header="Med" Width="70" DisplayMemberBinding="{Binding MedText}" />
                                 <GridViewColumn Header="Q3" Width="70" DisplayMemberBinding="{Binding Q3Text}" />
                                 <GridViewColumn Header="Max" Width="70" DisplayMemberBinding="{Binding MaxText}" />
                                 <GridViewColumn Header="Latest" Width="80" DisplayMemberBinding="{Binding Latest}" />

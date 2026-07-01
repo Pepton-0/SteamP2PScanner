@@ -493,7 +493,7 @@ namespace SpsGui
 
             double labelX = xZero + 22;
             labelX += DrawText(drawingContext, $"Min:{stats.Min:0}/Q1:{stats.Q1:0}/", labelX, 0, 14, Brushes.White);
-            labelX += DrawText(drawingContext, $"Mid:{stats.Med:0}", labelX, 0, 14, medianBrush);
+            labelX += DrawText(drawingContext, $"Med:{stats.Med:0}", labelX, 0, 14, medianBrush);
             DrawText(drawingContext, $"/Q3:{stats.Q3:0}", labelX, 0, 14, Brushes.White);
 
             DrawText(drawingContext, stats.Max.ToString("0", CultureInfo.InvariantCulture), Math.Max(0, xMax - 34), 0, 14, Brushes.White);
