@@ -46,6 +46,9 @@
     <PackageReference Include="MahApps.Metro">
       <Version>2.4.11</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
+      <Version>10.0.9</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Windows.SDK.Contracts">
       <Version>10.0.28000.1839</Version>
     </PackageReference>
@@ -105,6 +108,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Conductor.cs" />
     <Compile Include="PingOverlayTest.xaml.cs">
       <DependentUpon>PingOverlayTest.xaml</DependentUpon>
       <SubType>Code</SubType>

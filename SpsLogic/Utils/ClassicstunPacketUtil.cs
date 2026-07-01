@@ -1,4 +1,7 @@
-﻿using System;
+﻿// test flag to check the util with classicstun services other than steam p2p
+#define STUN_STEAM
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,12 +41,7 @@ namespace SpsLogic.Utils
                 return false;
             }
 
-#if DEBUG
-            if (!IsDebugClassicStunMessageType(messageType))
-            {
-                return false;
-            }
-#else
+#if STUN_STEAM
             bool isRequest = payload.Length == 56;
             bool isResponse = payload.Length == 68;
 
@@ -58,6 +56,11 @@ namespace SpsLogic.Utils
             }
 
             if (isResponse && messageType != 0x0101)
+            {
+                return false;
+            }
+#else
+            if (!IsDebugClassicStunMessageType(messageType))
             {
                 return false;
             }

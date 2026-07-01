@@ -1,4 +1,8 @@
-﻿using SpsLogic;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using SpsGui.Behaviors;
+using SpsGui.Models;
+using SpsLogic;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,8 +20,13 @@ namespace SpsGui
     {
         public App()
         {
-            Logger.Log("Hello world to everyone");
-            Logger.Log("This is remembered forever", true);
+            Logger.DebugLog("Hello world!");
+
+            // Prepare MVVM application
+            Ioc.Default.ConfigureServices(new ServiceCollection()
+                .AddSingleton<IConductor, Conductor>()
+                .BuildServiceProvider());
+
             //new PingOverlayTest().Show();
             //new MainWindow().Show();
             //new PacketScanTest().Show();

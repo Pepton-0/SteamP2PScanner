@@ -321,10 +321,12 @@ namespace SpsLogic
                     {
                         if (sendPacketFromMe)
                         {
+                            Logger.DebugLog("Packet send detected: " + id.ToString());
                             history.ReportSend(id, raw.Timeval);
                         }
                         else
                         {
+                            Logger.DebugLog("Packet recv detected: " + id.ToString());
                             history.ReportReceive(id, raw.Timeval);
                         }
                     }
