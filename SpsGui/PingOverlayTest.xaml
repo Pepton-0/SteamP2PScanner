@@ -1,0 +1,86 @@
+<Window x:Class="SpsGui.PingOverlayTest"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SpsGui"
+        Title="Ping Overlay Test"
+        MinWidth="560"
+        SizeToContent="WidthAndHeight"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False">
+    <Window.Resources>
+        <SolidColorBrush x:Key="PanelBrush" Color="#CC101820" />
+        <SolidColorBrush x:Key="LineBrush" Color="#33FFFFFF" />
+        <SolidColorBrush x:Key="TextBrush" Color="#F8FAFC" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#B8C2CC" />
+
+        <DataTemplate x:Key="ProfilerRowTemplate" DataType="{x:Type local:PingProfileSnapshot}">
+            <Grid MinHeight="48" Margin="0,0,0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="NameColumn" />
+                    <ColumnDefinition Width="70" SharedSizeGroup="AverageColumn" />
+                    <ColumnDefinition Width="50" SharedSizeGroup="LossColumn" />
+                    <ColumnDefinition Width="270" />
+                    <ColumnDefinition Width="120" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding Name}"
+                           Foreground="{StaticResource TextBrush}"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,14,2" />
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding AverageText}"
+                           Foreground="#22C55E"
+                           FontSize="16"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0,0,14,2" />
+
+                <TextBlock Grid.Column="2"
+                           Text="{Binding LossText}"
+                           Foreground="#F87171"
+                           FontSize="16"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,2" />
+
+                <local:BoxPlotView Grid.Column="3"
+                                   Height="46"
+                                   Margin="0,0,12,2"
+                                   VerticalAlignment="Center"
+                                   DataContext="{Binding}" />
+
+                <local:RecentStatsBarsView Grid.Column="4"
+                                           Height="46"
+                                           Margin="0,0,0,2"
+                                           VerticalAlignment="Center"
+                                           DataContext="{Binding}" />
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Border Background="{StaticResource PanelBrush}"
+            BorderBrush="#55FFFFFF"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="8"
+            MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ItemsControl Grid.Row="0"
+                          Grid.IsSharedSizeScope="True"
+                          ItemsSource="{Binding Profiles}"
+                          ItemTemplate="{StaticResource ProfilerRowTemplate}" />
+        </Grid>
+    </Border>
+</Window>

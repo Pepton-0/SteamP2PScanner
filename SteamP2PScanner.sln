@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37027.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpsGui", "SpsGui\SpsGui.csproj", "{CC9202EE-C7DA-4A8C-BE21-660A3BE37ED2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpsLogic", "SpsLogic\SpsLogic.csproj", "{CEA3613C-7F00-48CA-84F7-245BF757FDBD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC9202EE-C7DA-4A8C-BE21-660A3BE37ED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC9202EE-C7DA-4A8C-BE21-660A3BE37ED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC9202EE-C7DA-4A8C-BE21-660A3BE37ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC9202EE-C7DA-4A8C-BE21-660A3BE37ED2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CFD2002-3046-4C6B-B968-2E4F7A37F852}
+	EndGlobalSection
+EndGlobal
