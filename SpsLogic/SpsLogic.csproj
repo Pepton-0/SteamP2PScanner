@@ -77,8 +77,10 @@
     <Compile Include="AppConfig.cs" />
     <Compile Include="ConnectionStats.cs" />
     <Compile Include="DnsPing.cs" />
+    <Compile Include="GameConfig.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="PacketScan.cs" />
+    <Compile Include="SteamAppFinder.cs" />
     <Compile Include="SteamPeerBase.cs" />
     <Compile Include="SteamPeerInfo.cs" />
     <Compile Include="SteamPeerManager.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="SteamPeerOldAPI.cs" />
     <Compile Include="Tester.cs" />
     <Compile Include="Utils\ClassicstunPacketUtil.cs" />
+    <Compile Include="WinApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

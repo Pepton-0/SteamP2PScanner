@@ -467,7 +467,6 @@ namespace SpsGui
             var axisPen = new Pen(new SolidColorBrush(Color.FromArgb(160, 220, 230, 240)), 1);
             var boxPen = new Pen(new SolidColorBrush(Color.FromRgb(226, 232, 240)), 1.2);
             var medianPen = new Pen(new SolidColorBrush(Color.FromRgb(250, 204, 21)), 2);
-            var averagePen = new Pen(new SolidColorBrush(Color.FromRgb(34, 197, 94)), 2);
             var fillBrush = new SolidColorBrush(Color.FromArgb(80, 125, 211, 252));
 
             double max = Math.Max(1, stats.Max);
@@ -476,7 +475,6 @@ namespace SpsGui
             double xQ1 = ToX(stats.Q1, max, plotLeft, plotRight);
             double xMedian = ToX(stats.Med, max, plotLeft, plotRight);
             double xQ3 = ToX(stats.Q3, max, plotLeft, plotRight);
-            double xAverage = ToX(stats.Avg, max, plotLeft, plotRight);
             double xMax = ToX(stats.Max, max, plotLeft, plotRight);
 
             drawingContext.DrawLine(axisPen, new Point(xZero, centerY), new Point(plotRight, centerY));
@@ -485,7 +483,6 @@ namespace SpsGui
             drawingContext.DrawLine(boxPen, new Point(xMin, centerY - 6), new Point(xMin, centerY + 6));
             drawingContext.DrawLine(boxPen, new Point(xMax, centerY - 6), new Point(xMax, centerY + 6));
             drawingContext.DrawRectangle(fillBrush, boxPen, new Rect(new Point(xQ1, boxTop), new Point(xQ3, boxBottom)));
-            drawingContext.DrawLine(averagePen, new Point(xAverage, boxTop - 1), new Point(xAverage, boxBottom + 1));
             drawingContext.DrawLine(medianPen, new Point(xMedian, boxTop - 1), new Point(xMedian, boxBottom + 1));
 
             Brush medianBrush = new SolidColorBrush(Color.FromRgb(250, 204, 21));
@@ -579,6 +576,7 @@ namespace SpsGui
             plotRight = Math.Min(plotRight, plotLeft + barWidth * 10 + barGap * 9);
 
             var gridPen = new Pen(new SolidColorBrush(Color.FromArgb(80, 255, 255, 255)), 1);
+            var averagePen = new Pen(new SolidColorBrush(Color.FromRgb(34, 197, 94)), 2);
             drawingContext.DrawLine(gridPen, new Point(plotLeft, plotTop), new Point(plotRight, plotTop));
             drawingContext.DrawLine(gridPen, new Point(plotLeft, plotBottom), new Point(plotRight, plotBottom));
 
@@ -598,6 +596,13 @@ namespace SpsGui
                     : new SolidColorBrush(Color.FromArgb(210, 255, 255, 255));
 
                 drawingContext.DrawRectangle(brush, null, new Rect(x, y, barWidth, barHeight));
+            }
+
+            if (stats.Avg >= 0)
+            {
+                double averageNormalized = Math.Max(0.0, Math.Min(1.0, stats.Avg / (double)max));
+                double averageY = plotBottom - plotHeight * averageNormalized;
+                drawingContext.DrawLine(averagePen, new Point(plotLeft, averageY), new Point(plotRight, averageY));
             }
         }
 

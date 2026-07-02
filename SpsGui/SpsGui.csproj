@@ -99,6 +99,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="WindowSelectDialogTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SteamAppIdSelectDialogTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SteamAppFinderTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -119,6 +131,18 @@
     </Compile>
     <Compile Include="SteamPacketScanTest.xaml.cs">
       <DependentUpon>SteamPacketScanTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WindowSelectDialogTest.xaml.cs">
+      <DependentUpon>WindowSelectDialogTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SteamAppIdSelectDialogTest.xaml.cs">
+      <DependentUpon>SteamAppIdSelectDialogTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SteamAppFinderTest.xaml.cs">
+      <DependentUpon>SteamAppFinderTest.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Resources\StringResource.en-us.xaml">

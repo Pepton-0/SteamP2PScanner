@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,10 +22,512 @@ namespace SpsLogic
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
+
             TestClassicStunTransactionIdDictionary();
             // TestPacketAnalysis(args);
             // TestDnsPingDispose();
             // TestDnsPing();
+        }
+
+        public static void TestSteamAppFinderEnumWindows(int iterationCount = 10)
+        {
+            if (iterationCount <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(iterationCount));
+            }
+
+            Logger.Log($"Starting SteamAppFinder.EnumWindows test: iterations={iterationCount}");
+            LogSteamAppFinderEnumWindowsFilterStats();
+
+            var finder = new SteamAppFinder();
+            var warmupWindows = new List<SteamAppFinder.WindowInfo>();
+            finder.EnumWindows(warmupWindows.Add);
+            VerifySteamAppFinderWindows(warmupWindows, "warmup");
+
+            int totalWindowCount = 0;
+            int minWindowCount = int.MaxValue;
+            int maxWindowCount = 0;
+            int firstWindowCount = -1;
+            int lastWindowCount = -1;
+            List<SteamAppFinder.WindowInfo> lastWindows = null;
+
+            TimeSpan started = Logger.GetTimestamp();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int iteration = 0; iteration < iterationCount; iteration++)
+            {
+                var windows = new List<SteamAppFinder.WindowInfo>();
+                finder.EnumWindows(windows.Add);
+                VerifySteamAppFinderWindows(windows, "iteration " + iteration);
+
+                if (iteration == 0)
+                {
+                    firstWindowCount = windows.Count;
+                }
+
+                lastWindowCount = windows.Count;
+                totalWindowCount += windows.Count;
+                minWindowCount = Math.Min(minWindowCount, windows.Count);
+                maxWindowCount = Math.Max(maxWindowCount, windows.Count);
+                lastWindows = windows;
+            }
+
+            stopwatch.Stop();
+
+            double totalMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
+            double averageIterationMilliseconds = totalMilliseconds / iterationCount;
+            double averageWindowMilliseconds = totalWindowCount == 0
+                ? 0.0
+                : totalMilliseconds / totalWindowCount;
+
+            Logger.LogWithTimestamp("SteamAppFinder.EnumWindows measured by Logger", started);
+            Logger.Log(
+                $"SteamAppFinder.EnumWindows: iterations={iterationCount}, totalWindows={totalWindowCount}, " +
+                $"first={firstWindowCount}, last={lastWindowCount}, min={minWindowCount}, max={maxWindowCount}, " +
+                $"total={totalMilliseconds:F3} ms, avgIteration={averageIterationMilliseconds:F3} ms, " +
+                $"avgWindow={averageWindowMilliseconds:F4} ms");
+
+            if (lastWindows != null)
+            {
+                foreach (SteamAppFinder.WindowInfo window in lastWindows.Take(10))
+                {
+                    Logger.Log(
+                        $"SteamAppFinder.EnumWindows sample: hwnd=0x{window.Handle.ToInt64():X}, " +
+                        $"pid={window.ProcessId}, thread={window.ThreadId}, title=\"{window.Title}\", " +
+                        $"process=\"{window.ProcessName}\", path=\"{window.ProcessPath}\"");
+                }
+            }
+
+            Logger.Log("SteamAppFinder.EnumWindows test passed.");
+        }
+
+        private sealed class EnumWindowsFilterStats
+        {
+            public int Raw;
+            public int Shell;
+            public int Visible;
+            public int HasTitleLength;
+            public int TextRead;
+            public int HasProcessId;
+            public int OpenProcessSuccess;
+            public int QueryImageSuccess;
+            public string FirstOpenProcessError;
+            public string FirstQueryImageError;
+        }
+
+        private static void LogSteamAppFinderEnumWindowsFilterStats()
+        {
+            EnumWindowsFilterStats stats = CollectSteamAppFinderEnumWindowsFilterStats();
+
+            Logger.Log(
+                "SteamAppFinder.EnumWindows filters: " +
+                $"raw={stats.Raw}, shell={stats.Shell}, visible={stats.Visible}, " +
+                $"hasTitleLength={stats.HasTitleLength}, textRead={stats.TextRead}, " +
+                $"hasProcessId={stats.HasProcessId}, openProcessSuccess={stats.OpenProcessSuccess}, " +
+                $"queryImageSuccess={stats.QueryImageSuccess}, " +
+                $"firstOpenProcessError={stats.FirstOpenProcessError ?? "none"}, " +
+                $"firstQueryImageError={stats.FirstQueryImageError ?? "none"}");
+        }
+
+        private static EnumWindowsFilterStats CollectSteamAppFinderEnumWindowsFilterStats()
+        {
+            var stats = new EnumWindowsFilterStats();
+            IntPtr shellWindow = WinApi.GetShellWindow();
+
+            WinApi.EnumWindows((hWnd, lParam) =>
+            {
+                stats.Raw++;
+
+                if (hWnd == shellWindow)
+                {
+                    stats.Shell++;
+                    return true;
+                }
+
+                if (!WinApi.IsWindowVisible(hWnd))
+                {
+                    return true;
+                }
+
+                stats.Visible++;
+
+                int length = WinApi.GetWindowTextLength(hWnd);
+                if (length == 0)
+                {
+                    return true;
+                }
+
+                stats.HasTitleLength++;
+
+                var builder = new StringBuilder(length + 1);
+                if (WinApi.GetWindowText(hWnd, builder, length + 1) <= 0)
+                {
+                    return true;
+                }
+
+                stats.TextRead++;
+
+                WinApi.GetWindowThreadProcessId(hWnd, out uint processId);
+                if (processId == 0)
+                {
+                    return true;
+                }
+
+                stats.HasProcessId++;
+
+                IntPtr processHandle = WinApi.OpenProcess(
+                    WinApi.ProcessAccessFlags.QueryLimitedInformation,
+                    false,
+                    (int)processId);
+
+                if (processHandle == IntPtr.Zero)
+                {
+                    if (stats.FirstOpenProcessError == null)
+                    {
+                        stats.FirstOpenProcessError = CreateLastWin32ErrorMessage("OpenProcess");
+                    }
+
+                    return true;
+                }
+
+                try
+                {
+                    stats.OpenProcessSuccess++;
+
+                    int capacity = 32768;
+                    var imageBuilder = new StringBuilder(capacity);
+                    if (!WinApi.QueryFullProcessImageName(processHandle, 0, imageBuilder, ref capacity))
+                    {
+                        if (stats.FirstQueryImageError == null)
+                        {
+                            stats.FirstQueryImageError = CreateLastWin32ErrorMessage("QueryFullProcessImageName");
+                        }
+
+                        return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(imageBuilder.ToString()))
+                    {
+                        stats.QueryImageSuccess++;
+                    }
+                }
+                finally
+                {
+                    WinApi.CloseHandle(processHandle);
+                }
+
+                return true;
+            }, 0);
+
+            return stats;
+        }
+
+        private static void VerifySteamAppFinderWindows(
+            List<SteamAppFinder.WindowInfo> windows,
+            string caseName)
+        {
+            AssertForTest(windows != null, caseName + ": windows should not be null.");
+
+            var handles = new HashSet<IntPtr>();
+
+            foreach (SteamAppFinder.WindowInfo window in windows)
+            {
+                AssertForTest(window != null, caseName + ": WindowInfo should not be null.");
+                AssertForTest(window.Handle != IntPtr.Zero, caseName + ": window handle should not be zero.");
+                AssertForTest(!string.IsNullOrEmpty(window.Title), caseName + ": title should not be empty.");
+                AssertForTest(window.ProcessId != 0, caseName + ": process id should not be zero.");
+                AssertForTest(window.ThreadId != 0, caseName + ": thread id should not be zero.");
+                AssertForTest(!string.IsNullOrEmpty(window.ProcessPath), caseName + ": process path should not be empty.");
+                AssertForTest(!string.IsNullOrEmpty(window.ProcessName), caseName + ": process name should not be empty.");
+
+                if (!WinApi.IsWindow(window.Handle))
+                {
+                    Logger.Log($"{caseName}: window handle was already destroyed: 0x{window.Handle.ToInt64():X}");
+                    continue;
+                }
+
+                if (!WinApi.IsWindowVisible(window.Handle))
+                {
+                    Logger.Log($"{caseName}: window handle was no longer visible: 0x{window.Handle.ToInt64():X}");
+                }
+
+                string expectedProcessName = Path.GetFileNameWithoutExtension(window.ProcessPath);
+                AssertForTest(
+                    string.Equals(window.ProcessName, expectedProcessName, StringComparison.OrdinalIgnoreCase),
+                    $"{caseName}: process name should match path. actual={window.ProcessName}, expected={expectedProcessName}");
+
+                AssertForTest(
+                    handles.Add(window.Handle),
+                    $"{caseName}: duplicate window handle was returned: 0x{window.Handle.ToInt64():X}");
+            }
+        }
+
+        public static void TestApproximatePath()
+        {
+            Logger.Log("Starting ApproximatePath tests.");
+
+            AssertApproximatePathEquals(
+                "a/b/c/x.txt",
+                "a/b/c/y.txt",
+                true,
+                "same directory should be treated as equal");
+
+            AssertApproximatePathEquals(
+                "a/b/c/x.txt",
+                "a/b/y.txt",
+                true,
+                "child directory and parent directory should be treated as equal");
+
+            AssertApproximatePathEquals(
+                "a/b/y.txt",
+                "a/b/c/x.txt",
+                true,
+                "parent directory and child directory should be treated as equal");
+
+            AssertApproximatePathEquals(
+                "a/b/d/z.txt",
+                "a/b/e/w.txt",
+                false,
+                "sibling directories should not be treated as equal");
+
+            AssertApproximatePathDictionaryKey(
+                "a/b/c/x.txt",
+                "a/b/c/y.txt",
+                true,
+                "same directory should be usable as a Dictionary key");
+
+            AssertApproximatePathDictionaryKey(
+                "a/b/c/x.txt",
+                "a/b/y.txt",
+                true,
+                "child and parent directories should be usable as a Dictionary key");
+
+            AssertApproximatePathDictionaryKey(
+                "a/b/y.txt",
+                "a/b/c/x.txt",
+                true,
+                "parent and child directories should be usable as a Dictionary key");
+
+            AssertApproximatePathDictionaryKey(
+                "a/b/d/z.txt",
+                "a/b/e/w.txt",
+                false,
+                "sibling directories should not collide as a Dictionary key");
+
+            Logger.Log("ApproximatePath tests passed.");
+        }
+
+        private static void AssertApproximatePathEquals(
+            string leftPath,
+            string rightPath,
+            bool expected,
+            string message)
+        {
+            var left = new SteamAppFinder.ApproximatePath(leftPath);
+            var right = new SteamAppFinder.ApproximatePath(rightPath);
+            bool actual = left.Equals(right);
+
+            Logger.Log(
+                $"ApproximatePath.Equals: left=\"{leftPath}\", right=\"{rightPath}\", expected={expected}, actual={actual}");
+
+            AssertForTest(
+                actual == expected,
+                $"{message}: left=\"{leftPath}\", right=\"{rightPath}\", expected={expected}, actual={actual}");
+        }
+
+        private static void AssertApproximatePathDictionaryKey(
+            string storedPath,
+            string lookupPath,
+            bool expected,
+            string message)
+        {
+            var dictionary = new Dictionary<SteamAppFinder.ApproximatePath, string>();
+            dictionary[new SteamAppFinder.ApproximatePath(storedPath)] = "detected";
+
+            bool actual = dictionary.ContainsKey(new SteamAppFinder.ApproximatePath(lookupPath));
+
+            Logger.Log(
+                $"ApproximatePath Dictionary: stored=\"{storedPath}\", lookup=\"{lookupPath}\", expected={expected}, actual={actual}");
+
+            AssertForTest(
+                actual == expected,
+                $"{message}: stored=\"{storedPath}\", lookup=\"{lookupPath}\", expected={expected}, actual={actual}");
+        }
+
+        public static void TestProcessPathLookupCost(int iterationCount = 5)
+        {
+            if (iterationCount <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(iterationCount));
+            }
+
+            Process[] processes = Process.GetProcesses()
+                .OrderBy(process => process.Id)
+                .ToArray();
+
+            Logger.Log(
+                $"Starting process path lookup cost test: processes={processes.Length}, iterations={iterationCount}");
+
+            // Warm up JIT and common framework paths before measuring the full process set.
+            using (Process currentProcess = Process.GetCurrentProcess())
+            {
+                string warmupPath;
+                string warmupError;
+                TryGetProcessPathByQueryFullProcessImageName(currentProcess, out warmupPath, out warmupError);
+                TryGetProcessPathByMainModule(currentProcess, out warmupPath, out warmupError);
+            }
+
+            RunProcessPathLookupCostCase(
+                "OpenProcess + QueryFullProcessImageName",
+                processes,
+                iterationCount,
+                TryGetProcessPathByQueryFullProcessImageName);
+
+            RunProcessPathLookupCostCase(
+                "Process.MainModule.FileName",
+                processes,
+                iterationCount,
+                TryGetProcessPathByMainModule);
+
+            foreach (Process process in processes)
+            {
+                process.Dispose();
+            }
+
+            Logger.Log("Finished process path lookup cost test.");
+        }
+
+        private delegate bool TryGetProcessPathDelegate(
+            Process process,
+            out string processPath,
+            out string error);
+
+        private static void RunProcessPathLookupCostCase(
+            string caseName,
+            Process[] processes,
+            int iterationCount,
+            TryGetProcessPathDelegate tryGetProcessPath)
+        {
+            int successCount = 0;
+            int failureCount = 0;
+            long totalPathLength = 0;
+            string firstFailure = null;
+
+            TimeSpan started = Logger.GetTimestamp();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int iteration = 0; iteration < iterationCount; iteration++)
+            {
+                foreach (Process process in processes)
+                {
+                    string path;
+                    string error;
+                    if (tryGetProcessPath(process, out path, out error))
+                    {
+                        successCount++;
+                        totalPathLength += path == null ? 0 : path.Length;
+                    }
+                    else
+                    {
+                        failureCount++;
+                        if (firstFailure == null)
+                        {
+                            firstFailure = $"pid={SafeGetProcessId(process)}, error={error}";
+                        }
+                    }
+                }
+            }
+
+            stopwatch.Stop();
+
+            int attemptCount = processes.Length * iterationCount;
+            double totalMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
+            double averageMilliseconds = attemptCount == 0
+                ? 0.0
+                : totalMilliseconds / attemptCount;
+
+            Logger.LogWithTimestamp(caseName + " measured by Logger", started);
+            Logger.Log(
+                $"{caseName}: attempts={attemptCount}, success={successCount}, failure={failureCount}, " +
+                $"total={totalMilliseconds:F3} ms, avg={averageMilliseconds:F4} ms, " +
+                $"pathChars={totalPathLength}, firstFailure={firstFailure ?? "none"}");
+        }
+
+        private static bool TryGetProcessPathByQueryFullProcessImageName(
+            Process process,
+            out string processPath,
+            out string error)
+        {
+            processPath = string.Empty;
+            error = null;
+
+            IntPtr processHandle = WinApi.OpenProcess(
+                WinApi.ProcessAccessFlags.QueryLimitedInformation,
+                false,
+                SafeGetProcessId(process));
+
+            if (processHandle == IntPtr.Zero)
+            {
+                error = CreateLastWin32ErrorMessage("OpenProcess");
+                return false;
+            }
+
+            try
+            {
+                int capacity = 32768;
+                var builder = new StringBuilder(capacity);
+
+                if (!WinApi.QueryFullProcessImageName(processHandle, 0, builder, ref capacity))
+                {
+                    error = CreateLastWin32ErrorMessage("QueryFullProcessImageName");
+                    return false;
+                }
+
+                processPath = builder.ToString();
+                return !string.IsNullOrEmpty(processPath);
+            }
+            finally
+            {
+                WinApi.CloseHandle(processHandle);
+            }
+        }
+
+        private static bool TryGetProcessPathByMainModule(
+            Process process,
+            out string processPath,
+            out string error)
+        {
+            processPath = string.Empty;
+            error = null;
+
+            try
+            {
+                processPath = process.MainModule?.FileName ?? string.Empty;
+                return !string.IsNullOrEmpty(processPath);
+            }
+            catch (Exception ex)
+            {
+                error = $"{ex.GetType().Name}: {ex.Message}";
+                return false;
+            }
+        }
+
+        private static int SafeGetProcessId(Process process)
+        {
+            try
+            {
+                return process.Id;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private static string CreateLastWin32ErrorMessage(string apiName)
+        {
+            var exception = new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+            return $"{apiName} failed: {exception.Message}";
         }
 
         public static void TestClassicStunTransactionIdDictionary()
