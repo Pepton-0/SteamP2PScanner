@@ -25,7 +25,7 @@ namespace SpsLogic
         // (0 if not applicable.)
         public override bool UsingRelay { get { return (uint)mConnInfo.m_idPOPRelay != 0; } }
 
-        // TODO remove to use Stats.Name
+        // TODO remove to use Stats.Name or any managed names in ping monitor 
         private readonly string _name;
         public override string Name => _name;
 

@@ -7,16 +7,8 @@ namespace SpsLogic
 {
     public class AppConfig : INotifyPropertyChanged
     {
-        public static AppConfig Instance { get; set; }
-        private static readonly string path = "config\\app_config.json";
-
-        [JsonProperty("check_update")]
-        public bool CheckUpdate
-        {
-            get { return _checkUpdate; }
-            set { _checkUpdate = value; Save(); RaisePropertyChanged(); }
-        }
-        private bool _checkUpdate = true;
+        public static AppConfig Instance { get; private set; }
+        private static readonly string path = @"config\\app_config.json";
 
         [JsonProperty("steam_exe")]
         public string SteamExe
@@ -92,10 +84,12 @@ namespace SpsLogic
 
         public static bool LoadOrCreate()
         {
-            if (!Directory.Exists("config"))
-                Directory.CreateDirectory("config");
+            var dir = Path.GetDirectoryName(path);
 
-            if (!File.Exists($"config\\appconfig.json"))
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            if (!File.Exists(path))
             {
                 Instance = new AppConfig();
                 Instance.Save();
@@ -108,6 +102,7 @@ namespace SpsLogic
                 return false;
             }
         }
+
         public void Save()
         {
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);

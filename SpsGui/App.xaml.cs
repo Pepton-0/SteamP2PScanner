@@ -29,8 +29,11 @@ namespace SpsGui
 
             //new PingOverlayTest().Show();
             //new MainWindow().Show();
-            //new PacketScanTest().Show();
-            new SteamPacketScanTest().Show();
+            // new PacketScanTest().Show();
+            //new SteamDetectTest().Show();
+            //new SteamDetectorV2Test().Show();
+            new SteamAppFinderTest().Show();
+            //new SteamPacketScanTest().Show();
         }
     }
 }

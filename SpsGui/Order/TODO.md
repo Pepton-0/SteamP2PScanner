@@ -1,8 +1,9 @@
 # 自分のTODO
 
-SteamPeer*の実装
 overlayの根底の実装をして、codexが悩まないようにする
-steam app の検知を自動化する
+Iocにて、引数指定を伴うインスタンス作成はどうするんだ?
+
+- AppConfigなどで現在のsteam appのパスとIDを保存できる場所を作る
 
 # ユーザーが知りたい内容
 

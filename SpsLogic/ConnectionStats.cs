@@ -100,10 +100,6 @@ namespace SpsLogic
             get { lock (syncRoot) { return recentPings.ToArray(); } }
         }
 
-        /// <summary>
-        /// Used by average calculation
-        /// </summary>
-        private double Sum = 0;
         private int lossCount = 0;
         private List<double> sortedPings;
         private Queue<double> RecentPingQueue;
@@ -152,9 +148,7 @@ namespace SpsLogic
                     }
                     sortedPings.Add(value);
                     sortedPings.Sort();
-                    Sum += value;
-
-                    Avg = Sum / sortedPings.Count;
+                    Avg = RecentPings.Sum(x => x < 0 ? 0 : x) / RecentPings.Count(x => x >= 0);
                     Q1 = Percentile(sortedPings, 0.25);
                     Med = Percentile(sortedPings, 0.5);
                     Q3 = Percentile(sortedPings, 0.75);
