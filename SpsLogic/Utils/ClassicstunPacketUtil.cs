@@ -68,7 +68,7 @@ namespace SpsLogic.Utils
             }
 #else
             isRequestPacket = messageType == 0x0000;
-            isresponsePacket = messageType == 0x0100;
+            isResponsePacket = messageType == 0x0100;
 
             if (!IsDebugClassicStunMessageType(messageType))
             {

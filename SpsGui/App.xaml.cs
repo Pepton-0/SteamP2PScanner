@@ -1,3 +1,5 @@
+﻿#define MVVM_APP
+
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using SpsGui.Behaviors;
@@ -25,31 +27,34 @@ namespace SpsGui
             Logger.DebugLog("Hello world!");
 
             // Prepare MVVM application
+#if MVVM_APP
             Ioc.Default.ConfigureServices(new ServiceCollection()
                 .AddSingleton<IConductor, Conductor>()
                 .AddSingleton<ISteamAppFinder, SteamAppFinder>()
                 .AddSingleton<IPacketScan, PacketScan>()
                 .AddTransient<CoreWindowViewModel>()
                 .BuildServiceProvider());
-
+#else
             //new PingOverlayTest().Show();
             //new MainWindow().Show();
             // new PacketScanTest().Show();
             //new SteamDetectTest().Show();
             //new SteamDetectorV2Test().Show();
             // new SteamAppFinderTest().Show();
-            //new SteamPacketScanTest().Show();
+            new SteamPacketScanTest().Show();
+#endif
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
+#if MVVM_APP
             Ioc.Default.GetRequiredService<IConductor>();
 
             var window = new CoreWindow();
             MainWindow = window;
             window.Show();
+#endif
         }
     }
 }

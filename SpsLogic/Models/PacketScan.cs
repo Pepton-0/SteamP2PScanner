@@ -232,6 +232,15 @@ namespace SpsLogic
         private readonly double PatienceLimitMs;
 
         /// <summary>
+        /// Creates a packet scanner using the patience limit configured by <see cref="AppConfig"/>.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when packet capture devices cannot be opened.</exception>
+        public PacketScan()
+            : this(AppConfig.PacketPatienceLimitMs)
+        {
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="patienceLimitMs">After this time passed 
@@ -247,7 +256,7 @@ namespace SpsLogic
             Stopwatch = new Stopwatch();
             Stopwatch.Start();
             var l0 = Logger.GetTimestamp();
-            Logger.DebugLog("Setting up network device listener");
+            Logger.Log("Setting up network device listener", true);
 
             var devCandis = LibPcapLiveDeviceList.Instance;
             if(devCandis.Count <= 0)
@@ -316,8 +325,6 @@ namespace SpsLogic
                 {
                     history.Archive.AddCapture(raw);
 
-                    // TODO Detects classicstun protocol and
-                    // if its send from me or receive from opponent.
                     if (ClassicStunPacketUtil.TryGetClassicStunTransactionId(
                         packet,
                         out ClassicStunTransactionId id,
@@ -415,6 +422,7 @@ namespace SpsLogic
 
         public void Dispose()
         {
+            Logger.Log("Dispose network device listener", true);
             lock (Registries)
             {
                 foreach (var device in _devices)

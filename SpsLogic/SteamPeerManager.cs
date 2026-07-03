@@ -27,6 +27,7 @@ namespace SpsLogic
 
         private static readonly Regex STEAMID3_REGEX = new Regex(@"\[U:1:(?<id>\d+)\]", RegexOptions.Compiled);
         private const long STEAMID64_BASE = 0x0110_0001_0000_0000;
+        private static bool SteamApiInitialized = false;
 
         private static readonly Func<CSteamID, IPacketScan, SteamPeerBase>[] PEER_FACTORIES =
             Assembly.GetExecutingAssembly()
@@ -42,6 +43,11 @@ namespace SpsLogic
 
         public SteamPeerManager(IPacketScan packetScan, string gameProcessName)
         {
+            if (!SteamApiInitialized)
+            {
+                throw new InvalidOperationException("Call InitializeSteamApi() first");
+            }
+
             this.PacketScan = packetScan;
             this.GameProcessName = gameProcessName;
             sw = new Stopwatch();
@@ -51,6 +57,58 @@ namespace SpsLogic
             fsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
             fsWatcher.Changed += (e, s) => mustReopenLog = true;
             fsWatcher.EnableRaisingEvents = true;
+        }
+
+        /// <summary>
+        /// Initializes Steamworks.NET once for Steam peer inspection.
+        /// </summary>
+        public static void InitializeSteamApi(SteamAppInfo info)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+
+            if (SteamApiInitialized)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(info.SteamAppId))
+            {
+                throw new ArgumentException("SteamAppId is required.", nameof(info));
+            }
+
+            Environment.SetEnvironmentVariable("SteamAppId", info.SteamAppId);
+
+            if (!SteamAPI.IsSteamRunning())
+            {
+                throw new InvalidOperationException("Steam is not running.");
+            }
+
+            if (!SteamAPI.Init())
+            {
+                throw new InvalidOperationException("SteamAPI.Init returned false.");
+            }
+
+            Logger.Log("Initialized steam api");
+
+            SteamApiInitialized = true;
+        }
+
+        /// <summary>
+        /// Shuts down Steamworks.NET if this manager initialized it.
+        /// </summary>
+        public static void ShutdownSteamApi()
+        {
+            if (!SteamApiInitialized)
+            {
+                return;
+            }
+
+            SteamAPI.Shutdown();
+            SteamApiInitialized = false;
+            Logger.Log("Shutdown steam api");
         }
 
         /// <summary>
@@ -102,7 +160,6 @@ namespace SpsLogic
 
         public async void UpdatePeerList()
         {
-            Logger.DebugLog("Updating peer list");
             // Make sure we're constantly writing to the IPC log to force Steam to eventually flush
             // This call was chosen because it's not something a game will call often
             // Thus we avoid blowing up the IPC log with dummy calls
@@ -137,9 +194,6 @@ namespace SpsLogic
             while (!mustReopenLog)
             {
                 string line = await sr.ReadLineAsync();
-
-                if (!string.IsNullOrEmpty(line))
-                    Logger.DebugLog("read a line: " + line);
 
                 // ログの終端に到達したら終了
                 if (line == null)

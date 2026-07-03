@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -15,8 +16,8 @@ namespace SpsGui.Views.Controls
         /// Samples dependency property.
         /// </summary>
         public static readonly DependencyProperty SamplesProperty =
-            DependencyProperty.Register(nameof(Samples), typeof(double[]), typeof(BarChartControl),
-                new FrameworkPropertyMetadata(new double[0], FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register(nameof(Samples), typeof(IEnumerable), typeof(BarChartControl),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
         /// <summary>
         /// Average dependency property.
@@ -49,9 +50,9 @@ namespace SpsGui.Views.Controls
         /// <summary>
         /// Gets or sets ping samples. Negative values are rendered as packet loss bars.
         /// </summary>
-        public double[] Samples
+        public IEnumerable Samples
         {
-            get { return (double[])GetValue(SamplesProperty); }
+            get { return (IEnumerable)GetValue(SamplesProperty); }
             set { SetValue(SamplesProperty, value); }
         }
 
@@ -99,7 +100,9 @@ namespace SpsGui.Views.Controls
         {
             base.OnRender(drawingContext);
 
-            double[] samples = Samples ?? new double[0];
+            double[] samples = Samples == null
+                ? new double[0]
+                : Samples.Cast<object>().Select(Convert.ToDouble).ToArray();
             double width = ActualWidth;
             double height = ActualHeight;
             if (width <= 0 || height <= 0 || samples.Length == 0)
