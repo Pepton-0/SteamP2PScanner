@@ -1,59 +1,94 @@
 # 自分のTODO
 
 overlayの根底の実装をして、codexが悩まないようにする
+- Mvvmを想定して、コードビハインドはBehaviorに代替する
+
 Iocにて、引数指定を伴うインスタンス作成はどうするんだ?
 
-- AppConfigなどで現在のsteam appのパスとIDを保存できる場所を作る
+パケロス表示は小数第一位まで
+p2p開始直後のclassicstunはパケロスが大きくなることが当然なので、2秒経過するまではそのパケロス判定を無視する
+(PlayerPingHistory.Update()におけるPushPing(-1)をしなくする)
 
 # ユーザーが知りたい内容
 
 1. 相手とのping(avg, 四分位数)/packet loss
 	1. SteamP2PInfoだと対戦終了後は記録が無くなってしまうが、今回ではテーブルに保存し、アプリ起動中はいつでも参照できるようにしたい
 	2. ユーザーが望んだ場合キャプチャしたパケットを出力し、いつでも証拠して利用できるようにする
-２. 客観的なサーバーとのping/packet lossをし、1での劣悪な状態が自分によるものなのか相手によるものか区別出来るようにする
+２. 客観的なサーバーとのping/packet lossをモニタし、1での劣悪な状態が自分によるものなのか相手によるものか区別出来るようにする
 
 # 実装方法
 
 WinAutoTyperが雛形になるので、それを良く熟読し、それに準拠した構造になるようにせよ
-なお、IConfigServiceやILogServiceはこちらにはなく、AppConfigやLoggerを使用することにせよ
+なお、IConfigServiceやILogServiceはこちらにはなく、AppConfig/GameConfigやLoggerを使用することにせよ
 
 SpsLogic/ 実際行う内部処理の定義. ここをCodexが触る場合は基本的に開発者からの許可を得なければならない
+		SpsLogic/Models/... ここについては加えて、SpsGui/Modelと同じく内部処理を統括するもので、DependencyInjectionによる起動を前提とする。
 SpsGui/Model SpsLogicの各処理とやり取りを行う場所。内部処理を統括する
-SpsGui/Views 表示されるGuiパーツを置く場所。Views/直下にはWindowを書き、Views/Controls/にはUserControlを書く。Data Drive的に後述のViewModelから渡された情報をGuiに表現する
+SpsGui/Views 表示されるGuiパーツを置く場所。Views/直下にはWindowを書き、Views/Controls/にはUserControlを書く。Data Drive的に後述のViewModelから渡された情報をGuiに表現する。Controlsでは、MVVMから若干逸脱し、Behaviorに依存せずコードビハインドを書いて構わない。
 SpsGui/ViewModels は、ViewとModelの橋渡しをするViewModelを置く
 SpsGui/Behaviorには、WinAutoTyperと同じくBehaviorを置く。ViewはData Driven的にしか動けないので、どうしてもコードビハインドが必要な処理はこちらにて行う。
 SpsGui/Resourcesには、StaticResourceや音、絵などのリソース系を置く。i18nされうる文字列は全てこちらに置く
 
 # 各種UIの説明
 
+SpsGui/View/Controls/BoxPlotControl
+	テストコードのbox plotを参考に、四分位数・最小値・最大値をバインディングされた場合以下の描画を行うこと。
+	特に指定がない場合白色の線により描画すること。
+	数値部分とグラフ部分が上下に分かれている。数値部分について、0を左端とし、最大値を右端とする。グラフ部分についても、0に当たる部分は左端、最大値に当たる部分を右端とおく。
+	あとは他パーツをテストコードと同じように描画してよい。
+	背景は一切描画しないままの透明とする。
+	なお、UIサイズの拡大縮小に対応して、以下を行う。
+	グラフ部分の高さは固定でよい。グラフ部分の長さはUIサイズ一杯占められるように最大限大きくなれるようにする。
+	数値部分について、0を左端、最大値右端とし、最小値と四分位数は中央に羅列して表示するように。Min:x/Q1:y/Med:z/Q3:w といった感じ。
+	フォントサイズはUIの高さに合わせて可変である。
+	数値部分とグラフ部分の間は空くと想定され、数値部分は上詰め、グラフ部分は下詰めで描画される。
+	Med:zとグラフ部分の中央値は黄色く描画すること。
+
+SpsGui/View/Controls/BarChartControl
+	テストコードのbar viewを参考に、double配列と平均値をバインディングされた場合以下の描写を行うこと。
+	特に指定がない場合白色で描画すること。
+	背景は一切描写しないままの透明とする。
+	横軸は0から配列の最大値まで。
+	横軸の線の描画は0と最大値、平均値。平均値だけは緑色。
+	0と最大値に限りグラフの右隣のそれぞれ右下と右上に数値を描画する。
+	0未満のpingはパケロスと認識し、赤い棒を描画すること。
+	Controlのサイズに合わせてUIの各パーツが拡大縮小できるようにすること。単なるアップスケーリングでは不自然なので、パーツ単位で自然な形に他のパーツと干渉しないよう調整すること。
+
 SpsGui/Views/CoreWindow
 - タイトルバー
 	- 左端にアプリ名とバージョンを記入。
 	- 右端からは簡易的なコマンドボタン/テキストを羅列させる場所。今のところは適当なテキストを複数並べておけば問題ない。
 - 初期画面(指定タイミングでのみ表示。別のUserControlにて定義)
-	- AppConfig.SteamExeを設定できる項目。アプリ起動時にしかSteamExeは使用されない(アプリ起動中の他のタイミングでは変更できない)ので、この時点でのみ設定できれば良い。
-	- Steamアプリ検知ボタン。初期画面の下側に配置して、初期画面の他の設定項目が完了したのちに触るものであることを分かりやすくする。これが入力されたとき、具体的な実装は後回しにしてとりあえず初期画面の代わりに次のプロファイリング画面を引数armoredcore6と1888160と共に呼んで表示せよ。
+	- 上半分(レイアウト的にはこれだが、実際のサイズはもっと小さくなるはず): AppConfig.SteamExeを設定できる項目。アプリ起動時にしかSteamExeは使用されない(アプリ起動中の他のタイミングでは変更できない)ので、この時点でのみ設定できれば良い。
+	- 下半分のうち左側: 
+	- 下半分のうち右側: 
 - プロファイリング画面(指定タイミングでのみ表示。別のUserControlにて定義)
     - タブによって以下を表示切替できる
-		- 現在のping
-		- 過去のping
-		- コンフィグ(exclude appconfig.steamexe)
+		- 現在のpingモニタ
+		- 過去のpingモニタ
+		- コンフィグ(exclude appconfig.steamexe)。
+	- コンフィグ:
+		- AppConfigとGameConfigの各種内容について、起動時の処理順序の0.2.に限り変更できるようにする。また、AppConfigのsteam exe のパスと、gameconfigのregisretedgamesはここでいじる対象ではない。
+		- 名前と内容の2列に分かれ、名前を0列の左詰めにし、内容を1列の右詰めにする。
+		- 名前は変数名直接ではなく、i18nされうる専用の物を設定すること。
+		- boolはトグルボタンで表現する
 
 SpsGui/Views/OverlayWindow
 
 # 起動時の処理順序
 
-1. 0. 各種staticなクラス
+0. 各種staticなクラス
 	1. Logger: ログ出力は全てこちらを中継するように。
 	   デバッグ用にのみ通知してほしい内容や、恐らく高頻度になり普段から読むのは邪魔になりそうなものはLogger.DebugLogを活用せよ
 	   Logger.Log(msg,true)は、ユーザーにも見て欲しいものにのみ使ってよい。例えば、アプリが不具合などで中断する可能性のある処理に対し、アプリ側が認知していることを通知するため。そのログを元にユーザーが私にバグ報告を行うことを想定している
 	   Logger.DebugLog(msg,true)はデバッグ用コンパイルかつファイル出力を態々行う特殊なシーンのため一応残しているが、ひょっとしたら使わないかもしれない
-2. App起動
+	2. AppConfig/GameConfig。用途はその中身やTestコードから推察せよ。Newtonsoft.Jsonでシリアライズされうる項目が、実際にUI上でも表示して変更可能にしてよい項目である。
+1. App起動
 	1. DependencyInjectionのセットアップ
-	2. StringResourcesを、WinAutoTyperのConductorがやっているようにローカルごとに読み込んでみる
+	2. ConductorではStringResourcesを、WinAutoTyperのConductorがやっているようにローカルごとに読み込んでみる
 	   無いならスキップすることで、App.xamlに指定されたデフォルトのen-usが読み込まれる
 	   en-usには単なるi18nだけでなく、絵などのリソースを登録してキーから参照できるようにしてよい
 	   UIに共通するデザインや色合いもこちらに登録してよい
-3. CoreWindow初期画面表示
-4. CoreWindowプロファイリング画面表示が要求されたとき、それを表示
-	1.
+2. CoreWindow初期画面表示
+3. CoreWindowプロファイリング画面表示が要求されたとき、それを表示
+	1. 

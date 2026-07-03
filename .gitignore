@@ -364,3 +364,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /_codex_build
+/SpsGui/Order/rules.md
+/SpsGui/Order/TODO.md
