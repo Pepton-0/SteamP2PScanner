@@ -79,8 +79,8 @@
     <Compile Include="DnsPing.cs" />
     <Compile Include="GameConfig.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="PacketScan.cs" />
-    <Compile Include="SteamAppFinder.cs" />
+    <Compile Include="Models\PacketScan.cs" />
+    <Compile Include="Models\SteamAppFinder.cs" />
     <Compile Include="SteamPeerBase.cs" />
     <Compile Include="SteamPeerInfo.cs" />
     <Compile Include="SteamPeerManager.cs" />

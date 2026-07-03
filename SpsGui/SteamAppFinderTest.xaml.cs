@@ -58,7 +58,7 @@ namespace SpsGui
 
             try
             {
-                SteamAppFinder.WindowInfo[] windows = GetVisibleWindows();
+                WindowInfo[] windows = GetVisibleWindows();
                 var windowDialog = new WindowSelectDialogTest(windows)
                 {
                     Owner = this
@@ -70,7 +70,7 @@ namespace SpsGui
                     return;
                 }
 
-                SteamAppFinder.WindowInfo selectedWindow = windowDialog.SelectedWindow;
+                WindowInfo selectedWindow = windowDialog.SelectedWindow;
                 string initialSteamAppId = FindDetectedSteamAppId(selectedWindow);
 
                 var appIdDialog = new SteamAppIdSelectDialogTest(selectedWindow, initialSteamAppId)
@@ -123,13 +123,13 @@ namespace SpsGui
         {
             try
             {
-                SteamAppFinder.SteamAppInfo[] apps = finder.GetSteamProcesses();
+                SteamAppInfo[] apps = finder.GetSteamProcesses();
 
                 isRefreshingCandidates = true;
                 try
                 {
                     CandidateRows.Clear();
-                    foreach (SteamAppFinder.SteamAppInfo app in apps
+                    foreach (SteamAppInfo app in apps
                         .Where(app => app.IsVisible)
                         .OrderBy(app => FormatWindowName(app.Info)))
                     {
@@ -144,7 +144,7 @@ namespace SpsGui
                 }
 
                 HiddenRows.Clear();
-                foreach (SteamAppFinder.SteamAppInfo app in apps
+                foreach (SteamAppInfo app in apps
                     .Where(app => !app.IsVisible)
                     .OrderBy(app => FormatWindowName(app.Info)))
                 {
@@ -185,7 +185,7 @@ namespace SpsGui
                 return;
             }
 
-            SteamAppFinder.SteamAppInfo app = selectedCandidateRow.App;
+            SteamAppInfo app = selectedCandidateRow.App;
             AppendLog(
                 $"Auto monitor selected: hwnd=0x{app.Info.Handle.ToInt64():X}, " +
                 $"pid={app.Info.ProcessId}, steamAppId={app.SteamAppId}, " +
@@ -286,14 +286,14 @@ namespace SpsGui
             return text.Substring(0, maxLength - 3) + "...";
         }
 
-        private SteamAppFinder.WindowInfo[] GetVisibleWindows()
+        private WindowInfo[] GetVisibleWindows()
         {
-            var windows = new System.Collections.Generic.List<SteamAppFinder.WindowInfo>();
+            var windows = new System.Collections.Generic.List<WindowInfo>();
             finder.EnumWindows(windows.Add);
             return windows.ToArray();
         }
 
-        private string FindDetectedSteamAppId(SteamAppFinder.WindowInfo selectedWindow)
+        private string FindDetectedSteamAppId(WindowInfo selectedWindow)
         {
             if (selectedWindow == null)
             {
@@ -302,8 +302,8 @@ namespace SpsGui
 
             try
             {
-                SteamAppFinder.SteamAppInfo[] apps = finder.GetSteamProcesses();
-                SteamAppFinder.SteamAppInfo matchedApp = apps.FirstOrDefault(app =>
+                SteamAppInfo[] apps = finder.GetSteamProcesses();
+                SteamAppInfo matchedApp = apps.FirstOrDefault(app =>
                     app.Info != null &&
                     (app.Info.Handle == selectedWindow.Handle ||
                      app.Info.ProcessId == selectedWindow.ProcessId ||
@@ -328,7 +328,7 @@ namespace SpsGui
             LogTextBox.ScrollToEnd();
         }
 
-        internal static string FormatWindowName(SteamAppFinder.WindowInfo window)
+        internal static string FormatWindowName(WindowInfo window)
         {
             if (window == null)
             {
@@ -356,12 +356,12 @@ namespace SpsGui
 
     public sealed class SteamAppFinderRow
     {
-        public SteamAppFinderRow(SteamAppFinder.SteamAppInfo app)
+        public SteamAppFinderRow(SteamAppInfo app)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
         }
 
-        public SteamAppFinder.SteamAppInfo App { get; private set; }
+        public SteamAppInfo App { get; private set; }
 
         public string Name
         {

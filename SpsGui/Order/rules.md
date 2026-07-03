@@ -46,6 +46,8 @@ Mvvmの雛形として、C:\Users\Kent2\Desktop\MyProgram\WPF\WinAutoTyper\を読み取りで
 # UI設計のルール
 
 MetroUIをライブラリとして使用可能です。
+App.xamlのResourceDictionaryにてMetroUIの各コンポーネントのデザイン設定を適応しています。
+通常のUIの代わりに、極力MetroUIを使用してください。
 https://mahapps.com/docs/guides/quick-start
 に始まるサイトで使用方法が書かれています。
 各UIコンポーネントを極力これに依存するように設計し、デザインの統一化を計ってください。

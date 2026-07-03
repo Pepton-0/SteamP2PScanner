@@ -9,6 +9,21 @@ Iocにて、引数指定を伴うインスタンス作成はどうするんだ?
 p2p開始直後のclassicstunはパケロスが大きくなることが当然なので、2秒経過するまではそのパケロス判定を無視する
 (PlayerPingHistory.Update()におけるPushPing(-1)をしなくする)
 
+## 調整内容
+
+SteamP2PInfoのMainWindowと同じく、実際のタイトルバーは消して仮想的なタイトルバーだけにしましょう
+仮想タイトルバーに、縮小や拡大や×ボタンも用意しておきましょう。
+恐らくMetroUIに簡易的な実装手段が用意されているので、SteamP2PInfo/MainWindowをよくよみましょう
+Steam executableのAPPLYボタンは必要ありません。
+フォーマットが正しいときに 限り自動で適応できるようにしましょう
+Auto Detected...のテキストも必要ありません
+REFRESHも必要ありません。
+AUTOMATIC DETECTIONにて、steam app idとハンドルの列は必要ありません
+SELECT WINDOWにて、TITLEとPATH以外は見せなくてよいです
+CoreWindowのConfigにて、Show log directoryは必要ありません
+Show box plotのトグルボタンについて、これではなくて、押したら左右に円がうごく 
+パーツがMetroUIで用意されているはずです。
+
 # ユーザーが知りたい内容
 
 1. 相手とのping(avg, 四分位数)/packet loss
@@ -30,6 +45,12 @@ SpsGui/Behaviorには、WinAutoTyperと同じくBehaviorを置く。ViewはData Driven的にし
 SpsGui/Resourcesには、StaticResourceや音、絵などのリソース系を置く。i18nされうる文字列は全てこちらに置く
 
 # 各種UIの説明
+
+基本的に以下で振れられていないUIは極力追加しないこと。
+余計な情報が増えるのはユーザー体験的にストレスであるため。
+私からの指摘があるならば追加してよい。
+各説明についてはViewとViewModel両方含んでいるし、ものによってはBehaviorで実装したほうがいいものがある。
+適宜分割して実装するように。
 
 SpsGui/View/Controls/BoxPlotControl
 	テストコードのbox plotを参考に、四分位数・最小値・最大値をバインディングされた場合以下の描画を行うこと。
@@ -61,8 +82,21 @@ SpsGui/Views/CoreWindow
 - 初期画面(指定タイミングでのみ表示。別のUserControlにて定義)
 	- 上半分(レイアウト的にはこれだが、実際のサイズはもっと小さくなるはず): AppConfig.SteamExeを設定できる項目。アプリ起動時にしかSteamExeは使用されない(アプリ起動中の他のタイミングでは変更できない)ので、この時点でのみ設定できれば良い。
 	- 下半分のうち左側: 
+		- マニュアルでSteamアプリを検知するボタン。
+		- 押されたとき、SteamAppFinder.EnumWindowsの一覧を元にWindowSelectDialogを開く。
+		- 何かを選択されたら、GameConfig.RegisteredGamesにてSteamAppIdがすでに登録されているか確認し、されていなかったらSteamAppIdDialogを開く。
+		- されていたらプロファイリング画面へ移行する。
+		- SteamAppIdDialogでidが認識出来たら、GameConfig.RegisteredGamesにパスとidを登録してプロファイリング画面へ移行する。
 	- 下半分のうち右側: 
-- プロファイリング画面(指定タイミングでのみ表示。別のUserControlにて定義)
+		- steam app idを所有するアプリを自動検知する欄。上側に一覧、下側にボタンを配置する。
+		- 一覧では、SteamAppFinder.GetSteamProcesses()で取得されたウィンドウのタイトルを表示する。1秒ごとにGetSteamProcess()を呼び更新する。
+		- 一覧のテキストは選択可能であり、以前選択したものはhwndが同一なら次の更新でも選択状態を維持する。
+		- 一覧に出てきた項目が1つだけなら、自動でそれを選択する。
+		- 一覧で選択されたものがある時、それをボタンの内容に反映させる…つまるところMonitor XXXなどのようにする。
+		- 一覧で選択されたものがない時、ボタンはNothing detectedとなり、操作不可となる。
+		- ボタンが押されたとき、GameConfig.RegisteredGamesにてパスとidが未登録なら登録して、プロファイリング画面へ移行する。
+		- SteamAppInfo.IsVisible==falseのものは、自動検出の一覧に表示しないようにする。
+- プロファイリング画面(指定タイミングでのみ表示。別のUserControlにて定義, 少なくともSteamAppInfoをConstructorの引数として持つ)
     - タブによって以下を表示切替できる
 		- 現在のpingモニタ
 		- 過去のpingモニタ
@@ -71,7 +105,20 @@ SpsGui/Views/CoreWindow
 		- AppConfigとGameConfigの各種内容について、起動時の処理順序の0.2.に限り変更できるようにする。また、AppConfigのsteam exe のパスと、gameconfigのregisretedgamesはここでいじる対象ではない。
 		- 名前と内容の2列に分かれ、名前を0列の左詰めにし、内容を1列の右詰めにする。
 		- 名前は変数名直接ではなく、i18nされうる専用の物を設定すること。
-		- boolはトグルボタンで表現する
+		- boolはトグルボタンで表現する。
+    - 現在のpingモニタ
+		- 今は未実装でよい
+		- とりあえずSteamAppInfoの中身をデバッグ的に表示するように。
+	- 過去のpingモニタ
+		- 今は未実装でよい
+
+
+SpsGui/Views/WindowSelectDialog : MetroWindow
+	SteamP2PInfoのWindowSelectDialogを参考にしてよい。
+
+SpsGui/Views/SteamAppIdDialog: MetroWindow
+	Steam app idの入力の旨のテキストと、実際のテキスト入力欄、テキスト入力がフォーマットに従わない時に表示するための警告テキスト、OKボタン。
+	あとはWindowSelectDialogと変わらない。
 
 SpsGui/Views/OverlayWindow
 

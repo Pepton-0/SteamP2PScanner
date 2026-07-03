@@ -1,14 +1,14 @@
-<mah:MetroWindow x:Class="SpsGui.WindowSelectDialogTest"
+<mah:MetroWindow x:Class="SpsGui.Views.WindowSelectDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 Title="Select Window"
+                 Title="{StaticResource WindowSelectTitle}"
                  Width="840"
                  Height="560"
                  MinWidth="720"
                  MinHeight="460"
                  WindowStartupLocation="CenterOwner"
-                 GlowBrush="#2F6FED">
+                 GlowBrush="#C53A4C">
     <Grid Margin="14">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -25,11 +25,7 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Title" Width="340" DisplayMemberBinding="{Binding Title}" />
-                    <GridViewColumn Header="Process" Width="150" DisplayMemberBinding="{Binding ProcessName}" />
-                    <GridViewColumn Header="PID" Width="80" DisplayMemberBinding="{Binding ProcessId}" />
-                    <GridViewColumn Header="Path" Width="360" DisplayMemberBinding="{Binding ProcessPath}" />
-                    <GridViewColumn Header="Thread" Width="80" DisplayMemberBinding="{Binding ThreadId}" />
-                    <GridViewColumn Header="HWND" Width="140" DisplayMemberBinding="{Binding HandleText}" />
+                    <GridViewColumn Header="Path" Width="520" DisplayMemberBinding="{Binding ProcessPath}" />
                 </GridView>
             </ListView.View>
         </ListView>
@@ -42,15 +38,15 @@
 
             <TextBlock Grid.Column="0"
                        Text="{Binding SelectionStatus}"
-                       Foreground="#57606A"
+                       Foreground="#C8C8C8"
                        VerticalAlignment="Center"
                        Margin="0,0,12,0"
                        TextTrimming="CharacterEllipsis"
                        TextWrapping="NoWrap" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Cancel" Width="92" Margin="0,0,8,0" Click="CancelButton_Click" />
+                <Button Content="{StaticResource CancelButton}" Width="92" Margin="0,0,8,0" Click="CancelButton_Click" />
                 <Button x:Name="OkButton"
-                        Content="OK"
+                        Content="{StaticResource OkButton}"
                         Width="92"
                         IsDefault="True"
                         IsEnabled="False"

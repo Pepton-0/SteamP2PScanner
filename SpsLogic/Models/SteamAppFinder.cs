@@ -14,9 +14,43 @@ namespace SpsLogic
 {
     public interface ISteamAppFinder
     {
-        void EnumWindows(Action<SteamAppFinder.WindowInfo> callback);
+        void EnumWindows(Action<WindowInfo> callback);
 
-        SteamAppFinder.SteamAppInfo[] GetSteamProcesses();
+        SteamAppInfo[] GetSteamProcesses();
+    }
+
+    public class WindowInfo
+    {
+        public readonly IntPtr Handle;
+        public readonly string Title;
+        public readonly string ProcessName;
+        public readonly string ProcessPath;
+        public readonly uint ProcessId;
+        public readonly uint ThreadId;
+
+        public WindowInfo(IntPtr handle, string title, string processName, string processPath, uint processId, uint threadId)
+        {
+            Handle = handle;
+            Title = title;
+            ProcessName = processName;
+            ProcessPath = processPath;
+            ProcessId = processId;
+            ThreadId = threadId;
+        }
+    }
+
+    public class SteamAppInfo
+    {
+        public readonly WindowInfo Info;
+        public string SteamAppId;
+        public readonly bool IsVisible;
+
+        public SteamAppInfo(WindowInfo info, string steamAppId, bool isVisible)
+        {
+            Info = info;
+            SteamAppId = steamAppId;
+            this.IsVisible = isVisible;
+        }
     }
 
     public class SteamAppFinder : ISteamAppFinder
@@ -76,40 +110,6 @@ namespace SpsLogic
                 }
 
                 return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            }
-        }
-
-        public class WindowInfo
-        {
-            public readonly IntPtr Handle;
-            public readonly string Title;
-            public readonly string ProcessName;
-            public readonly string ProcessPath;
-            public readonly uint ProcessId;
-            public readonly uint ThreadId;
-
-            public WindowInfo(IntPtr handle, string title, string processName, string processPath, uint processId, uint threadId)
-            {
-                Handle = handle;
-                Title = title;
-                ProcessName = processName;
-                ProcessPath = processPath;
-                ProcessId = processId;
-                ThreadId = threadId;
-            }
-        }
-
-        public class SteamAppInfo
-        {
-            public readonly WindowInfo Info;
-            public string SteamAppId;
-            public readonly bool IsVisible;
-
-            public SteamAppInfo(WindowInfo info, string steamAppId, bool isVisible)
-            {
-                Info = info;
-                SteamAppId = steamAppId;
-                this.IsVisible = isVisible;
             }
         }
 
@@ -406,6 +406,8 @@ namespace SpsLogic
                 }
 
                 var pHandle = WinApi.OpenProcess(WinApi.ProcessAccessFlags.QueryLimitedInformation, false, (int)processId);
+                string processPath = null;
+                string processName = null;
                 try
                 {
                     if (pHandle != IntPtr.Zero)
@@ -417,24 +419,13 @@ namespace SpsLogic
                             return true;
                         }
 
-                        var processPath = imgBuilder.ToString();
+                        processPath = imgBuilder.ToString();
                         if (string.IsNullOrEmpty(processPath))
                         {
                             return true;
                         }
 
-                        var processName = Path.GetFileNameWithoutExtension(processPath);
-
-                        WindowInfo wInfo = new WindowInfo(
-                            hWnd,
-                            builder.ToString(),
-                            processName,
-                            processPath,
-                            processId,
-                            threadId
-                            );
-
-                        func.Invoke(wInfo);
+                        processName = Path.GetFileNameWithoutExtension(processPath);
                     }
                 }
                 finally
@@ -445,12 +436,26 @@ namespace SpsLogic
                     }
                 }
 
+                if (processName != null && processPath != null)
+                {
+                    WindowInfo wInfo = new WindowInfo(
+                        hWnd,
+                        builder.ToString(),
+                        processName,
+                        processPath,
+                        processId,
+                        threadId
+                        );
+
+                    func.Invoke(wInfo);
+                }
+
                 return true;
             }, 0);
         }
 
         /// <summary>
-        /// List up all the processes and its steam app ids which.
+        /// List up all the processes and its steam app ids.
         /// Call this frequently ( ex. per 1 sec) to detect a temporal launcher which has steam app id envrionment variable.
         /// </summary>
         /// <returns></returns>
@@ -480,11 +485,14 @@ namespace SpsLogic
                     }
                     else
                     { // if the path exe still doesn't have steam app id envrionment var yet
+                        //TODO なんかめちゃくちゃ重い
                         ProcessEnvironmentReader
                         .TryReadEnvironmentVariables(
                             (int)w.ProcessId,
                             out var variables,
                             out var err);
+                        /*var variables = new Dictionary<string, string>();
+                        variables.Add(SteamAppIdVariableName, "114514");*/
 
                         if (variables.TryGetValue(SteamAppIdVariableName, out var steamAppId1))
                         {

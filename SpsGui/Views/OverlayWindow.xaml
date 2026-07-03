@@ -1,0 +1,18 @@
+<mah:MetroWindow x:Class="SpsGui.Views.OverlayWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 Title="SteamP2PScanner Overlay"
+                 Width="360"
+                 Height="160"
+                 ResizeMode="CanResizeWithGrip"
+                 Topmost="True"
+                 ShowInTaskbar="False"
+                 WindowStartupLocation="Manual"
+                 GlowBrush="#C53A4C">
+    <Grid Margin="12">
+        <TextBlock Text="{StaticResource OverlayPlaceholder}"
+                   Foreground="#C8C8C8"
+                   TextWrapping="Wrap" />
+    </Grid>
+</mah:MetroWindow>
