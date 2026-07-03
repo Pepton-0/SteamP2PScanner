@@ -7,9 +7,26 @@ namespace SpsLogic
 {
     public class AppConfig : INotifyPropertyChanged
     {
+        private const double DefaultPacketPatienceLimitMs = 3000;
+
         public static AppConfig Instance { get; private set; }
+
+        /// <summary>
+        /// Gets the packet loss patience limit used by the default packet scanner constructor.
+        /// </summary>
+        public static double PacketPatienceLimitMs
+        {
+            get
+            {
+                return Instance == null
+                    ? DefaultPacketPatienceLimitMs
+                    : Instance.PacketPatienceMs;
+            }
+        }
+
         private static readonly string path = @"config\\app_config.json";
 
+        #region steam exe and related paths
         [JsonProperty("steam_exe")]
         public string SteamExe
         {
@@ -68,6 +85,7 @@ namespace SpsLogic
             set { _steamBootstrapLogPath = value; RaisePropertyChanged(); }
         }
         private string _steamBootstrapLogPath = "C:\\Program Files (x86)\\Steam\\logs\\bootstrap_log.txt";
+        #endregion
 
         [JsonProperty("show_boxplot")]
         public bool ShowBoxPlot
@@ -81,6 +99,37 @@ namespace SpsLogic
             }
         }
         private bool _showBoxPlot = true;
+
+        [JsonProperty("dns_ip")]
+        public string DnsIp
+        {
+            get { return _dnsIp; }
+            set
+            {
+                _dnsIp = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private string _dnsIp = "8.8.8.8";
+
+        [JsonProperty("packet_patience_ms")]
+        public double PacketPatienceMs
+        {
+            get { return _packetPatienceMs; }
+            set
+            {
+                if (value <= 0)
+                {
+                    return;
+                }
+
+                _packetPatienceMs = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private double _packetPatienceMs = DefaultPacketPatienceLimitMs;
 
         static AppConfig()
         {

@@ -1,9 +1,7 @@
-# Ž©•ª‚ÌTODO
+# Ž©•ª‚ÌTODO(Codex‚Í“Ç‚Ü‚È‚­‚Ä‚æ‚¢)
 
 overlay‚Ìª’ê‚ÌŽÀ‘•‚ð‚µ‚ÄAcodex‚ª”Y‚Ü‚È‚¢‚æ‚¤‚É‚·‚é
 - Mvvm‚ð‘z’è‚µ‚ÄAƒR[ƒhƒrƒnƒCƒ“ƒh‚ÍBehavior‚É‘ã‘Ö‚·‚é
-
-Ioc‚É‚ÄAˆø”Žw’è‚ð”º‚¤ƒCƒ“ƒXƒ^ƒ“ƒXì¬‚Í‚Ç‚¤‚·‚é‚ñ‚¾?
 
 ƒpƒPƒƒX•\Ž¦‚Í¬”‘æˆêˆÊ‚Ü‚Å
 p2pŠJŽn’¼Œã‚Ìclassicstun‚ÍƒpƒPƒƒX‚ª‘å‚«‚­‚È‚é‚±‚Æ‚ª“–‘R‚È‚Ì‚ÅA2•bŒo‰ß‚·‚é‚Ü‚Å‚Í‚»‚ÌƒpƒPƒƒX”»’è‚ð–³Ž‹‚·‚é
@@ -11,18 +9,7 @@ p2pŠJŽn’¼Œã‚Ìclassicstun‚ÍƒpƒPƒƒX‚ª‘å‚«‚­‚È‚é‚±‚Æ‚ª“–‘R‚È‚Ì‚ÅA2•bŒo‰ß‚·‚é‚Ü‚Å‚
 
 ## ’²®“à—e
 
-SteamP2PInfo‚ÌMainWindow‚Æ“¯‚¶‚­AŽÀÛ‚Ìƒ^ƒCƒgƒ‹ƒo[‚ÍÁ‚µ‚Ä‰¼‘z“I‚Èƒ^ƒCƒgƒ‹ƒo[‚¾‚¯‚É‚µ‚Ü‚µ‚å‚¤
-‰¼‘zƒ^ƒCƒgƒ‹ƒo[‚ÉAk¬‚âŠg‘å‚â~ƒ{ƒ^ƒ“‚à—pˆÓ‚µ‚Ä‚¨‚«‚Ü‚µ‚å‚¤B
-‹°‚ç‚­MetroUI‚ÉŠÈˆÕ“I‚ÈŽÀ‘•Žè’i‚ª—pˆÓ‚³‚ê‚Ä‚¢‚é‚Ì‚ÅASteamP2PInfo/MainWindow‚ð‚æ‚­‚æ‚Ý‚Ü‚µ‚å‚¤
-Steam executable‚ÌAPPLYƒ{ƒ^ƒ“‚Í•K—v‚ ‚è‚Ü‚¹‚ñB
-ƒtƒH[ƒ}ƒbƒg‚ª³‚µ‚¢‚Æ‚«‚É ŒÀ‚èŽ©“®‚Å“K‰ž‚Å‚«‚é‚æ‚¤‚É‚µ‚Ü‚µ‚å‚¤
-Auto Detected...‚ÌƒeƒLƒXƒg‚à•K—v‚ ‚è‚Ü‚¹‚ñ
-REFRESH‚à•K—v‚ ‚è‚Ü‚¹‚ñB
-AUTOMATIC DETECTION‚É‚ÄAsteam app id‚Æƒnƒ“ƒhƒ‹‚Ì—ñ‚Í•K—v‚ ‚è‚Ü‚¹‚ñ
-SELECT WINDOW‚É‚ÄATITLE‚ÆPATHˆÈŠO‚ÍŒ©‚¹‚È‚­‚Ä‚æ‚¢‚Å‚·
-CoreWindow‚ÌConfig‚É‚ÄAShow log directory‚Í•K—v‚ ‚è‚Ü‚¹‚ñ
-Show box plot‚ÌƒgƒOƒ‹ƒ{ƒ^ƒ“‚É‚Â‚¢‚ÄA‚±‚ê‚Å‚Í‚È‚­‚ÄA‰Ÿ‚µ‚½‚ç¶‰E‚É‰~‚ª‚¤‚²‚­ 
-ƒp[ƒc‚ªMetroUI‚Å—pˆÓ‚³‚ê‚Ä‚¢‚é‚Í‚¸‚Å‚·B
+ProfileScreen‚ÌATargetName‚ÆProcessPath‚ð•\Ž¦‚·‚é‚Æ‚±‚ë‚Í•s—vB
 
 # ƒ†[ƒU[‚ª’m‚è‚½‚¢“à—e
 
@@ -78,7 +65,8 @@ SpsGui/View/Controls/BarChartControl
 SpsGui/Views/CoreWindow
 - ƒ^ƒCƒgƒ‹ƒo[
 	- ¶’[‚ÉƒAƒvƒŠ–¼‚Æƒo[ƒWƒ‡ƒ“‚ð‹L“üB
-	- ‰E’[‚©‚ç‚ÍŠÈˆÕ“I‚ÈƒRƒ}ƒ“ƒhƒ{ƒ^ƒ“/ƒeƒLƒXƒg‚ð—…—ñ‚³‚¹‚éêŠB¡‚Ì‚Æ‚±‚ë‚Í“K“–‚ÈƒeƒLƒXƒg‚ð•¡”•À‚×‚Ä‚¨‚¯‚Î–â‘è‚È‚¢B
+	- ‰E’[‚©‚ç‚ÍŠÈˆÕ“I‚ÈƒRƒ}ƒ“ƒhƒ{ƒ^ƒ“/ƒeƒLƒXƒg‚ð—…—ñ‚³‚¹‚éêŠBˆÈ‰º‚Ì€–Ú‚É•ª‚©‚ê‚éB
+		- ƒvƒƒZƒX–¼‚ð•\Ž¦‚µ‚Ä’u‚­êŠB
 - ‰Šú‰æ–Ê(Žw’èƒ^ƒCƒ~ƒ“ƒO‚Å‚Ì‚Ý•\Ž¦B•Ê‚ÌUserControl‚É‚Ä’è‹`)
 	- ã”¼•ª(ƒŒƒCƒAƒEƒg“I‚É‚Í‚±‚ê‚¾‚ªAŽÀÛ‚ÌƒTƒCƒY‚Í‚à‚Á‚Æ¬‚³‚­‚È‚é‚Í‚¸): AppConfig.SteamExe‚ðÝ’è‚Å‚«‚é€–ÚBƒAƒvƒŠ‹N“®Žž‚É‚µ‚©SteamExe‚ÍŽg—p‚³‚ê‚È‚¢(ƒAƒvƒŠ‹N“®’†‚Ì‘¼‚Ìƒ^ƒCƒ~ƒ“ƒO‚Å‚Í•ÏX‚Å‚«‚È‚¢)‚Ì‚ÅA‚±‚ÌŽž“_‚Å‚Ì‚ÝÝ’è‚Å‚«‚ê‚Î—Ç‚¢B
 	- ‰º”¼•ª‚Ì‚¤‚¿¶‘¤: 
@@ -96,22 +84,35 @@ SpsGui/Views/CoreWindow
 		- ˆê——‚Å‘I‘ð‚³‚ê‚½‚à‚Ì‚ª‚È‚¢ŽžAƒ{ƒ^ƒ“‚ÍNothing detected‚Æ‚È‚èA‘€ì•s‰Â‚Æ‚È‚éB
 		- ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«AGameConfig.RegisteredGames‚É‚ÄƒpƒX‚Æid‚ª–¢“o˜^‚È‚ç“o˜^‚µ‚ÄAƒvƒƒtƒ@ƒCƒŠƒ“ƒO‰æ–Ê‚ÖˆÚs‚·‚éB
 		- SteamAppInfo.IsVisible==false‚Ì‚à‚Ì‚ÍAŽ©“®ŒŸo‚Ìˆê——‚É•\Ž¦‚µ‚È‚¢‚æ‚¤‚É‚·‚éB
-- ƒvƒƒtƒ@ƒCƒŠƒ“ƒO‰æ–Ê(Žw’èƒ^ƒCƒ~ƒ“ƒO‚Å‚Ì‚Ý•\Ž¦B•Ê‚ÌUserControl‚É‚Ä’è‹`, ­‚È‚­‚Æ‚àSteamAppInfo‚ðConstructor‚Ìˆø”‚Æ‚µ‚ÄŽ‚Â)
+- ProfileSreen: ƒvƒƒtƒ@ƒCƒŠƒ“ƒO‰æ–Ê(Žw’èƒ^ƒCƒ~ƒ“ƒO‚Å‚Ì‚Ý•\Ž¦B•Ê‚ÌUserControl‚É‚Ä’è‹`, SteamAppInfo/SteamPeerManager/IPacketScan‚ðconstructor‚Ìˆø”‚Æ‚µ‚ÄŽ‚Â)
+	- ŠÉÕ—p‚ÌObservableObject‚Å‚ ‚éPingProfileSnapshot‚ðì¬‚·‚é
+		- PingOverlayTest.xaml.cs.PingProfileSnapshot‚Æ“¯‚¶B
+	- ObservableCollection<PingProfileSnapshot>‚ð2‚Â—pˆÓ‚·‚éB‚Â‚Ü‚èŒ»Ý‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚ÆA‰ß‹Ž‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚Ì2‚Â‚ðŠ—L‚·‚éB
+	- –ñ1•b‚²‚Æ‚ÉˆÈ‰º‚Ì“à—e‚ðŒÄ‚Ño‚·
+		- PacketScan.Update()
+		- PacketScan.ForEachActiveHistory()
+			- ‘O‚ÌŒÄ‚Ño‚µ‚Æ”äŠr‚µ‚Ä0‚©‚ç1ˆÈã‚É‚È‚Á‚½‚Æ‚«ADnsPing‚à“¯Žž‚É‹N“®‚·‚éB
+				- DnsƒT[ƒrƒX‚ÍAAppConfig.DnsIp‚ÉŠî‚Ã‚­BDnsIp‚Íƒ†[ƒU[‚ªŽ©—R‚É•Ï‚¦‚ç‚ê‚é‚à‚Ì‚Å‚Í‚ ‚é‚ªA‚¢‚Ü‚Ì‚Æ‚±‚ë‚ÍŒ˜˜S‚Èƒ`ƒFƒbƒN‚Í‚¹‚¸â‘Î“I‚ÈM—Š‚ð‚µ‚Ä‚æ‚¢BIsNullOrEmpty‚®‚ç‚¢‚É‚Æ‚Ç‚ß‚éB
+			- ‘O‚ÌŒÄ‚Ño‚µ‚Æ”äŠr‚µ‚Ä1ˆÈã‚©‚ç0‚É‚È‚Á‚½‚Æ‚«ADnsPing‚ª‚ ‚é‚È‚ç‚»‚ê‚ðI—¹‚·‚éB
+			- Œ»Ý‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚ðƒNƒŠƒA‚µA‚±‚ê‚ÉXV‚·‚éB 
+			- DnsPing‚ª‚ ‚é‚È‚çAŒ»Ý‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚É‚»‚Ìpingî•ñ‚ð’Ç‰Á‚·‚éB
+		- PacketScan.TakeUnseenOldHistories()
+			- ‰ß‹Ž‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚Ö‘}“ü‚·‚éB 
     - ƒ^ƒu‚É‚æ‚Á‚ÄˆÈ‰º‚ð•\Ž¦Ø‘Ö‚Å‚«‚é
+		- ƒRƒ“ƒtƒBƒO:
+			- AppConfig‚ÆGameConfig‚ÌŠeŽí“à—e‚É‚Â‚¢‚ÄA‹N“®Žž‚Ìˆ—‡˜‚Ì0.2.‚ÉŒÀ‚è•ÏX‚Å‚«‚é‚æ‚¤‚É‚·‚éB‚Ü‚½AAppConfig‚Ìsteam exe ‚ÌƒpƒX‚ÆAgameconfig‚Ìregisretedgames‚Í‚±‚±‚Å‚¢‚¶‚é‘ÎÛ‚Å‚Í‚È‚¢B
+			- –¼‘O‚Æ“à—e‚Ì2—ñ‚É•ª‚©‚êA–¼‘O‚ð0—ñ‚Ì¶‹l‚ß‚É‚µA“à—e‚ð1—ñ‚Ì‰E‹l‚ß‚É‚·‚éB
+			- –¼‘O‚Í•Ï”–¼’¼Ú‚Å‚Í‚È‚­Ai18n‚³‚ê‚¤‚éê—p‚Ì•¨‚ðÝ’è‚·‚é‚±‚ÆB
+			- bool‚ÍƒgƒOƒ‹ƒ{ƒ^ƒ“‚Å•\Œ»‚·‚éB
 		- Œ»Ý‚Ìpingƒ‚ƒjƒ^
+			- Œ»Ý‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚Ìƒe[ƒuƒ‹‚ð•\Ž¦‚·‚éB
+			- •\Ž¦—ñ‚Í¶‚©‚ç‡‚ÉˆÈ‰º‚Ì’Ê‚èB•¶Žš‚ÍŠî–{“I‚É”’F‚Æ‚·‚éB—ñ‚Ìƒ^ƒCƒgƒ‹‚à•t‚¯‚éB
+				- name, avg(—ÎFB®”), loss%(ÔFB­”‘æˆêˆÊ‚Ü‚Å), usingRelay(ƒZƒ‹‚É‚Â‚¢‚ÄA‚È‚¢ê‡‚Í”ñ•\Ž¦‚¾‚ªŠÔŠu‚ÍŠm•Û‚µ‚Ä‚­), usingDns(ƒZƒ‹‚É‚Â‚¢‚ÄA‚È‚¢ê‡‚Í”ñ•\Ž¦‚¾‚ªŠÔŠu‚ÍŠm•Û‚µ‚Ä‚­), BoxPlotControl, BarChartControl
 		- ‰ß‹Ž‚Ìpingƒ‚ƒjƒ^
-		- ƒRƒ“ƒtƒBƒO(exclude appconfig.steamexe)B
-	- ƒRƒ“ƒtƒBƒO:
-		- AppConfig‚ÆGameConfig‚ÌŠeŽí“à—e‚É‚Â‚¢‚ÄA‹N“®Žž‚Ìˆ—‡˜‚Ì0.2.‚ÉŒÀ‚è•ÏX‚Å‚«‚é‚æ‚¤‚É‚·‚éB‚Ü‚½AAppConfig‚Ìsteam exe ‚ÌƒpƒX‚ÆAgameconfig‚Ìregisretedgames‚Í‚±‚±‚Å‚¢‚¶‚é‘ÎÛ‚Å‚Í‚È‚¢B
-		- –¼‘O‚Æ“à—e‚Ì2—ñ‚É•ª‚©‚êA–¼‘O‚ð0—ñ‚Ì¶‹l‚ß‚É‚µA“à—e‚ð1—ñ‚Ì‰E‹l‚ß‚É‚·‚éB
-		- –¼‘O‚Í•Ï”–¼’¼Ú‚Å‚Í‚È‚­Ai18n‚³‚ê‚¤‚éê—p‚Ì•¨‚ðÝ’è‚·‚é‚±‚ÆB
-		- bool‚ÍƒgƒOƒ‹ƒ{ƒ^ƒ“‚Å•\Œ»‚·‚éB
-    - Œ»Ý‚Ìpingƒ‚ƒjƒ^
-		- ¡‚Í–¢ŽÀ‘•‚Å‚æ‚¢
-		- ‚Æ‚è‚ ‚¦‚¸SteamAppInfo‚Ì’†g‚ðƒfƒoƒbƒO“I‚É•\Ž¦‚·‚é‚æ‚¤‚ÉB
-	- ‰ß‹Ž‚Ìpingƒ‚ƒjƒ^
-		- ¡‚Í–¢ŽÀ‘•‚Å‚æ‚¢
-
+			- ‰ß‹Ž‚Ìpingƒ‚ƒjƒ^ƒŠƒ“ƒOó‹µ‚Ìƒe[ƒuƒ‹‚ð•\Ž¦‚·‚éB
+			- •\Ž¦—ñ‚ÍˆÈ‰º‚Ì’Ê‚èB•¶Žš‚ÍŠî–{“I‚É”’F‚Æ‚·‚éB—ñ‚Ìƒ^ƒCƒgƒ‹‚à•t‚¯‚éB
+				- startedAt, ƒA[ƒJƒCƒuo—Íƒ{ƒ^ƒ“, name, steamid, avg(—ÎFB®”), loss%(ÔFB­”‘æˆêˆÊ‚Ü‚Å), BoxPlotControl, BarChartControl, usingRelay(‚È‚¢ê‡‚Í”ñ•\Ž¦A‚½‚¾ŠÔŠu‚ÍŠm•Û‚µ‚Ä‚­)
+					- ƒA[ƒJƒCƒuo—Íƒ{ƒ^ƒ“‚ð‰Ÿ‚·‚ÆAsnapshot.PacketArchive‚ªŒÄ‚Î‚êAMetroWindow‚Ìƒ_ƒCƒAƒƒO‚Åƒtƒ@ƒCƒ‹ƒpƒX‚ÆƒRƒs[ƒ{ƒ^ƒ“AOKƒ{ƒ^ƒ“‚ª•\Ž¦‚³‚ê‚éBƒRƒs[‚Í‚»‚Ì‚Ü‚ÜƒNƒŠƒbƒvƒ{[ƒh‚Öƒtƒ@ƒCƒ‹ƒpƒX‚ð•Û‘¶‚·‚éB‚Ç‚¿‚ç‚Ìƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚Ä‚àƒ_ƒCƒAƒƒO‚Í•Â‚¶‚éB
 
 SpsGui/Views/WindowSelectDialog : MetroWindow
 	SteamP2PInfo‚ÌWindowSelectDialog‚ðŽQl‚É‚µ‚Ä‚æ‚¢B
@@ -138,4 +139,4 @@ SpsGui/Views/OverlayWindow
 	   UI‚É‹¤’Ê‚·‚éƒfƒUƒCƒ“‚âF‡‚¢‚à‚±‚¿‚ç‚É“o˜^‚µ‚Ä‚æ‚¢
 2. CoreWindow‰Šú‰æ–Ê•\Ž¦
 3. CoreWindowƒvƒƒtƒ@ƒCƒŠƒ“ƒO‰æ–Ê•\Ž¦‚ª—v‹‚³‚ê‚½‚Æ‚«A‚»‚ê‚ð•\Ž¦
-	1. 
+	1. CoreWindow‚ÌRightWindowCommands‚É‚ÄAƒvƒƒZƒX–¼‚Ì€–Ú‚ðXV‚·‚éB

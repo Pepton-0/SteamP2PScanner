@@ -17,6 +17,7 @@ namespace SpsGui
     public partial class SteamPacketScanTest : Window
     {
         private const string TargetGameProcessName = "armoredcore6";
+        private const string TargetSteamAppId = "1888160";
 
         private readonly DispatcherTimer updateTimer;
         private readonly List<PingProfileSnapshot> oldProfiles = new List<PingProfileSnapshot>();
@@ -139,9 +140,10 @@ namespace SpsGui
                     return true;
                 }
 
-                InitializeSteamApi();
+                SteamAppInfo testAppInfo = CreateTestSteamAppInfo();
+                InitializeSteamApi(testAppInfo);
                 packetScan = new PacketScan(ReadPatienceMilliseconds());
-                steamPeerManager = new SteamPeerManager(packetScan, TargetGameProcessName);
+                steamPeerManager = new SteamPeerManager(packetScan, testAppInfo.Info.ProcessName);
 
                 monitoringStarted = true;
                 PacketScanTextBlock.Text = "constructed";
@@ -163,28 +165,34 @@ namespace SpsGui
         /// <summary>
         /// Initializes Steamworks.NET once for Steam peer inspection.
         /// </summary>
-        private void InitializeSteamApi()
+        private void InitializeSteamApi(SteamAppInfo testAppInfo)
         {
             if (steamApiInitialized)
             {
                 return;
             }
 
-            Environment.SetEnvironmentVariable("SteamAppId", 1888160.ToString());
-
-            if (!SteamAPI.IsSteamRunning())
-            {
-                throw new InvalidOperationException("Steam is not running.");
-            }
-
-            if (!SteamAPI.Init())
-            {
-                throw new InvalidOperationException("SteamAPI.Init returned false.");
-            }
-
+            SteamPeerManager.InitializeSteamApi(testAppInfo);
             steamApiInitialized = true;
             SteamApiTextBlock.Text = "initialized";
-            AppendLog("Steam API initialized.");
+            AppendLog($"Steam API initialized by SteamPeerManager: steamAppId={testAppInfo.SteamAppId}.");
+        }
+
+        /// <summary>
+        /// Creates a test-only Steam app identity for the fixed target process.
+        /// </summary>
+        /// <returns>Dummy app info enough for Steam API initialization and manager construction.</returns>
+        private static SteamAppInfo CreateTestSteamAppInfo()
+        {
+            var windowInfo = new WindowInfo(
+                IntPtr.Zero,
+                "SteamPacketScanTest",
+                TargetGameProcessName,
+                TargetGameProcessName + ".exe",
+                0,
+                0);
+
+            return new SteamAppInfo(windowInfo, TargetSteamAppId, true);
         }
 
         /// <summary>
@@ -215,7 +223,7 @@ namespace SpsGui
 
             if (steamApiInitialized)
             {
-                SteamAPI.Shutdown();
+                SteamPeerManager.ShutdownSteamApi();
                 steamApiInitialized = false;
                 SteamApiTextBlock.Text = "shutdown";
             }
