@@ -372,9 +372,12 @@ namespace SpsLogic
         private Dictionary<string, bool> Path2Ignore = 
             new Dictionary<string, bool>();
 
+        private static readonly int MyPid =
+                Process.GetCurrentProcess().Id;
+
         public SteamAppFinder()
         {
-
+            Logger.Log("The p2p scanner pid: " + MyPid + "," + Process.GetCurrentProcess().ProcessName);
         }
 
         /// <summary>
@@ -404,6 +407,10 @@ namespace SpsLogic
                 {
                     return true;
                 }
+                if(processId == MyPid)
+                {
+                    return true;
+                }
 
                 var pHandle = WinApi.OpenProcess(WinApi.ProcessAccessFlags.QueryLimitedInformation, false, (int)processId);
                 string processPath = null;
@@ -427,6 +434,9 @@ namespace SpsLogic
 
                         processName = Path.GetFileNameWithoutExtension(processPath);
                     }
+                }catch(Exception e)
+                {
+                    Logger.Log("Unexpected error while EnumWindows " + e.Message);
                 }
                 finally
                 {
@@ -465,60 +475,64 @@ namespace SpsLogic
 
             EnumWindows((w) =>
             {
-                string appId = null;
-                bool invisible = true;
-                var registered = GameConfig.Instance.RegisteredGames[w.ProcessPath];
-                if (registered != null)
+                try
                 {
-                    appId = registered;
-                    invisible = false;
-                }
-                else
-                {
-                    var approxPath = new ApproximatePath(w.ProcessPath);
-                    if (Path2SteamAppId.TryGetValue(approxPath, out var steamAppId0))
-                    { // if the path exe has detected steam app id
-                        if (steamAppId0.Length > 0)
-                        {
-                            appId = steamAppId0;
-                        }
+                    string appId = null;
+                    bool invisible = true;
+                    var registered = GameConfig.Instance.RegisteredGames[w.ProcessPath];
+                    if (registered != null)
+                    {
+                        appId = registered;
+                        invisible = false;
                     }
                     else
-                    { // if the path exe still doesn't have steam app id envrionment var yet
-                        //TODO なんかめちゃくちゃ重い
-                        ProcessEnvironmentReader
-                        .TryReadEnvironmentVariables(
-                            (int)w.ProcessId,
-                            out var variables,
-                            out var err);
-                        /*var variables = new Dictionary<string, string>();
-                        variables.Add(SteamAppIdVariableName, "114514");*/
-
-                        if (variables.TryGetValue(SteamAppIdVariableName, out var steamAppId1))
-                        {
-                            Path2SteamAppId[approxPath] = steamAppId1;
-                            if (steamAppId1.Length > 0)
+                    {
+                        var approxPath = new ApproximatePath(w.ProcessPath);
+                        if (Path2SteamAppId.TryGetValue(approxPath, out var steamAppId0))
+                        { // if the path exe has detected steam app id
+                            if (steamAppId0.Length > 0)
                             {
-                                appId = steamAppId1;
+                                appId = steamAppId0;
+                            }
+                        }
+                        else
+                        { // if the path exe still doesn't have steam app id envrionment var yet
+                          //TODO なんかめちゃくちゃ重い
+                            ProcessEnvironmentReader
+                            .TryReadEnvironmentVariables(
+                                (int)w.ProcessId,
+                                out var variables,
+                                out var err);
+
+                            if (variables.TryGetValue(SteamAppIdVariableName, out var steamAppId1))
+                            {
+                                Path2SteamAppId[approxPath] = steamAppId1;
+                                if (steamAppId1.Length > 0)
+                                {
+                                    appId = steamAppId1;
+                                }
                             }
                         }
                     }
-                }
 
-                if(appId != null)
+                    if (appId != null)
+                    {
+                        if (Path2Ignore.TryGetValue(w.ProcessPath, out var ignore))
+                        {
+                            invisible = ignore;
+                        }
+                        else
+                        {
+                            invisible = IsEasyAntiCheatSigned(w.ProcessPath);
+                            Path2Ignore[w.ProcessPath] = invisible;
+                        }
+
+                        var info = new SteamAppInfo(w, appId, !invisible);
+                        steamApps.Add(info);
+                    }
+                }catch(Exception e)
                 {
-                    if(Path2Ignore.TryGetValue(w.ProcessPath, out var ignore))
-                    {
-                        invisible = ignore;
-                    }
-                    else
-                    {
-                        invisible = IsEasyAntiCheatSigned(w.ProcessPath);
-                        Path2Ignore[w.ProcessPath] = invisible;
-                    }
-
-                    var info = new SteamAppInfo(w, appId, !invisible);
-                    steamApps.Add(info);
+                    Logger.Log("Occured unexpected error while searching steam app candidates " + e.Message);
                 }
             });
 

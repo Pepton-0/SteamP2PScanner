@@ -146,29 +146,22 @@ namespace SpsGui.Views.Controls
             var pen = new Pen(Stroke, 1.5);
             var medianPen = new Pen(MedianBrush, 2.0);
 
-            DrawText(drawingContext, "0", 0, 0, Stroke, textSize, TextAlignment.Left);
-            DrawText(drawingContext, FormatMiddleText(), width / 2.0, 0, Stroke, textSize, TextAlignment.Center);
-            DrawText(drawingContext, "Max:" + FormatValue(Maximum), width, 0, Stroke, textSize, TextAlignment.Right);
-            DrawText(drawingContext, "Med:" + FormatValue(Median), width / 2.0, textSize + 2, MedianBrush, textSize, TextAlignment.Center);
+            DrawText(drawingContext, "0", 0, 0, Stroke, textSize);
+            DrawTextRight(drawingContext, FormatInteger(Maximum), width, 0, Stroke, textSize);
+            DrawCenteredMetricText(drawingContext, textSize);
 
+            double zeroX = ToX(0.0, scaleMax, width);
             double minX = ToX(Minimum, scaleMax, width);
             double q1X = ToX(FirstQuartile, scaleMax, width);
             double medX = ToX(Median, scaleMax, width);
             double q3X = ToX(ThirdQuartile, scaleMax, width);
             double maxX = ToX(Maximum, scaleMax, width);
 
-            drawingContext.DrawLine(pen, new Point(minX, graphCenter), new Point(maxX, graphCenter));
+            drawingContext.DrawLine(pen, new Point(zeroX, graphCenter), new Point(maxX, graphCenter));
             drawingContext.DrawLine(pen, new Point(minX, graphTop), new Point(minX, graphTop + graphHeight));
             drawingContext.DrawLine(pen, new Point(maxX, graphTop), new Point(maxX, graphTop + graphHeight));
             drawingContext.DrawRectangle(null, pen, new Rect(new Point(q1X, graphTop), new Point(q3X, graphTop + graphHeight)));
             drawingContext.DrawLine(medianPen, new Point(medX, graphTop), new Point(medX, graphTop + graphHeight));
-        }
-
-        private string FormatMiddleText()
-        {
-            return "Min:" + FormatValue(Minimum) +
-                   "/Q1:" + FormatValue(FirstQuartile) +
-                   "/Q3:" + FormatValue(ThirdQuartile);
         }
 
         private static double ToX(double value, double maximum, double width)
@@ -182,22 +175,54 @@ namespace SpsGui.Views.Controls
             return value.ToString("0.#", CultureInfo.InvariantCulture);
         }
 
-        private void DrawText(DrawingContext context, string text, double x, double y, Brush brush, double size, TextAlignment alignment)
+        private static string FormatInteger(double value)
         {
-            var formatted = new FormattedText(
+            return Math.Round(value).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private void DrawCenteredMetricText(DrawingContext context, double size)
+        {
+            string prefix = "Min:" + FormatValue(Minimum) +
+                            "/Q1:" + FormatValue(FirstQuartile) + "/";
+            string median = "Med:" + FormatValue(Median);
+            string suffix = "/Q3:" + FormatValue(ThirdQuartile);
+
+            FormattedText prefixText = CreateText(prefix, Stroke, size);
+            FormattedText medianText = CreateText(median, MedianBrush, size);
+            FormattedText suffixText = CreateText(suffix, Stroke, size);
+            double totalWidth = prefixText.WidthIncludingTrailingWhitespace +
+                                medianText.WidthIncludingTrailingWhitespace +
+                                suffixText.WidthIncludingTrailingWhitespace;
+            double x = Math.Max(0.0, (ActualWidth - totalWidth) / 2.0);
+
+            context.DrawText(prefixText, new Point(x, 0));
+            x += prefixText.WidthIncludingTrailingWhitespace;
+            context.DrawText(medianText, new Point(x, 0));
+            x += medianText.WidthIncludingTrailingWhitespace;
+            context.DrawText(suffixText, new Point(x, 0));
+        }
+
+        private void DrawText(DrawingContext context, string text, double x, double y, Brush brush, double size)
+        {
+            context.DrawText(CreateText(text, brush, size), new Point(x, y));
+        }
+
+        private void DrawTextRight(DrawingContext context, string text, double right, double y, Brush brush, double size)
+        {
+            FormattedText formatted = CreateText(text, brush, size);
+            context.DrawText(formatted, new Point(Math.Max(0.0, right - formatted.WidthIncludingTrailingWhitespace), y));
+        }
+
+        private FormattedText CreateText(string text, Brush brush, double size)
+        {
+            return new FormattedText(
                 text,
                 CultureInfo.CurrentCulture,
                 FlowDirection.LeftToRight,
                 new Typeface("Segoe UI"),
                 size,
                 brush,
-                VisualTreeHelper.GetDpi(this).PixelsPerDip)
-            {
-                TextAlignment = alignment,
-                MaxTextWidth = Math.Max(1.0, ActualWidth)
-            };
-
-            context.DrawText(formatted, new Point(x, y));
+                VisualTreeHelper.GetDpi(this).PixelsPerDip);
         }
     }
 }

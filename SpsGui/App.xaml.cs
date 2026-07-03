@@ -56,5 +56,13 @@ namespace SpsGui
             window.Show();
 #endif
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+#if MVVM_APP
+            Ioc.Default.GetRequiredService<IPacketScan>().Dispose();
+#endif
+        }
     }
 }

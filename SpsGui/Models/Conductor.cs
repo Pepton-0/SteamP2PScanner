@@ -75,7 +75,11 @@ namespace SpsGui.Models
                 throw new ArgumentNullException(nameof(info));
             }
 
-            SteamPeerManager.InitializeSteamApi(info);
+            if (!SteamPeerManager.InitializeSteamApi(info))
+            {
+                return null;
+            }
+
             return new SteamPeerManager(packetScan, info.Info.ProcessName);
         }
     }

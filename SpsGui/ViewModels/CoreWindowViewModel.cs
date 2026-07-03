@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SpsGui.Models;
+using SpsGui.Views;
 using SpsLogic;
 using System;
 using System.Reflection;
@@ -15,6 +17,8 @@ namespace SpsGui.ViewModels
         private object currentViewModel;
         private readonly IConductor Conductor;
 
+        public IRelayCommand<object> ExitCommand { get; private set; }
+
         /// <summary>
         /// Initializes the root window view model.
         /// </summary>
@@ -28,6 +32,7 @@ namespace SpsGui.ViewModels
             var initialScreen = new InitialScreenViewModel(steamAppFinder);
             initialScreen.ProfileRequested += OnProfileRequested;
             CurrentViewModel = initialScreen;
+            ExitCommand = new RelayCommand<object>(OnExit);
         }
 
         /// <summary>
@@ -71,15 +76,30 @@ namespace SpsGui.ViewModels
             catch(Exception e)
             {
                 // TODO i18n
-                MessageBox.Show("Initializing steam api is failed due to " + e.Message);
+                Logger.Log("Failed to initialize steam api because " + e.Message, true);
+                MessageBox.Show("Initializing steam api is failed because " + e.Message);
+                manager = null;
             }
 
             if (manager != null)
             {
+                if (GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] != appInfo.SteamAppId)
+                {
+                    // overwrite the gameconfig file
+                    GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
+                }
                 CurrentProcessName = appInfo.Info.ProcessName;
                 CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan);
                 // TODO create overlay
             }
+        }
+
+        private void OnExit(object sender)
+        {
+            var window = sender as CoreWindow;
+            window.Hide();
+            SteamPeerManager.ShutdownSteamApi();
+            App.Current.Shutdown();
         }
     }
 }
