@@ -5,8 +5,7 @@ using Steamworks;
 namespace SpsLogic
 {
     /// <summary>
-    /// Repr
-    /// TODO Notify values changes with objservableobject functions
+    /// Represent the base of steam peer to peer
     /// </summary>
     public abstract class SteamPeerBase : ObservableObject, IDisposable
     {

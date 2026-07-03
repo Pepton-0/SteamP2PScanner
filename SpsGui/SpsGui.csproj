@@ -111,6 +111,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\CoreWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\InitialScreen.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProfileScreen.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\WindowSelectDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SteamAppIdDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\OverlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -143,6 +167,35 @@
     </Compile>
     <Compile Include="SteamAppFinderTest.xaml.cs">
       <DependentUpon>SteamAppFinderTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModels\CoreWindowViewModel.cs" />
+    <Compile Include="ViewModels\InitialScreenViewModel.cs" />
+    <Compile Include="ViewModels\ProfileScreenViewModel.cs" />
+    <Compile Include="Views\Controls\BarChartControl.cs" />
+    <Compile Include="Views\Controls\BoxPlotControl.cs" />
+    <Compile Include="Views\CoreWindow.xaml.cs">
+      <DependentUpon>CoreWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\InitialScreen.xaml.cs">
+      <DependentUpon>InitialScreen.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\ProfileScreen.xaml.cs">
+      <DependentUpon>ProfileScreen.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\WindowSelectDialog.xaml.cs">
+      <DependentUpon>WindowSelectDialog.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\SteamAppIdDialog.xaml.cs">
+      <DependentUpon>SteamAppIdDialog.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\OverlayWindow.xaml.cs">
+      <DependentUpon>OverlayWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Resources\StringResource.en-us.xaml">

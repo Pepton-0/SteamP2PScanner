@@ -40,7 +40,7 @@ namespace SpsLogic
             LogSteamAppFinderEnumWindowsFilterStats();
 
             var finder = new SteamAppFinder();
-            var warmupWindows = new List<SteamAppFinder.WindowInfo>();
+            var warmupWindows = new List<WindowInfo>();
             finder.EnumWindows(warmupWindows.Add);
             VerifySteamAppFinderWindows(warmupWindows, "warmup");
 
@@ -49,14 +49,14 @@ namespace SpsLogic
             int maxWindowCount = 0;
             int firstWindowCount = -1;
             int lastWindowCount = -1;
-            List<SteamAppFinder.WindowInfo> lastWindows = null;
+            List<WindowInfo> lastWindows = null;
 
             TimeSpan started = Logger.GetTimestamp();
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             for (int iteration = 0; iteration < iterationCount; iteration++)
             {
-                var windows = new List<SteamAppFinder.WindowInfo>();
+                var windows = new List<WindowInfo>();
                 finder.EnumWindows(windows.Add);
                 VerifySteamAppFinderWindows(windows, "iteration " + iteration);
 
@@ -89,7 +89,7 @@ namespace SpsLogic
 
             if (lastWindows != null)
             {
-                foreach (SteamAppFinder.WindowInfo window in lastWindows.Take(10))
+                foreach (WindowInfo window in lastWindows.Take(10))
                 {
                     Logger.Log(
                         $"SteamAppFinder.EnumWindows sample: hwnd=0x{window.Handle.ToInt64():X}, " +
@@ -223,14 +223,14 @@ namespace SpsLogic
         }
 
         private static void VerifySteamAppFinderWindows(
-            List<SteamAppFinder.WindowInfo> windows,
+            List<WindowInfo> windows,
             string caseName)
         {
             AssertForTest(windows != null, caseName + ": windows should not be null.");
 
             var handles = new HashSet<IntPtr>();
 
-            foreach (SteamAppFinder.WindowInfo window in windows)
+            foreach (WindowInfo window in windows)
             {
                 AssertForTest(window != null, caseName + ": WindowInfo should not be null.");
                 AssertForTest(window.Handle != IntPtr.Zero, caseName + ": window handle should not be zero.");

@@ -1,27 +1,36 @@
 using MahApps.Metro.Controls;
+using SpsGui.ViewModels;
 using SpsLogic;
-using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace SpsGui
+namespace SpsGui.Views
 {
-    public partial class SteamAppIdSelectDialogTest : MetroWindow
+    /// <summary>
+    /// Prompts the user for a Steam application id.
+    /// </summary>
+    public partial class SteamAppIdDialog : MetroWindow
     {
-        public SteamAppIdSelectDialogTest(
-            WindowInfo window,
-            string initialSteamAppId)
+        /// <summary>
+        /// Initializes the Steam app id dialog.
+        /// </summary>
+        /// <param name="window">Selected window used for the dialog caption.</param>
+        /// <param name="initialSteamAppId">Initial id text. Empty is allowed.</param>
+        public SteamAppIdDialog(WindowInfo window, string initialSteamAppId)
         {
             InitializeComponent();
 
-            WindowTextBlock.Text = SteamAppFinderTest.FormatWindowName(window);
+            WindowTextBlock.Text = InitialScreenViewModel.FormatWindowName(window);
             SteamAppIdTextBox.Text = initialSteamAppId ?? string.Empty;
             SteamAppIdTextBox.SelectAll();
             SteamAppIdTextBox.Focus();
             RefreshValidation();
         }
 
+        /// <summary>
+        /// Gets the validated Steam application id after OK is pressed.
+        /// </summary>
         public string SteamAppId { get; private set; }
 
         private void SteamAppIdTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -53,7 +62,9 @@ namespace SpsGui
                          appId > 0;
 
             OkButton.IsEnabled = valid;
-            ValidationTextBlock.Text = valid || text.Length == 0 ? string.Empty : "SteamAppId must be a positive integer.";
+            ValidationTextBlock.Text = valid || text.Length == 0
+                ? string.Empty
+                : "SteamAppId must be a positive integer.";
             return valid;
         }
     }

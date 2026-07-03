@@ -69,13 +69,18 @@ namespace SpsLogic
         }
         private string _steamBootstrapLogPath = "C:\\Program Files (x86)\\Steam\\logs\\bootstrap_log.txt";
 
-        [JsonProperty("last_run_version")]
-        public string LastRunVersion
+        [JsonProperty("show_boxplot")]
+        public bool ShowBoxPlot
         {
-            get { return _lastRunVersion; }
-            set { _lastRunVersion = value; Save(); RaisePropertyChanged(); }
+            get { return _showBoxPlot; }
+            set
+            {
+                _showBoxPlot = value;
+                Save();
+                RaisePropertyChanged();
+            }
         }
-        private string _lastRunVersion = "0";
+        private bool _showBoxPlot = true;
 
         static AppConfig()
         {
