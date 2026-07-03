@@ -62,38 +62,43 @@ namespace SpsLogic
         /// <summary>
         /// Initializes Steamworks.NET once for Steam peer inspection.
         /// </summary>
-        public static void InitializeSteamApi(SteamAppInfo info)
+        public static bool InitializeSteamApi(SteamAppInfo info)
         {
             if (info == null)
             {
-                throw new ArgumentNullException(nameof(info));
+                Logger.Log("Failed to initialize steam api because SteamAppInfo is null.");
+                return false;
             }
 
             if (SteamApiInitialized)
             {
-                return;
+                return true;
             }
 
             if (string.IsNullOrWhiteSpace(info.SteamAppId))
             {
-                throw new ArgumentException("SteamAppId is required.", nameof(info));
+                Logger.Log("Failed to initialize steam api because SteamAppId is empty.");
+                return false;
             }
 
             Environment.SetEnvironmentVariable("SteamAppId", info.SteamAppId);
 
             if (!SteamAPI.IsSteamRunning())
             {
-                throw new InvalidOperationException("Steam is not running.");
+                Logger.Log("Failed to initialize steam api because Steam is not running.");
+                return false;
             }
 
             if (!SteamAPI.Init())
             {
-                throw new InvalidOperationException("SteamAPI.Init returned false.");
+                Logger.Log("Failed to initialize steam api because SteamAPI.Init returned false.");
+                return false;
             }
 
             Logger.Log("Initialized steam api");
 
             SteamApiInitialized = true;
+            return true;
         }
 
         /// <summary>
@@ -195,6 +200,9 @@ namespace SpsLogic
             {
                 string line = await sr.ReadLineAsync();
 
+                if (!string.IsNullOrEmpty(line))
+                    Logger.DebugLog("new line; " + line);
+
                 // ログの終端に到達したら終了
                 if (line == null)
                 {
@@ -258,16 +266,11 @@ namespace SpsLogic
                         }
                         else
                         {
-                            // In custom rooms, EndAuthSession can mean the round ended while
-                            // the lobby still remains. Keep the peer and last ping until LeaveLobby.
                             if (mPeers.TryGetValue(steamID, out SteamPeerInfo pInfo))
                             {
-                                if (pInfo.isConnected)
-                                {
-                                    pInfo.lastDisconnectTimeMS = sw.ElapsedMilliseconds;
-                                }
-                                pInfo.isConnected = false;
-                                LogDisconnect(pInfo.peer, steamID, "Auth session ended; keeping peer until lobby exit");
+                                SteamPeerBase peer = pInfo.peer;
+                                RemovePeer(steamID);
+                                LogDisconnect(peer, steamID, "Auth session ended");
                             }
                         }
                     }
@@ -329,11 +332,20 @@ namespace SpsLogic
                 }
                 else
                 {
-                    if (pInfo.isConnected)
+                    if (pInfo.peer != null)
                     {
-                        pInfo.lastDisconnectTimeMS = sw.ElapsedMilliseconds;
+                        SteamPeerBase peer = pInfo.peer;
+                        RemovePeer(item.Key);
+                        LogDisconnect(peer, item.Key, "P2P connection ended");
                     }
-                    pInfo.isConnected = false;
+                    else
+                    {
+                        if (pInfo.isConnected)
+                        {
+                            pInfo.lastDisconnectTimeMS = sw.ElapsedMilliseconds;
+                        }
+                        pInfo.isConnected = false;
+                    }
                 }
             }
         }
@@ -356,6 +368,7 @@ namespace SpsLogic
 
             // Unregistring and moving to history is called from peer.Dispose automatically
             //SessionHistory.Add(new SessionHistoryItem(pInfo.peer));
+            pInfo.peer.Dispose();
             mPeers.Remove(sid);
 
             return true;

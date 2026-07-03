@@ -141,7 +141,12 @@ namespace SpsGui
                 }
 
                 SteamAppInfo testAppInfo = CreateTestSteamAppInfo();
-                InitializeSteamApi(testAppInfo);
+                if (!InitializeSteamApi(testAppInfo))
+                {
+                    StateTextBlock.Text = "SteamPacketScan: start failed";
+                    return false;
+                }
+
                 packetScan = new PacketScan(ReadPatienceMilliseconds());
                 steamPeerManager = new SteamPeerManager(packetScan, testAppInfo.Info.ProcessName);
 
@@ -165,17 +170,24 @@ namespace SpsGui
         /// <summary>
         /// Initializes Steamworks.NET once for Steam peer inspection.
         /// </summary>
-        private void InitializeSteamApi(SteamAppInfo testAppInfo)
+        private bool InitializeSteamApi(SteamAppInfo testAppInfo)
         {
             if (steamApiInitialized)
             {
-                return;
+                return true;
             }
 
-            SteamPeerManager.InitializeSteamApi(testAppInfo);
+            if (!SteamPeerManager.InitializeSteamApi(testAppInfo))
+            {
+                SteamApiTextBlock.Text = "failed";
+                AppendLog($"Steam API initialization failed: steamAppId={testAppInfo.SteamAppId}.");
+                return false;
+            }
+
             steamApiInitialized = true;
             SteamApiTextBlock.Text = "initialized";
             AppendLog($"Steam API initialized by SteamPeerManager: steamAppId={testAppInfo.SteamAppId}.");
+            return true;
         }
 
         /// <summary>

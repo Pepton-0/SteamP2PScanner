@@ -91,6 +91,10 @@ namespace SpsGui.ViewModels
             get { return selectedCandidate; }
             set
             {
+                IntPtr? previousHandle = selectedCandidate == null
+                    ? (IntPtr?)null
+                    : selectedCandidate.AppInfo.Info.Handle;
+
                 if (SetProperty(ref selectedCandidate, value))
                 {
                     if (selectedCandidate == null)
@@ -103,6 +107,12 @@ namespace SpsGui.ViewModels
                     else
                     {
                         selectedWindowHandle = selectedCandidate.AppInfo.Info.Handle;
+                        if (!previousHandle.HasValue ||
+                            previousHandle.Value != selectedWindowHandle.Value ||
+                            !isRefreshingAutoCandidates)
+                        {
+                            LogSelectedCandidate(selectedCandidate);
+                        }
                     }
 
                     OnPropertyChanged(nameof(MonitorButtonText));
@@ -158,7 +168,6 @@ namespace SpsGui.ViewModels
                     }
 
                     steamAppId = appIdDialog.SteamAppId;
-                    GameConfig.Instance.RegisteredGames[window.ProcessPath] = steamAppId;
                 }
 
                 RequestProfile(new SteamAppInfo(window, steamAppId, true));
@@ -181,10 +190,6 @@ namespace SpsGui.ViewModels
             }
 
             SteamAppInfo appInfo = SelectedCandidate.AppInfo;
-            if (string.IsNullOrWhiteSpace(GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath]))
-            {
-                GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
-            }
 
             RequestProfile(appInfo);
         }
@@ -265,6 +270,25 @@ namespace SpsGui.ViewModels
         {
             autoDetectTimer.Stop();
             ProfileRequested?.Invoke(this, appInfo);
+        }
+
+        private static void LogSelectedCandidate(SteamAppCandidateViewModel candidate)
+        {
+            if (candidate == null)
+            {
+                return;
+            }
+
+            SteamAppInfo appInfo = candidate.AppInfo;
+            WindowInfo window = appInfo.Info;
+            Logger.DebugLog(
+                "InitialScreen auto candidate selected: " +
+                "name=\"" + candidate.DisplayName + "\", " +
+                "steamAppId=" + appInfo.SteamAppId + ", " +
+                "hwnd=" + candidate.WindowHandle + ", " +
+                "pid=" + window.ProcessId + ", " +
+                "processName=\"" + window.ProcessName + "\", " +
+                "processPath=\"" + window.ProcessPath + "\"");
         }
 
         internal static string FormatWindowName(WindowInfo window)

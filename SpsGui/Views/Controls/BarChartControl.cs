@@ -110,35 +110,43 @@ namespace SpsGui.Views.Controls
                 return;
             }
 
-            double labelWidth = Math.Min(70.0, Math.Max(42.0, width * 0.16));
-            double chartWidth = Math.Max(1.0, width - labelWidth);
+            double textSize = Math.Max(9.0, Math.Min(14.0, height * 0.12));
+            double labelWidth = Math.Min(70.0, Math.Max(34.0, width * 0.14));
+            double labelHeight = textSize + 4.0;
+            double plotLeft = 2.0;
+            double plotTop = 2.0;
+            double plotRight = Math.Max(plotLeft + 1.0, width - labelWidth);
+            double plotBottom = Math.Max(plotTop + 1.0, height - labelHeight);
+            double plotWidth = plotRight - plotLeft;
+            double plotHeight = plotBottom - plotTop;
             double max = Math.Max(1.0, samples.Where(sample => sample >= 0).DefaultIfEmpty(1.0).Max());
-            double rowGap = Math.Max(1.0, height / samples.Length * 0.18);
-            double rowHeight = Math.Max(2.0, height / samples.Length - rowGap);
-
-            for (int i = 0; i < samples.Length; i++)
-            {
-                double top = i * (rowHeight + rowGap);
-                double value = samples[i];
-                Brush brush = value < 0 ? LossBrush : BarBrush;
-                double barWidth = value < 0
-                    ? Math.Max(4.0, chartWidth * 0.04)
-                    : Math.Max(1.0, Math.Min(chartWidth, value / max * chartWidth));
-
-                drawingContext.DrawRectangle(brush, null, new Rect(0, top, barWidth, rowHeight));
-            }
+            double barGap = Math.Max(1.0, plotWidth / samples.Length * 0.18);
+            double barWidth = Math.Max(1.0, plotWidth / samples.Length - barGap);
 
             var axisPen = new Pen(BarBrush, 1.0);
             var averagePen = new Pen(AverageBrush, 1.5);
-            double averageX = Math.Max(0.0, Math.Min(max, Average)) / max * chartWidth;
 
-            drawingContext.DrawLine(axisPen, new Point(0, 0), new Point(0, height));
-            drawingContext.DrawLine(axisPen, new Point(chartWidth, 0), new Point(chartWidth, height));
-            drawingContext.DrawLine(averagePen, new Point(averageX, 0), new Point(averageX, height));
+            drawingContext.DrawLine(axisPen, new Point(plotRight, plotTop), new Point(plotRight, plotBottom));
+            drawingContext.DrawLine(axisPen, new Point(plotLeft, plotBottom), new Point(plotRight, plotBottom));
 
-            double textSize = Math.Max(9.0, Math.Min(14.0, height * 0.12));
-            DrawText(drawingContext, "0", chartWidth + 6, height - textSize - 1, BarBrush, textSize);
-            DrawText(drawingContext, FormatValue(max), chartWidth + 6, 0, BarBrush, textSize);
+            for (int i = 0; i < samples.Length; i++)
+            {
+                double value = samples[i];
+                Brush brush = value < 0 ? LossBrush : BarBrush;
+                double x = plotLeft + i * (barWidth + barGap);
+                double barHeight = value < 0
+                    ? Math.Max(3.0, plotHeight)
+                    : Math.Max(1.0, Math.Min(plotHeight, value / max * plotHeight));
+                double top = plotBottom - barHeight;
+
+                drawingContext.DrawRectangle(brush, null, new Rect(x, top, barWidth, barHeight));
+            }
+
+            double averageY = plotBottom - Math.Max(0.0, Math.Min(max, Average)) / max * plotHeight;
+            drawingContext.DrawLine(averagePen, new Point(plotLeft, averageY), new Point(plotRight, averageY));
+
+            DrawText(drawingContext, FormatValue(max), plotRight + 6.0, plotTop, BarBrush, textSize);
+            DrawText(drawingContext, "0", plotRight + 6.0, plotBottom - textSize, BarBrush, textSize);
         }
 
         private static string FormatValue(double value)
