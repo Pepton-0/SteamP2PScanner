@@ -100,6 +100,84 @@ namespace SpsLogic
         }
         private bool _showBoxPlot = true;
 
+        [JsonProperty("overlay_enabled")]
+        public bool OverlayEnabled
+        {
+            get { return _overlayEnabled; }
+            set
+            {
+                _overlayEnabled = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _overlayEnabled = true;
+
+        [JsonProperty("overlay_show_name")]
+        public bool OverlayShowName
+        {
+            get { return _overlayShowName; }
+            set
+            {
+                _overlayShowName = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _overlayShowName = true;
+
+        [JsonProperty("overlay_show_status")]
+        public bool OverlayShowStatus
+        {
+            get { return _overlayShowStatus; }
+            set
+            {
+                _overlayShowStatus = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _overlayShowStatus = true;
+
+        [JsonProperty("overlay_show_average")]
+        public bool OverlayShowAverage
+        {
+            get { return _overlayShowAverage; }
+            set
+            {
+                _overlayShowAverage = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _overlayShowAverage = true;
+
+        [JsonProperty("overlay_show_loss")]
+        public bool OverlayShowLoss
+        {
+            get { return _overlayShowLoss; }
+            set
+            {
+                _overlayShowLoss = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _overlayShowLoss = true;
+
+        [JsonProperty("overlay_show_chart")]
+        public bool OverlayShowChart
+        {
+            get { return _overlayShowChart; }
+            set
+            {
+                _overlayShowChart = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _overlayShowChart = true;
+
         [JsonProperty("dns_ip")]
         public string DnsIp
         {

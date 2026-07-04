@@ -4,7 +4,6 @@ using SpsGui.Models;
 using SpsGui.Models.Services;
 using SpsLogic;
 using System;
-using System.Reflection;
 using System.Windows;
 
 namespace SpsGui.ViewModels
@@ -17,6 +16,7 @@ namespace SpsGui.ViewModels
         private object currentViewModel;
         private readonly IConductor Conductor;
         private readonly IDialogService dialogService;
+        private readonly IOverlayService overlayService;
         private bool isExiting;
 
         public IRelayCommand<object> ExitCommand { get; private set; }
@@ -28,13 +28,26 @@ namespace SpsGui.ViewModels
         /// </summary>
         /// <param name="steamAppFinder">Finder service used by the initial screen.</param>
         /// <param name="conductor">Application conductor used to create runtime model objects.</param>
+        /// <param name="applicationTitleService">Service used to create application title text.</param>
         /// <param name="dialogService">Service used to show modal dialogs.</param>
-        public CoreWindowViewModel(ISteamAppFinder steamAppFinder, IConductor conductor, IDialogService dialogService)
+        /// <param name="overlayService">Service used to own the overlay window.</param>
+        public CoreWindowViewModel(
+            ISteamAppFinder steamAppFinder,
+            IConductor conductor,
+            IApplicationTitleService applicationTitleService,
+            IDialogService dialogService,
+            IOverlayService overlayService)
         {
             Conductor = conductor ?? throw new ArgumentNullException(nameof(conductor));
-            this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            if (applicationTitleService == null)
+            {
+                throw new ArgumentNullException(nameof(applicationTitleService));
+            }
 
-            ApplicationTitle = "SteamP2PScanner " + Assembly.GetExecutingAssembly().GetName().Version;
+            this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
+
+            ApplicationTitle = applicationTitleService.CreateApplicationTitle();
 
             var initialScreen = new InitialScreenViewModel(steamAppFinder, dialogService);
             initialScreen.ProfileRequested += OnProfileRequested;
@@ -102,7 +115,8 @@ namespace SpsGui.ViewModels
                 GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
             }
             CurrentProcessName = appInfo.Info.ProcessName;
-            CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan, dialogService);
+            CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan, dialogService, overlayService);
+            overlayService.Show(appInfo.Info);
 
             RequestManualSteamConsoleCommand();
 
@@ -130,6 +144,7 @@ namespace SpsGui.ViewModels
             }
 
             isExiting = true;
+            overlayService.Close();
             SteamPeerManager.ShutdownSteamApi();
             if (Application.Current != null)
             {

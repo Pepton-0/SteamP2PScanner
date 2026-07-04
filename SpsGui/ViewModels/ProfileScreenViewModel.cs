@@ -29,6 +29,7 @@ namespace SpsGui.ViewModels
         private readonly SteamPeerManager manager;
         private readonly IPacketScan packetScan;
         private readonly IDialogService dialogService;
+        private readonly IOverlayService overlayService;
         private readonly DispatcherTimer updateTimer;
         private readonly Dictionary<string, PingProfileSnapshot> activeSnapshots =
             new Dictionary<string, PingProfileSnapshot>(StringComparer.OrdinalIgnoreCase);
@@ -44,16 +45,19 @@ namespace SpsGui.ViewModels
         /// <param name="manager">Steam peer manager prepared for the selected application. Must not be null.</param>
         /// <param name="packetScan">Packet scanner shared with the peer manager. Must not be null.</param>
         /// <param name="dialogService">Service used to show modal dialogs.</param>
+        /// <param name="overlayService">Service used to update overlay rows.</param>
         public ProfileScreenViewModel(
             SteamAppInfo appInfo,
             SteamPeerManager manager,
             IPacketScan packetScan,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IOverlayService overlayService)
         {
             this.appInfo = appInfo ?? throw new ArgumentNullException(nameof(appInfo));
             this.manager = manager ?? throw new ArgumentNullException(nameof(manager));
             this.packetScan = packetScan ?? throw new ArgumentNullException(nameof(packetScan));
             this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
 
             ExportArchiveCommand = new AsyncRelayCommand<PingProfileSnapshot>(ExportArchiveAsync, CanExportArchive);
 
@@ -100,6 +104,99 @@ namespace SpsGui.ViewModels
                 {
                     AppConfig.Instance.ShowBoxPlot = value;
                     OnPropertyChanged(nameof(ShowBoxPlot));
+                    OnPropertyChanged(nameof(OverlayShowBoxPlot));
+                }
+            }
+        }
+
+        public bool OverlayEnabled
+        {
+            get { return AppConfig.Instance.OverlayEnabled; }
+            set
+            {
+                if (AppConfig.Instance.OverlayEnabled != value)
+                {
+                    AppConfig.Instance.OverlayEnabled = value;
+                    OnPropertyChanged(nameof(OverlayEnabled));
+                }
+            }
+        }
+
+        public bool OverlayShowName
+        {
+            get { return AppConfig.Instance.OverlayShowName; }
+            set
+            {
+                if (AppConfig.Instance.OverlayShowName != value)
+                {
+                    AppConfig.Instance.OverlayShowName = value;
+                    OnPropertyChanged(nameof(OverlayShowName));
+                }
+            }
+        }
+
+        public bool OverlayShowStatus
+        {
+            get { return AppConfig.Instance.OverlayShowStatus; }
+            set
+            {
+                if (AppConfig.Instance.OverlayShowStatus != value)
+                {
+                    AppConfig.Instance.OverlayShowStatus = value;
+                    OnPropertyChanged(nameof(OverlayShowStatus));
+                }
+            }
+        }
+
+        public bool OverlayShowAverage
+        {
+            get { return AppConfig.Instance.OverlayShowAverage; }
+            set
+            {
+                if (AppConfig.Instance.OverlayShowAverage != value)
+                {
+                    AppConfig.Instance.OverlayShowAverage = value;
+                    OnPropertyChanged(nameof(OverlayShowAverage));
+                }
+            }
+        }
+
+        public bool OverlayShowLoss
+        {
+            get { return AppConfig.Instance.OverlayShowLoss; }
+            set
+            {
+                if (AppConfig.Instance.OverlayShowLoss != value)
+                {
+                    AppConfig.Instance.OverlayShowLoss = value;
+                    OnPropertyChanged(nameof(OverlayShowLoss));
+                }
+            }
+        }
+
+        public bool OverlayShowBoxPlot
+        {
+            get { return AppConfig.Instance.ShowBoxPlot; }
+            set
+            {
+                if (AppConfig.Instance.ShowBoxPlot != value)
+                {
+                    AppConfig.Instance.ShowBoxPlot = value;
+                    OnPropertyChanged(nameof(OverlayShowBoxPlot));
+                    OnPropertyChanged(nameof(ShowBoxPlot));
+                }
+            }
+        }
+
+        public bool OverlayShowChart
+        {
+            get { return AppConfig.Instance.OverlayShowChart; }
+            set
+            {
+                if (AppConfig.Instance.OverlayShowChart != value)
+                {
+                    AppConfig.Instance.OverlayShowChart = value;
+                    OnPropertyChanged(nameof(OverlayShowChart));
                 }
             }
         }
@@ -117,6 +214,7 @@ namespace SpsGui.ViewModels
             isDisposed = true;
             updateTimer.Stop();
             updateTimer.Tick -= UpdateTimer_Tick;
+            overlayService.Close();
             StopDnsPing();
         }
 
@@ -179,6 +277,7 @@ namespace SpsGui.ViewModels
             }
 
             ReplaceCollection(CurrentProfiles, next);
+            overlayService.UpdateProfiles(CurrentProfiles);
             previousActiveCount = next.Count(snapshot => !snapshot.UsingDns);
         }
 
@@ -304,7 +403,7 @@ namespace SpsGui.ViewModels
 
             if (peer != null)
             {
-                snapshot.SetSteamPeerInfo(peer.SteamID, peer.UsingRelay);
+                snapshot.SetSteamPeerInfo(peer.SteamID.m_SteamID, peer.UsingRelay);
             }
         }
 
@@ -335,7 +434,7 @@ namespace SpsGui.ViewModels
         private double[] recentPings = new double[0];
         private ulong? netIdValue;
         private PacketScan.PacketArchive packetArchive;
-        private CSteamID steamID = new CSteamID(0);
+        private ulong steamID;
         private bool usingRelay;
         private bool usingDns;
 
@@ -522,7 +621,7 @@ namespace SpsGui.ViewModels
         /// <summary>
         /// Gets the Steam ID associated with this row.
         /// </summary>
-        public CSteamID SteamID
+        public ulong SteamID
         {
             get { return steamID; }
             private set
@@ -604,7 +703,7 @@ namespace SpsGui.ViewModels
         /// </summary>
         public string SteamIDText
         {
-            get { return SteamID.m_SteamID == 0 ? "-" : SteamID.m_SteamID.ToString(CultureInfo.InvariantCulture); }
+            get { return SteamID == 0 ? "-" : SteamID.ToString(CultureInfo.InvariantCulture); }
         }
 
         /// <summary>
@@ -654,7 +753,7 @@ namespace SpsGui.ViewModels
         /// </summary>
         /// <param name="steamId">Steam ID associated with the peer.</param>
         /// <param name="usesRelay">True when the peer currently uses Steam relay.</param>
-        public void SetSteamPeerInfo(CSteamID steamId, bool usesRelay)
+        public void SetSteamPeerInfo(ulong steamId, bool usesRelay)
         {
             SteamID = steamId;
             UsingRelay = usesRelay;
