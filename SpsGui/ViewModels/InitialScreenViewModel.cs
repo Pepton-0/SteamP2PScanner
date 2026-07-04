@@ -1,12 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SpsGui.Views;
+using SpsGui.Models.Services;
 using SpsLogic;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Threading;
 
 namespace SpsGui.ViewModels
@@ -17,12 +16,14 @@ namespace SpsGui.ViewModels
     public class InitialScreenViewModel : ObservableObject
     {
         private readonly ISteamAppFinder steamAppFinder;
+        private readonly IDialogService dialogService;
         private readonly DispatcherTimer autoDetectTimer;
         private readonly RelayCommand monitorSelectedCommand;
         private SteamAppCandidateViewModel selectedCandidate;
         private IntPtr? selectedWindowHandle;
         private bool isRefreshingAutoCandidates;
         private string steamExePath;
+        private bool autoIpc;
 
         /// <summary>
         /// Raised when the user selected a Steam application and profiling should start.
@@ -33,11 +34,14 @@ namespace SpsGui.ViewModels
         /// Initializes the startup screen and starts periodic automatic Steam app detection.
         /// </summary>
         /// <param name="steamAppFinder">Finder used to enumerate windows and detect Steam application ids.</param>
-        public InitialScreenViewModel(ISteamAppFinder steamAppFinder)
+        /// <param name="dialogService">Service used to show modal dialogs.</param>
+        public InitialScreenViewModel(ISteamAppFinder steamAppFinder, IDialogService dialogService)
         {
             this.steamAppFinder = steamAppFinder ?? throw new ArgumentNullException(nameof(steamAppFinder));
+            this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
             steamExePath = AppConfig.Instance.SteamExe;
+            autoIpc = AppConfig.Instance.AutoIpc;
 
             ManualSelectCommand = new RelayCommand(ManualSelect);
             monitorSelectedCommand = new RelayCommand(MonitorSelected, CanMonitorSelected);
@@ -79,6 +83,21 @@ namespace SpsGui.ViewModels
                     File.Exists(value))
                 {
                     AppConfig.Instance.SteamExe = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether Steam console IPC setup should be automated.
+        /// </summary>
+        public bool AutoIpc
+        {
+            get { return autoIpc; }
+            set
+            {
+                if (SetProperty(ref autoIpc, value))
+                {
+                    AppConfig.Instance.AutoIpc = value;
                 }
             }
         }
@@ -141,33 +160,24 @@ namespace SpsGui.ViewModels
             try
             {
                 WindowInfo[] windows = EnumerateWindows();
-                var windowDialog = new WindowSelectDialog(windows)
-                {
-                    Owner = Application.Current.MainWindow
-                };
-
-                if (windowDialog.ShowDialog() != true || windowDialog.SelectedWindow == null)
+                WindowInfo window = dialogService.ShowWindowSelectDialog(windows);
+                if (window == null)
                 {
                     return;
                 }
 
-                WindowInfo window = windowDialog.SelectedWindow;
                 string steamAppId = GameConfig.Instance.RegisteredGames[window.ProcessPath];
 
                 if (string.IsNullOrWhiteSpace(steamAppId))
                 {
                     steamAppId = FindDetectedSteamAppId(window);
-                    var appIdDialog = new SteamAppIdDialog(window, steamAppId)
-                    {
-                        Owner = Application.Current.MainWindow
-                    };
-
-                    if (appIdDialog.ShowDialog() != true)
+                    string selectedSteamAppId = dialogService.ShowSteamAppIdDialog(window, steamAppId);
+                    if (selectedSteamAppId == null)
                     {
                         return;
                     }
 
-                    steamAppId = appIdDialog.SteamAppId;
+                    steamAppId = selectedSteamAppId;
                 }
 
                 RequestProfile(new SteamAppInfo(window, steamAppId, true));
@@ -224,7 +234,7 @@ namespace SpsGui.ViewModels
                     isRefreshingAutoCandidates = false;
                 }
 
-                Logger.DebugLog($"InitialScreen auto refresh: source={source}, count={AutoCandidates.Count}");
+                //Logger.DebugLog($"InitialScreen auto refresh: source={source}, count={AutoCandidates.Count}");
             }
             catch (Exception ex)
             {

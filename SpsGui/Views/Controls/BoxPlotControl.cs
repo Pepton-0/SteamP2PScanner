@@ -142,13 +142,14 @@ namespace SpsGui.Views.Controls
             double graphHeight = Math.Min(22.0, Math.Max(10.0, height * 0.28));
             double graphTop = height - graphHeight;
             double graphCenter = graphTop + graphHeight / 2.0;
+            double textTop = Math.Max(0.0, graphTop - textSize - 2.0);
 
             var pen = new Pen(Stroke, 1.5);
             var medianPen = new Pen(MedianBrush, 2.0);
 
-            DrawText(drawingContext, "0", 0, 0, Stroke, textSize);
-            DrawTextRight(drawingContext, FormatInteger(Maximum), width, 0, Stroke, textSize);
-            DrawCenteredMetricText(drawingContext, textSize);
+            DrawText(drawingContext, "0", 0, textTop, Stroke, textSize);
+            DrawTextRight(drawingContext, FormatInteger(Maximum), width, textTop, Stroke, textSize);
+            DrawCenteredMetricText(drawingContext, textSize, textTop);
 
             double zeroX = ToX(0.0, scaleMax, width);
             double minX = ToX(Minimum, scaleMax, width);
@@ -180,7 +181,7 @@ namespace SpsGui.Views.Controls
             return Math.Round(value).ToString(CultureInfo.InvariantCulture);
         }
 
-        private void DrawCenteredMetricText(DrawingContext context, double size)
+        private void DrawCenteredMetricText(DrawingContext context, double size, double y)
         {
             string prefix = "Min:" + FormatValue(Minimum) +
                             "/Q1:" + FormatValue(FirstQuartile) + "/";
@@ -195,11 +196,11 @@ namespace SpsGui.Views.Controls
                                 suffixText.WidthIncludingTrailingWhitespace;
             double x = Math.Max(0.0, (ActualWidth - totalWidth) / 2.0);
 
-            context.DrawText(prefixText, new Point(x, 0));
+            context.DrawText(prefixText, new Point(x, y));
             x += prefixText.WidthIncludingTrailingWhitespace;
-            context.DrawText(medianText, new Point(x, 0));
+            context.DrawText(medianText, new Point(x, y));
             x += medianText.WidthIncludingTrailingWhitespace;
-            context.DrawText(suffixText, new Point(x, 0));
+            context.DrawText(suffixText, new Point(x, y));
         }
 
         private void DrawText(DrawingContext context, string text, double x, double y, Brush brush, double size)

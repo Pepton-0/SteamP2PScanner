@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpsGui.Models;
-using SpsGui.Views;
+using SpsGui.Models.Services;
 using SpsLogic;
 using System;
 using System.Reflection;
@@ -16,6 +16,7 @@ namespace SpsGui.ViewModels
     {
         private object currentViewModel;
         private readonly IConductor Conductor;
+        private readonly IDialogService dialogService;
         private bool isExiting;
 
         public IRelayCommand<object> ExitCommand { get; private set; }
@@ -26,33 +27,20 @@ namespace SpsGui.ViewModels
         /// Initializes the root window view model.
         /// </summary>
         /// <param name="steamAppFinder">Finder service used by the initial screen.</param>
-        public CoreWindowViewModel(ISteamAppFinder steamAppFinder, IConductor conductor)
+        /// <param name="conductor">Application conductor used to create runtime model objects.</param>
+        /// <param name="dialogService">Service used to show modal dialogs.</param>
+        public CoreWindowViewModel(ISteamAppFinder steamAppFinder, IConductor conductor, IDialogService dialogService)
         {
-            (Conductor) = conductor;
+            Conductor = conductor ?? throw new ArgumentNullException(nameof(conductor));
+            this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
             ApplicationTitle = "SteamP2PScanner " + Assembly.GetExecutingAssembly().GetName().Version;
 
-            var initialScreen = new InitialScreenViewModel(steamAppFinder);
+            var initialScreen = new InitialScreenViewModel(steamAppFinder, dialogService);
             initialScreen.ProfileRequested += OnProfileRequested;
             CurrentViewModel = initialScreen;
             ExitCommand = new RelayCommand<object>(OnExit);
-            TestCommand = new RelayCommand<object>(async (d) => {
-                var result0 = AppConfig.Instance.AutoIpc && await Conductor.AutoSteamConsoleAsync();
-
-                int result1 = int.MaxValue;
-                if (!result0 && (result1 = Conductor.RequestSteamConsole()) == 1)
-                {
-                    var dialog = new SteamConsoleCommandDialog(Conductor.SteamConsoleCommand)
-                    {
-                        Owner = Application.Current == null ? null : Application.Current.MainWindow
-                    };
-                    dialog.ShowDialog();
-                }
-                else if (result1 == -1)
-                {
-                    MessageBox.Show("Failed to show steam console for some reason.");
-                }
-            });
+            TestCommand = new RelayCommand<object>((d) => RequestManualSteamConsoleCommand());
         }
 
         /// <summary>
@@ -86,7 +74,7 @@ namespace SpsGui.ViewModels
         }
         private string currentProcessName = string.Empty;
 
-        private async void OnProfileRequested(object sender, SteamAppInfo appInfo)
+        private void OnProfileRequested(object sender, SteamAppInfo appInfo)
         {
             SteamPeerManager manager = null;
             try
@@ -97,37 +85,40 @@ namespace SpsGui.ViewModels
             {
                 // TODO i18n
                 Logger.Log("Failed to initialize steam api because " + e.Message, true);
-                MessageBox.Show("Initializing steam api is failed because " + e.Message);
-                manager = null;
+                dialogService.ShowMessage("Initializing steam api is failed because " + e.Message);
+                return;
             }
 
-            if (manager != null)
+            if (manager == null)
             {
-                if (GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] != appInfo.SteamAppId)
-                {
-                    // overwrite the gameconfig file
-                    GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
-                }
-                CurrentProcessName = appInfo.Info.ProcessName;
-                CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan);
+                Logger.Log("Failed to initialize steam api because SteamPeerManager was not created.", true);
+                dialogService.ShowMessage("Initializing steam api is failed.");
+                return;
+            }
 
-                var result0 = AppConfig.Instance.AutoIpc && await Conductor.AutoSteamConsoleAsync();
+            if (GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] != appInfo.SteamAppId)
+            {
+                // overwrite the gameconfig file
+                GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
+            }
+            CurrentProcessName = appInfo.Info.ProcessName;
+            CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan, dialogService);
 
-                int result1 = int.MaxValue;
-                if (!result0 && (result1 = Conductor.RequestSteamConsole()) == 1)
-                {
-                    var dialog = new SteamConsoleCommandDialog(Conductor.SteamConsoleCommand)
-                    {
-                        Owner = Application.Current == null ? null : Application.Current.MainWindow
-                    };
-                    dialog.ShowDialog();
-                }
-                else if(result1 == -1)
-                {
-                    MessageBox.Show("Failed to show steam console for some reason.");
-                }
+            RequestManualSteamConsoleCommand();
 
-                // TODO create overlay
+            // TODO create overlay
+        }
+
+        private void RequestManualSteamConsoleCommand()
+        {
+            int result = Conductor.RequestSteamConsole();
+            if (result == 1)
+            {
+                dialogService.ShowSteamConsoleCommandDialog(Conductor.SteamConsoleCommand);
+            }
+            else if(result == -1)
+            {
+                dialogService.ShowMessage("Failed to show steam console for some reason.");
             }
         }
 

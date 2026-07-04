@@ -3,13 +3,12 @@
 overlayの根底の実装をして、codexが悩まないようにする
 - Mvvmを想定して、コードビハインドはBehaviorに代替する
 
-コンソールのコマンド要求をする
-箱ひげ中央数値
--2は透明
 archiveを記憶し過ぎるとメモリ圧迫の可能性がある
 圧縮したらいいんじゃね？
 
 ## 調整内容
+
+kent2の名前はtestから除く
 
 # ユーザーが知りたい内容
 
@@ -25,11 +24,12 @@ WinAutoTyperが雛形になるので、それを良く熟読し、それに準拠した構造になるようにせ
 
 SpsLogic/ 実際行う内部処理の定義. ここをCodexが触る場合は基本的に開発者からの許可を得なければならない
 		SpsLogic/Models/... ここについては加えて、SpsGui/Modelと同じく内部処理を統括するもので、DependencyInjectionによる起動を前提とする。
-SpsGui/Model SpsLogicの各処理とやり取りを行う場所。内部処理を統括する
+SpsGui/Models SpsLogicの各処理とやり取りを行う場所。内部処理を統括する
 SpsGui/Views 表示されるGuiパーツを置く場所。Views/直下にはWindowを書き、Views/Controls/にはUserControlを書く。Data Drive的に後述のViewModelから渡された情報をGuiに表現する。Controlsでは、MVVMから若干逸脱し、Behaviorに依存せずコードビハインドを書いて構わない。
 SpsGui/ViewModels は、ViewとModelの橋渡しをするViewModelを置く
 SpsGui/Behaviorには、WinAutoTyperと同じくBehaviorを置く。ViewはData Driven的にしか動けないので、どうしてもコードビハインドが必要な処理はこちらにて行う。
 SpsGui/Resourcesには、StaticResourceや音、絵などのリソース系を置く。i18nされうる文字列は全てこちらに置く
+SpsGui/Models/Services VMとしては自分の担当するModelとViewの仲介をやりたいが、しかし他のMVVMと触れ合ってしまうのは疎結合が達成できない。よって、Serviceに依頼するものとする。
 
 # 各種UIの説明
 
