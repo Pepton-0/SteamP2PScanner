@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Globalization;
 using System.Linq;
@@ -12,6 +12,8 @@ namespace SpsGui.Views.Controls
     /// </summary>
     public class BarChartControl : FrameworkElement
     {
+        private const double PlaceholderSampleValue = -2.0;
+
         /// <summary>
         /// Samples dependency property.
         /// </summary>
@@ -132,6 +134,11 @@ namespace SpsGui.Views.Controls
             for (int i = 0; i < samples.Length; i++)
             {
                 double value = samples[i];
+                if (value == PlaceholderSampleValue)
+                {
+                    continue;
+                }
+
                 Brush brush = value < 0 ? LossBrush : BarBrush;
                 double x = plotLeft + i * (barWidth + barGap);
                 double barHeight = value < 0

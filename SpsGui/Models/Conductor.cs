@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Forms = System.Windows.Forms;
 
 namespace SpsGui.Models
 {
@@ -50,13 +51,9 @@ namespace SpsGui.Models
         private const string STEAM_COMMAND = "log_ipc \"BeginAuthSession,EndAuthSession,LeaveLobby,SendClanChatMessage\"";
         private const int OpenConsoleDelayMilliseconds = 1500;
         private const int ClipboardDelayMilliseconds = 150;
-        private const int ClipboardRetryCount = 10;
-        private const int ClipboardRetryDelayMilliseconds = 50;
-        private const uint INPUT_KEYBOARD = 1;
-        private const ushort VK_CONTROL = 0x11;
-        private const ushort VK_V = 0x56;
-        private const ushort VK_RETURN = 0x0D;
-        private const uint KEYEVENTF_KEYUP = 0x0002;
+        private const int ClipboardRestoreDelayMilliseconds = 700;
+        private const int ClipboardRetryCount = 50;
+        private const int ClipboardRetryDelayMilliseconds = 100;
         private const int SW_RESTORE = 9;
         private static readonly string[] SteamProcessNames = { "steam", "steamwebhelper" };
         private readonly IPacketScan packetScan;
@@ -121,7 +118,7 @@ namespace SpsGui.Models
 
             if (!SteamPeerManager.InitializeSteamApi(info))
             {
-                return null;
+                throw new InvalidOperationException("Steam API initialization returned false.");
             }
 
             return new SteamPeerManager(packetScan, info.Info.ProcessName);
@@ -152,8 +149,7 @@ namespace SpsGui.Models
                     return false;
                 }
                 await Task.Delay(ClipboardDelayMilliseconds);
-                PasteSteamConsoleCommand();
-                return true;
+                return PasteSteamConsoleCommand();
             }
             catch (Exception e)
             {
@@ -240,19 +236,31 @@ namespace SpsGui.Models
             return startupDateString == null || DateTime.Parse(startupDateString) > ipcLogDate;
         }
 
-        private static void PasteSteamConsoleCommand()
+        private static bool PasteSteamConsoleCommand()
         {
+            Logger.DebugLog("Called paste steam console command");
             IDataObject previousClipboard = null;
             bool shouldRestoreClipboard = TryGetClipboardData(out previousClipboard);
 
             try
             {
-                SetClipboardText(STEAM_COMMAND);
-                SendPasteAndEnter();
+                if (!TrySetClipboardText(STEAM_COMMAND))
+                {
+                    Logger.DebugLog("Failed to set cllipboard text");
+                    return false;
+                }
+
+                if (!TryActivateSteamWindow())
+                {
+                    Logger.Log("Failed to activate Steam window before sending keys.", true);
+                    return false;
+                }
+
+                return SendPasteAndEnter();
             }
             finally
             {
-                Task.Delay(ClipboardDelayMilliseconds).Wait();
+                Task.Delay(ClipboardRestoreDelayMilliseconds).Wait();
                 if (shouldRestoreClipboard)
                 {
                     TryRestoreClipboardData(previousClipboard);
@@ -263,6 +271,7 @@ namespace SpsGui.Models
         private static bool TryGetClipboardData(out IDataObject data)
         {
             data = null;
+            ExternalException lastException = null;
             for (int i = 0; i < ClipboardRetryCount; i++)
             {
                 try
@@ -270,37 +279,51 @@ namespace SpsGui.Models
                     data = Clipboard.GetDataObject();
                     return data != null;
                 }
-                catch (ExternalException)
+                catch (ExternalException e)
                 {
+                    lastException = e;
                     Task.Delay(ClipboardRetryDelayMilliseconds).Wait();
                 }
+            }
+
+            if (lastException != null)
+            {
+                Logger.Log("Failed to get clipboard data because " + lastException.Message, true);
             }
 
             return false;
         }
 
-        private static void SetClipboardText(string text)
+        private static bool TrySetClipboardText(string text)
         {
+            ExternalException lastException = null;
             for (int i = 0; i < ClipboardRetryCount; i++)
             {
                 try
                 {
                     Clipboard.SetText(text);
-                    return;
+                    return true;
                 }
-                catch (ExternalException)
+                catch (ExternalException e)
                 {
+                    lastException = e;
                     Task.Delay(ClipboardRetryDelayMilliseconds).Wait();
                 }
             }
 
-            Clipboard.SetText(text);
+            if (lastException != null)
+            {
+                Logger.Log("Failed to set clipboard text because " + lastException.Message, true);
+            }
+
+            return false;
         }
 
         private static void TryRestoreClipboardData(IDataObject data)
         {
             try
             {
+                Logger.DebugLog("Try restore clipboard data");
                 Clipboard.SetDataObject(data, true);
             }
             catch (ExternalException e)
@@ -309,39 +332,21 @@ namespace SpsGui.Models
             }
         }
 
-        private static void SendPasteAndEnter()
+        private static bool SendPasteAndEnter()
         {
-            INPUT[] inputs =
+            try
             {
-                CreateKeyInput(VK_CONTROL, false),
-                CreateKeyInput(VK_V, false),
-                CreateKeyInput(VK_V, true),
-                CreateKeyInput(VK_CONTROL, true),
-                CreateKeyInput(VK_RETURN, false),
-                CreateKeyInput(VK_RETURN, true)
-            };
-
-            uint sent = SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
-            if (sent != inputs.Length)
-            {
-                Logger.Log("Failed to send Steam console input. SendInput sent " + sent + " of " + inputs.Length + " events.", true);
+                Logger.DebugLog("Send Steam console input with SendKeys.");
+                Forms.SendKeys.SendWait("^v");
+                Task.Delay(ClipboardDelayMilliseconds).Wait();
+                Forms.SendKeys.SendWait("{ENTER}");
+                return true;
             }
-        }
-
-        private static INPUT CreateKeyInput(ushort virtualKey, bool keyUp)
-        {
-            return new INPUT
+            catch (Exception e)
             {
-                Type = INPUT_KEYBOARD,
-                Data = new InputUnion
-                {
-                    Keyboard = new KEYBDINPUT
-                    {
-                        VirtualKey = virtualKey,
-                        Flags = keyUp ? KEYEVENTF_KEYUP : 0
-                    }
-                }
-            };
+                Logger.Log("Failed to send Steam console input with SendKeys because " + e.Message, true);
+                return false;
+            }
         }
 
         private static bool TryActivateSteamWindow()
@@ -363,8 +368,8 @@ namespace SpsGui.Models
                             continue;
                         }
 
-                        ShowWindow(windowHandle, SW_RESTORE);
-                        SetForegroundWindow(windowHandle);
+                        WinApi.ShowWindow(windowHandle, SW_RESTORE);
+                        WinApi.SetForegroundWindow(windowHandle);
                         Task.Delay(ClipboardDelayMilliseconds).Wait();
                         if (IsSteamForegroundWindow())
                         {
@@ -387,14 +392,14 @@ namespace SpsGui.Models
 
         private static bool IsSteamForegroundWindow()
         {
-            IntPtr foregroundWindow = GetForegroundWindow();
+            IntPtr foregroundWindow = WinApi.GetForegroundWindow();
             if (foregroundWindow == IntPtr.Zero)
             {
                 return false;
             }
 
             uint processId;
-            GetWindowThreadProcessId(foregroundWindow, out processId);
+            WinApi.GetWindowThreadProcessId(foregroundWindow, out processId);
             if (processId == 0)
             {
                 return false;
@@ -412,45 +417,6 @@ namespace SpsGui.Models
                 Logger.Log("Failed to inspect foreground window because " + e.Message, true);
                 return false;
             }
-        }
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint SendInput(uint inputCount, INPUT[] inputs, int size);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr windowHandle);
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr windowHandle, int command);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern uint GetWindowThreadProcessId(IntPtr windowHandle, out uint processId);
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct INPUT
-        {
-            public uint Type;
-            public InputUnion Data;
-        }
-
-        [StructLayout(LayoutKind.Explicit)]
-        private struct InputUnion
-        {
-            [FieldOffset(0)]
-            public KEYBDINPUT Keyboard;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct KEYBDINPUT
-        {
-            public ushort VirtualKey;
-            public ushort ScanCode;
-            public uint Flags;
-            public uint Time;
-            public IntPtr ExtraInfo;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SpsGui.Views;
+using SpsGui.Models.Services;
 using SpsLogic;
 using Steamworks;
 using System;
@@ -28,6 +28,7 @@ namespace SpsGui.ViewModels
         private readonly SteamAppInfo appInfo;
         private readonly SteamPeerManager manager;
         private readonly IPacketScan packetScan;
+        private readonly IDialogService dialogService;
         private readonly DispatcherTimer updateTimer;
         private readonly Dictionary<string, PingProfileSnapshot> activeSnapshots =
             new Dictionary<string, PingProfileSnapshot>(StringComparer.OrdinalIgnoreCase);
@@ -42,11 +43,17 @@ namespace SpsGui.ViewModels
         /// <param name="appInfo">Selected Steam application information. Must not be null.</param>
         /// <param name="manager">Steam peer manager prepared for the selected application. Must not be null.</param>
         /// <param name="packetScan">Packet scanner shared with the peer manager. Must not be null.</param>
-        public ProfileScreenViewModel(SteamAppInfo appInfo, SteamPeerManager manager, IPacketScan packetScan)
+        /// <param name="dialogService">Service used to show modal dialogs.</param>
+        public ProfileScreenViewModel(
+            SteamAppInfo appInfo,
+            SteamPeerManager manager,
+            IPacketScan packetScan,
+            IDialogService dialogService)
         {
             this.appInfo = appInfo ?? throw new ArgumentNullException(nameof(appInfo));
             this.manager = manager ?? throw new ArgumentNullException(nameof(manager));
             this.packetScan = packetScan ?? throw new ArgumentNullException(nameof(packetScan));
+            this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
             ExportArchiveCommand = new AsyncRelayCommand<PingProfileSnapshot>(ExportArchiveAsync, CanExportArchive);
 
@@ -257,11 +264,7 @@ namespace SpsGui.ViewModels
                 string fileName = CreateArchiveFileName(snapshot);
                 await snapshot.PacketArchive.SaveCaptureAsync(fileName).ConfigureAwait(true);
                 string path = Path.GetFullPath(Path.Combine("archives", fileName));
-                var dialog = new ArchivePathDialog(path)
-                {
-                    Owner = Application.Current == null ? null : Application.Current.MainWindow
-                };
-                dialog.ShowDialog();
+                dialogService.ShowArchivePathDialog(path);
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using SpsGui.Behaviors;
 using SpsGui.Models;
+using SpsGui.Models.Services;
 using SpsGui.ViewModels;
 using SpsGui.Views;
 using SpsLogic;
@@ -30,6 +31,7 @@ namespace SpsGui
 #if MVVM_APP
             Ioc.Default.ConfigureServices(new ServiceCollection()
                 .AddSingleton<IConductor, Conductor>()
+                .AddSingleton<IDialogService, DialogService>()
                 .AddSingleton<ISteamAppFinder, SteamAppFinder>()
                 .AddSingleton<IPacketScan, PacketScan>()
                 .AddTransient<CoreWindowViewModel>()

@@ -14,18 +14,34 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0"
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
                        Text="{StaticResource SteamExeLabel}"
                        VerticalAlignment="Center"
                        Margin="0,0,12,0" />
-            <TextBox Grid.Column="1"
+            <TextBox Grid.Row="0"
+                     Grid.Column="1"
                      Text="{Binding SteamExePath, UpdateSourceTrigger=PropertyChanged}"
                      VerticalContentAlignment="Center"
                      FontFamily="Consolas" />
+            <TextBlock Grid.Row="1"
+                       Grid.Column="0"
+                       Text="{StaticResource AutoIpcLabel}"
+                       VerticalAlignment="Center"
+                       Margin="0,10,12,0" />
+            <CheckBox Grid.Row="1"
+                      Grid.Column="1"
+                      IsChecked="{Binding AutoIpc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      VerticalAlignment="Center"
+                      Margin="0,10,0,0" />
         </Grid>
 
         <Grid Grid.Row="1">

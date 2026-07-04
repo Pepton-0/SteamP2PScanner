@@ -173,5 +173,8 @@ namespace SpsLogic
 
         [DllImport("USER32.DLL")]
         public static extern IntPtr GetShellWindow();
+
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr windowHandle, int command);
     }
 }
