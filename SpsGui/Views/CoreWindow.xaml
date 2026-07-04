@@ -4,6 +4,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                  xmlns:behaviors="clr-namespace:SpsGui.Behaviors"
                  xmlns:views="clr-namespace:SpsGui.Views"
                  xmlns:vm="clr-namespace:SpsGui.ViewModels"
@@ -20,6 +21,12 @@
                  ShowTitleBar="True"
                  ResizeMode="CanResizeWithGrip"
                  WindowStartupLocation="CenterScreen">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ExitCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
             <TextBlock Text="{Binding CurrentProcessName}"
@@ -28,6 +35,7 @@
                        Foreground="#C8C8C8"
                        TextTrimming="CharacterEllipsis"
                        MaxWidth="220" />
+            <Button Command="{Binding TestCommand}" Content="Test"/>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 

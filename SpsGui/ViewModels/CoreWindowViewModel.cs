@@ -16,8 +16,11 @@ namespace SpsGui.ViewModels
     {
         private object currentViewModel;
         private readonly IConductor Conductor;
+        private bool isExiting;
 
         public IRelayCommand<object> ExitCommand { get; private set; }
+
+        public IRelayCommand<object> TestCommand { get; private set; }
 
         /// <summary>
         /// Initializes the root window view model.
@@ -33,6 +36,23 @@ namespace SpsGui.ViewModels
             initialScreen.ProfileRequested += OnProfileRequested;
             CurrentViewModel = initialScreen;
             ExitCommand = new RelayCommand<object>(OnExit);
+            TestCommand = new RelayCommand<object>(async (d) => {
+                var result0 = AppConfig.Instance.AutoIpc && await Conductor.AutoSteamConsoleAsync();
+
+                int result1 = int.MaxValue;
+                if (!result0 && (result1 = Conductor.RequestSteamConsole()) == 1)
+                {
+                    var dialog = new SteamConsoleCommandDialog(Conductor.SteamConsoleCommand)
+                    {
+                        Owner = Application.Current == null ? null : Application.Current.MainWindow
+                    };
+                    dialog.ShowDialog();
+                }
+                else if (result1 == -1)
+                {
+                    MessageBox.Show("Failed to show steam console for some reason.");
+                }
+            });
         }
 
         /// <summary>
@@ -66,7 +86,7 @@ namespace SpsGui.ViewModels
         }
         private string currentProcessName = string.Empty;
 
-        private void OnProfileRequested(object sender, SteamAppInfo appInfo)
+        private async void OnProfileRequested(object sender, SteamAppInfo appInfo)
         {
             SteamPeerManager manager = null;
             try
@@ -90,16 +110,40 @@ namespace SpsGui.ViewModels
                 }
                 CurrentProcessName = appInfo.Info.ProcessName;
                 CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan);
+
+                var result0 = AppConfig.Instance.AutoIpc && await Conductor.AutoSteamConsoleAsync();
+
+                int result1 = int.MaxValue;
+                if (!result0 && (result1 = Conductor.RequestSteamConsole()) == 1)
+                {
+                    var dialog = new SteamConsoleCommandDialog(Conductor.SteamConsoleCommand)
+                    {
+                        Owner = Application.Current == null ? null : Application.Current.MainWindow
+                    };
+                    dialog.ShowDialog();
+                }
+                else if(result1 == -1)
+                {
+                    MessageBox.Show("Failed to show steam console for some reason.");
+                }
+
                 // TODO create overlay
             }
         }
 
         private void OnExit(object sender)
         {
-            var window = sender as CoreWindow;
-            window.Hide();
+            if (isExiting)
+            {
+                return;
+            }
+
+            isExiting = true;
             SteamPeerManager.ShutdownSteamApi();
-            App.Current.Shutdown();
+            if (Application.Current != null)
+            {
+                Application.Current.Shutdown();
+            }
         }
     }
 }

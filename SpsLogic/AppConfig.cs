@@ -131,6 +131,19 @@ namespace SpsLogic
         }
         private double _packetPatienceMs = DefaultPacketPatienceLimitMs;
 
+        [JsonProperty("auto_ipc")]
+        public bool AutoIpc
+        {
+            get { return _autoIpc; }
+            set
+            {
+                _autoIpc = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _autoIpc = true;
+
         static AppConfig()
         {
             LoadOrCreate();

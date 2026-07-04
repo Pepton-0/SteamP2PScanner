@@ -81,6 +81,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Models\PacketScan.cs" />
     <Compile Include="Models\SteamAppFinder.cs" />
+    <Compile Include="ReverseTextReader.cs" />
     <Compile Include="SteamPeerBase.cs" />
     <Compile Include="SteamPeerInfo.cs" />
     <Compile Include="SteamPeerManager.cs" />

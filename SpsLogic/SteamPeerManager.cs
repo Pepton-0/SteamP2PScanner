@@ -198,16 +198,25 @@ namespace SpsLogic
 
             while (!mustReopenLog)
             {
-                string line = await sr.ReadLineAsync();
-
-                if (!string.IsNullOrEmpty(line))
-                    Logger.DebugLog("new line; " + line);
-
-                // ログの終端に到達したら終了
-                if (line == null)
+                string line = null;
+                try
                 {
-                    lastPosInLog = fs.Position;
-                    break;
+                    line = await sr.ReadLineAsync();
+
+                    if (!string.IsNullOrEmpty(line))
+                        Logger.DebugLog("new line; " + line);
+
+                    // ログの終端に到達したら終了
+                    if (line == null)
+                    {
+                        lastPosInLog = fs.Position;
+                        break;
+                    }
+                }
+                catch(Exception e)
+                {
+                    Logger.Log("Failed to load a new line because " + e.Message);
+                    continue;
                 }
 
                 // 対象のプロセスに関するログでなければスキップ
