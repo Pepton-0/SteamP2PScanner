@@ -10,7 +10,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SpsLogic;
-using Steamworks;
 
 namespace SpsGui
 {
@@ -132,12 +131,12 @@ namespace SpsGui
             ConnectionStats stats,
             IEnumerable<int> initialPings,
             PacketScan.PacketArchive packetArchive = null,
-            CSteamID? steamId = null,
+            ulong steamId = 0,
             bool usingRelay = false)
         {
             var snapshot = new PingProfileSnapshot(stats);
             snapshot.PacketArchive = packetArchive;
-            snapshot.SteamID = steamId ?? new CSteamID(0);
+            snapshot.SteamID = steamId;
             snapshot.UsingRelay = usingRelay;
             snapshot.UsingDns = false;
             foreach (int ping in initialPings)
@@ -153,7 +152,7 @@ namespace SpsGui
         {
             var snapshot = new PingProfileSnapshot(stats);
             snapshot.PacketArchive = null;
-            snapshot.SteamID = new CSteamID(0);
+            snapshot.SteamID = 0;
             snapshot.UsingRelay = false;
             snapshot.UsingDns = true;
             foreach (int ping in initialPings)
@@ -169,7 +168,7 @@ namespace SpsGui
             string state,
             ulong? netId,
             PacketScan.PlayerPingHistory history,
-            CSteamID? steamId = null,
+            ulong steamId = 0,
             bool usingRelay = false)
         {
             if (history == null)
@@ -181,7 +180,7 @@ namespace SpsGui
             snapshot.State = state;
             snapshot.NetIdValue = netId;
             snapshot.PacketArchive = history.Archive;
-            snapshot.SteamID = steamId ?? new CSteamID(0);
+            snapshot.SteamID = steamId;
             snapshot.UsingRelay = usingRelay;
             snapshot.UsingDns = false;
             snapshot.RefreshFromStats();
@@ -201,7 +200,7 @@ namespace SpsGui
         private double[] recentPings = new double[0];
         private ulong? netIdValue;
         private PacketScan.PacketArchive packetArchive;
-        private CSteamID steamID = new CSteamID(0);
+        private ulong steamID;
         private bool usingRelay;
         private bool usingDns;
 
@@ -289,7 +288,7 @@ namespace SpsGui
             private set => SetProperty(ref packetArchive, value);
         }
 
-        public CSteamID SteamID
+        public ulong SteamID
         {
             get => steamID;
             private set => SetProperty(ref steamID, value);
@@ -350,7 +349,7 @@ namespace SpsGui
         public string MaxText => FormatPing(Max);
         public string Latest => FormatLatest(RecentPings);
         public string Recent => FormatRecent(RecentPings);
-        public string SteamIDText => SteamID.m_SteamID.ToString(CultureInfo.InvariantCulture);
+        public string SteamIDText => SteamID.ToString(CultureInfo.InvariantCulture);
         public string UsingRelayText => UsingRelay ? "relay" : "direct";
         public Visibility SteamInfoVisibility => UsingDns ? Visibility.Collapsed : Visibility.Visible;
 

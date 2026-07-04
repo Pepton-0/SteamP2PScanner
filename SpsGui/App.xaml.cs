@@ -31,7 +31,9 @@ namespace SpsGui
 #if MVVM_APP
             Ioc.Default.ConfigureServices(new ServiceCollection()
                 .AddSingleton<IConductor, Conductor>()
+                .AddSingleton<IApplicationTitleService, ApplicationTitleService>()
                 .AddSingleton<IDialogService, DialogService>()
+                .AddSingleton<IOverlayService, OverlayService>()
                 .AddSingleton<ISteamAppFinder, SteamAppFinder>()
                 .AddSingleton<IPacketScan, PacketScan>()
                 .AddTransient<CoreWindowViewModel>()
@@ -63,6 +65,7 @@ namespace SpsGui
         {
             base.OnExit(e);
 #if MVVM_APP
+            Ioc.Default.GetRequiredService<IOverlayService>().Close();
             Ioc.Default.GetRequiredService<IPacketScan>().Dispose();
 #endif
         }

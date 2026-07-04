@@ -164,12 +164,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Behaviors\IocHelper.cs" />
+    <Compile Include="Behaviors\OverlayWindowBehavior.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\Conductor.cs" />
+    <Compile Include="Models\Services\ApplicationTitleService.cs" />
     <Compile Include="Models\Services\DialogService.cs" />
+    <Compile Include="Models\Services\OverlayService.cs" />
     <Compile Include="PingOverlayTest.xaml.cs">
       <DependentUpon>PingOverlayTest.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -196,6 +199,7 @@
     </Compile>
     <Compile Include="ViewModels\CoreWindowViewModel.cs" />
     <Compile Include="ViewModels\InitialScreenViewModel.cs" />
+    <Compile Include="ViewModels\OverlayWindowViewModel.cs" />
     <Compile Include="ViewModels\ProfileScreenViewModel.cs" />
     <Compile Include="Views\Controls\BarChartControl.cs" />
     <Compile Include="Views\Controls\BoxPlotControl.cs" />

@@ -9,6 +9,7 @@ archiveを記憶し過ぎるとメモリ圧迫の可能性がある
 ## 調整内容
 
 kent2の名前はtestから除く
+boxplotとbarchartの表示非表示はoverlay専用か確認
 
 # ユーザーが知りたい内容
 
@@ -122,6 +123,21 @@ SpsGui/Views/SteamAppIdDialog: MetroWindow
 	あとはWindowSelectDialogと変わらない。
 
 SpsGui/Views/OverlayWindow
+	C:\Users\Kent2\Desktop\MyProgram\WPF\SteamP2PInfo-rad\SteamP2PInfo\OverlayWindow.xaml、
+	C:\Users\Kent2\Desktop\MyProgram\WPF\SteamP2PInfo-rad\SteamP2PInfo\OverlayWindow.xaml.cs
+	を参考に作成すること。
+	仮置きのものの構造は壊して構わない。
+	SteamP2PInfo.OverlayWindowとの差異は以下の通り
+	- OverlayWindowが各種ロジック処理をしていたところを代わりに専用VMがWindowInfoを所有し、それに基づき専用Behaviorが表示非表示の設定を切り替えるようにする。
+	- 前と同じく右上にテーブルを表示することになる。ProfileScreenViewModelから渡されたSnapshotの配列に基づきObservableCollectionを作成する。
+		- Name, RelayやDNSの表示, avg, loss%, BoxPlotControl, BarChartControlとなる。
+			- AppConfigにてそれぞれの表示非表示を設定できるプロパティがあり、ProfileScreenのコンフィグでのオーバーレイ用の枠組みにてそれぞれを設定できる。
+		- 各デザインはProfileScreenの現在のpingモニタと同じでよい。
+			- ただし"RelayやDNSの表示"については、同じ列でそれらの情報を表示できるようにする。
+			- Relayのみtrue、Dnsのみtrue、どちらもtrue、どちらもfalseで表示するテキストを変える。
+			- どちらもtrueということは実際のところないが堅牢さの為実装。
+
+
 
 # 起動時の処理順序
 

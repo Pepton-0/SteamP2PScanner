@@ -109,17 +109,107 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
                                Grid.Column="0"
-                               Text="{StaticResource ShowBoxPlotLabel}"
+                               Text="{StaticResource OverlayEnabledLabel}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center" />
                     <mah:ToggleSwitch Grid.Row="0"
                                       Grid.Column="1"
-                                      IsOn="{Binding ShowBoxPlot, Mode=TwoWay}"
+                                      IsOn="{Binding OverlayEnabled, Mode=TwoWay}"
                                       HorizontalAlignment="Right"
+                                      OnContent=""
+                                      OffContent="" />
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Text="{StaticResource OverlayShowNameLabel}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="0,8,0,0" />
+                    <mah:ToggleSwitch Grid.Row="1"
+                                      Grid.Column="1"
+                                      IsOn="{Binding OverlayShowName, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,8,0,0"
+                                      OnContent=""
+                                      OffContent="" />
+
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Text="{StaticResource OverlayShowStatusLabel}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="0,8,0,0" />
+                    <mah:ToggleSwitch Grid.Row="2"
+                                      Grid.Column="1"
+                                      IsOn="{Binding OverlayShowStatus, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,8,0,0"
+                                      OnContent=""
+                                      OffContent="" />
+
+                    <TextBlock Grid.Row="3"
+                               Grid.Column="0"
+                               Text="{StaticResource OverlayShowAverageLabel}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="0,8,0,0" />
+                    <mah:ToggleSwitch Grid.Row="3"
+                                      Grid.Column="1"
+                                      IsOn="{Binding OverlayShowAverage, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,8,0,0"
+                                      OnContent=""
+                                      OffContent="" />
+
+                    <TextBlock Grid.Row="4"
+                               Grid.Column="0"
+                               Text="{StaticResource OverlayShowLossLabel}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="0,8,0,0" />
+                    <mah:ToggleSwitch Grid.Row="4"
+                                      Grid.Column="1"
+                                      IsOn="{Binding OverlayShowLoss, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,8,0,0"
+                                      OnContent=""
+                                      OffContent="" />
+
+                    <TextBlock Grid.Row="5"
+                               Grid.Column="0"
+                               Text="{StaticResource ShowBoxPlotLabel}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="0,8,0,0" />
+                    <mah:ToggleSwitch Grid.Row="5"
+                                      Grid.Column="1"
+                                      IsOn="{Binding OverlayShowBoxPlot, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,8,0,0"
+                                      OnContent=""
+                                      OffContent="" />
+
+                    <TextBlock Grid.Row="6"
+                               Grid.Column="0"
+                               Text="{StaticResource OverlayShowChartLabel}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="0,8,0,0" />
+                    <mah:ToggleSwitch Grid.Row="6"
+                                      Grid.Column="1"
+                                      IsOn="{Binding OverlayShowChart, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,8,0,0"
                                       OnContent=""
                                       OffContent="" />
                 </Grid>
