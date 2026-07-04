@@ -10,6 +10,8 @@ archiveを記憶し過ぎるとメモリ圧迫の可能性がある
 
 kent2の名前はtestから除く
 boxplotとbarchartの表示非表示はoverlay専用か確認
+min少数から整数
+
 
 # ユーザーが知りたい内容
 

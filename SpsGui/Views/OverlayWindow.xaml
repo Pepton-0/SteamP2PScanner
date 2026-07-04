@@ -62,28 +62,28 @@
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,2"
                                     VerticalAlignment="Center">
+                            <TextBlock Text="{Binding StatusText}"
+                                       Width="40"
+                                       Margin="0,0,8,0"
+                                       Style="{StaticResource OverlayCellTextStyle}"
+                                       Visibility="{Binding DataContext.ShowStatusVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <TextBlock Text="{Binding Name}"
                                        Width="150"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayCellTextStyle}"
                                        Visibility="{Binding DataContext.ShowNameVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                            <TextBlock Text="{Binding StatusText}"
-                                       Width="70"
-                                       Margin="0,0,8,0"
-                                       Style="{StaticResource OverlayCellTextStyle}"
-                                       Visibility="{Binding DataContext.ShowStatusVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <TextBlock Text="{Binding AverageText}"
-                                       Width="48"
+                                       Width="30"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayAverageTextStyle}"
                                        Visibility="{Binding DataContext.ShowAverageVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <TextBlock Text="{Binding LossText}"
-                                       Width="68"
+                                       Width="40"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayLossTextStyle}"
                                        Visibility="{Binding DataContext.ShowLossVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <controls:BoxPlotControl Width="220"
-                                                     Height="44"
+                                                     Height="34"
                                                      Margin="0,0,8,0"
                                                      Effect="{StaticResource OverlayShadowEffect}"
                                                      Minimum="{Binding Min}"
@@ -93,7 +93,7 @@
                                                      Maximum="{Binding Max}"
                                                      Visibility="{Binding DataContext.ShowBoxPlotVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <controls:BarChartControl Width="180"
-                                                      Height="44"
+                                                      Height="34"
                                                       Effect="{StaticResource OverlayShadowEffect}"
                                                       Samples="{Binding RecentPings}"
                                                       Average="{Binding Avg}"

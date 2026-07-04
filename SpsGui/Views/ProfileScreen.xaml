@@ -60,10 +60,10 @@
             </DataTemplate>
         </Grid.Resources>
 
-        <TabControl>
+        <TabControl Margin="0,-10,0,0">
             <TabItem Header="{StaticResource CurrentPingTab}">
                 <ListView ItemsSource="{Binding CurrentProfiles}"
-                          Margin="0,12,0,0"
+                          Margin="0,6,0,0"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
@@ -82,7 +82,7 @@
 
             <TabItem Header="{StaticResource HistoryPingTab}">
                 <ListView ItemsSource="{Binding HistoryProfiles}"
-                          Margin="0,12,0,0"
+                          Margin="0,6,0,0"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
