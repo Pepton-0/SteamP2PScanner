@@ -26,6 +26,8 @@
     <sys:String x:Key="ArchiveButton">Export</sys:String>
     <sys:String x:Key="ArchivePathTitle">Packet archive</sys:String>
     <sys:String x:Key="CopyButton">Copy</sys:String>
+    <sys:String x:Key="CloseButton">Close</sys:String>
+    <sys:String x:Key="SteamConsoleCommandTitle">Steam console command</sys:String>
     <sys:String x:Key="WindowSelectTitle">Select Window</sys:String>
     <sys:String x:Key="SteamAppIdTitle">Steam AppID</sys:String>
     <sys:String x:Key="OverlayPlaceholder">Overlay output will be connected after ping monitor data is available.</sys:String>
