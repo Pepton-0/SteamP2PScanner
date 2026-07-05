@@ -191,6 +191,8 @@ namespace SpsGui.ViewModels
             Q1 = snapshot.Q1;
             Med = snapshot.Med;
             Q3 = snapshot.Q3;
+            Origin = snapshot.Origin;
+            Limit = snapshot.Limit;
             Avg = snapshot.Avg;
             RecentPings = snapshot.RecentPings ?? new double[0];
         }
@@ -206,6 +208,10 @@ namespace SpsGui.ViewModels
         public double Min { get; private set; }
 
         public double Max { get; private set; }
+
+        public double Origin { get; private set; }
+
+        public double Limit { get; private set; }
 
         public double Q1 { get; private set; }
 

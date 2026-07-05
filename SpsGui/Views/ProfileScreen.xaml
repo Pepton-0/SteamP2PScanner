@@ -24,28 +24,36 @@
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
             <DataTemplate x:Key="AverageCellTemplate">
-                <TextBlock Text="{Binding AverageText}" Style="{StaticResource AverageTextStyle}" />
+                <TextBlock Text="{Binding AverageText}" 
+                           Style="{StaticResource AverageTextStyle}" 
+                           VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="LossCellTemplate">
-                <TextBlock Text="{Binding LossText}" Style="{StaticResource LossTextStyle}" />
+                <TextBlock Text="{Binding LossText}" 
+                           Style="{StaticResource LossTextStyle}"
+                           VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="RelayCellTemplate">
                 <TextBlock Text="{Binding UsingRelayText}"
                            Style="{StaticResource CellTextStyle}"
-                           Visibility="{Binding UsingRelayVisibility}" />
+                           Visibility="{Binding UsingRelayVisibility}"
+                           VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="DnsCellTemplate">
                 <TextBlock Text="{Binding UsingDnsText}"
                            Style="{StaticResource CellTextStyle}"
-                           Visibility="{Binding UsingDnsVisibility}" />
+                           Visibility="{Binding UsingDnsVisibility}" 
+                           VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="BoxPlotCellTemplate">
                 <controls:BoxPlotControl Height="52"
+                                         Origin="{Binding Origin}"
                                          Minimum="{Binding Min}"
                                          FirstQuartile="{Binding Q1}"
                                          Median="{Binding Med}"
                                          ThirdQuartile="{Binding Q3}"
-                                         Maximum="{Binding Max}" />
+                                         Maximum="{Binding Max}"
+                                         Limit="{Binding Limit}" />
             </DataTemplate>
             <DataTemplate x:Key="BarChartCellTemplate">
                 <controls:BarChartControl Height="52"
@@ -68,7 +76,7 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="{StaticResource PingNameHeader}" Width="180" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="{StaticResource PingNameHeader}" Width="Auto" DisplayMemberBinding="{Binding Name}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingRelayHeader}" Width="82" CellTemplate="{StaticResource RelayCellTemplate}" />

@@ -138,10 +138,16 @@ namespace SpsLogic
 
         public class PlayerPingHistory : IDisposable
         {
+            /// <summary>
+            /// ignore packet loss in a few seconds since the scan begins
+            /// </summary>
+            private const double LossDetectPatience = 9.0d;
+
             public readonly PacketArchive Archive;
             public readonly ConnectionStats Stats;
 
             private readonly double PatienceLimitMs;
+            private readonly PosixTimeval StartTime;
 
             // register a pair when detecting a send classicstun from my computer to the opponent computer
             // because it can't be lossed
@@ -153,6 +159,7 @@ namespace SpsLogic
             {
                 Archive = new PacketArchive();
                 Stats = new ConnectionStats(10, name);
+                this.StartTime = new PosixTimeval(Stats.StartedAt);
                 UnmatchedPackets = new Dictionary<ClassicStunTransactionId, PosixTimeval>();
                 this.PatienceLimitMs = patienceLimitMs;
             }
@@ -201,6 +208,12 @@ namespace SpsLogic
                 List<ClassicStunTransactionId> removeCandidates = new List<ClassicStunTransactionId>();
                 foreach(var pair in UnmatchedPackets)
                 {
+                    if((double)(pair.Value.Value - StartTime.Value) * 1.0d < LossDetectPatience)
+                    {
+                        // The packet within a few secs since packet scan is ignored because its packet loss is common.
+                        removeCandidates.Add(pair.Key);
+                    }
+
                     if((double)((now.Value - pair.Value.Value) * 1000m) > PatienceLimitMs)
                     {
                         // Take the packet as packet loss.

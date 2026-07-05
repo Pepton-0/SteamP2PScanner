@@ -25,7 +25,7 @@ namespace SpsGui
             InitializeComponent();
             DataContext = this;
 
-            Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Kent2"), CreateInitialStats(36, 8, 0.05)));
+            Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Player Bravo"), CreateInitialStats(36, 8, 0.05)));
             Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Player Alpha"), CreateInitialStats(72, 22, 0.12)));
             Profiles.Add(PingProfileSnapshot.CreateDns(new ConnectionStats(10, "Cloudflare DNS"), CreateInitialStats(18, 4, 0.02)));
             Profiles.Add(PingProfileSnapshot.CreateDns(new ConnectionStats(10, "Google DNS"), CreateInitialStats(28, 6, 0.03)));

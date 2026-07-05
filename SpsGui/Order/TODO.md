@@ -6,12 +6,10 @@ overlayの根底の実装をして、codexが悩まないようにする
 archiveを記憶し過ぎるとメモリ圧迫の可能性がある
 圧縮したらいいんじゃね？
 
-## 調整内容
-
-kent2の名前はtestから除く
+csteamの情報をpacketscanに渡して、snapshotでも表示されるようにしたい。
 boxplotとbarchartの表示非表示はoverlay専用か確認
-min少数から整数
 
+## 調整内容
 
 # ユーザーが知りたい内容
 

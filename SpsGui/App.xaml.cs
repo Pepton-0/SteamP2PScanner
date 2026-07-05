@@ -40,12 +40,14 @@ namespace SpsGui
                 .BuildServiceProvider());
 #else
             //new PingOverlayTest().Show();
+            //new SnapshotChartDemoTest().Show();
             //new MainWindow().Show();
             // new PacketScanTest().Show();
             //new SteamDetectTest().Show();
             //new SteamDetectorV2Test().Show();
             // new SteamAppFinderTest().Show();
-            new SteamPacketScanTest().Show();
+            //new SteamPacketScanTest().Show();
+            new SnapshotChartDemoTest().Show();
 #endif
         }
 
