@@ -178,6 +178,32 @@ namespace SpsLogic
         }
         private bool _overlayShowChart = true;
 
+        [JsonProperty("overlay_offset_x")]
+        public double OverlayOffsetX
+        {
+            get { return _overlayOffsetX; }
+            set
+            {
+                _overlayOffsetX = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private double _overlayOffsetX;
+
+        [JsonProperty("overlay_offset_y")]
+        public double OverlayOffsetY
+        {
+            get { return _overlayOffsetY; }
+            set
+            {
+                _overlayOffsetY = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private double _overlayOffsetY;
+
         [JsonProperty("dns_ip")]
         public string DnsIp
         {

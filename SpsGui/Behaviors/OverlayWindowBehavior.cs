@@ -42,6 +42,20 @@ namespace SpsGui.Behaviors
                 typeof(OverlayWindowBehavior),
                 new PropertyMetadata(true, OnIsOverlayEnabledChanged));
 
+        public static readonly DependencyProperty OffsetXProperty =
+            DependencyProperty.Register(
+                nameof(OffsetX),
+                typeof(double),
+                typeof(OverlayWindowBehavior),
+                new PropertyMetadata(0.0, OnOffsetChanged));
+
+        public static readonly DependencyProperty OffsetYProperty =
+            DependencyProperty.Register(
+                nameof(OffsetY),
+                typeof(double),
+                typeof(OverlayWindowBehavior),
+                new PropertyMetadata(0.0, OnOffsetChanged));
+
         public WindowInfo TargetWindowInfo
         {
             get { return (WindowInfo)GetValue(TargetWindowInfoProperty); }
@@ -52,6 +66,18 @@ namespace SpsGui.Behaviors
         {
             get { return (bool)GetValue(IsOverlayEnabledProperty); }
             set { SetValue(IsOverlayEnabledProperty, value); }
+        }
+
+        public double OffsetX
+        {
+            get { return (double)GetValue(OffsetXProperty); }
+            set { SetValue(OffsetXProperty, value); }
+        }
+
+        public double OffsetY
+        {
+            get { return (double)GetValue(OffsetYProperty); }
+            set { SetValue(OffsetYProperty, value); }
         }
 
         protected override void OnAttached()
@@ -89,6 +115,11 @@ namespace SpsGui.Behaviors
         private static void OnIsOverlayEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((OverlayWindowBehavior)d).UpdateVisibility();
+        }
+
+        private static void OnOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((OverlayWindowBehavior)d).UpdatePosition();
         }
 
         private void AssociatedObject_SourceInitialized(object sender, EventArgs e)
@@ -267,8 +298,8 @@ namespace SpsGui.Behaviors
             }
 
             const double margin = 12;
-            AssociatedObject.Left = targetRect.Right - AssociatedObject.ActualWidth - margin;
-            AssociatedObject.Top = targetRect.Top + margin;
+            AssociatedObject.Left = targetRect.Right - AssociatedObject.ActualWidth - margin + OffsetX;
+            AssociatedObject.Top = targetRect.Top + margin + OffsetY;
         }
 
         private Rect GetTargetRect()

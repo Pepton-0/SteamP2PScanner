@@ -17,7 +17,9 @@
         IsHitTestVisible="False">
     <i:Interaction.Behaviors>
         <behaviors:OverlayWindowBehavior TargetWindowInfo="{Binding TargetWindowInfo}"
-                                         IsOverlayEnabled="{Binding OverlayEnabled}" />
+                                         IsOverlayEnabled="{Binding OverlayEnabled}"
+                                         OffsetX="{Binding OverlayOffsetX}"
+                                         OffsetY="{Binding OverlayOffsetY}" />
     </i:Interaction.Behaviors>
 
     <Window.Resources>
