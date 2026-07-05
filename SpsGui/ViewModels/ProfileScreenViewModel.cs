@@ -201,6 +201,32 @@ namespace SpsGui.ViewModels
             }
         }
 
+        public double OverlayOffsetX
+        {
+            get { return AppConfig.Instance.OverlayOffsetX; }
+            set
+            {
+                if (AppConfig.Instance.OverlayOffsetX != value)
+                {
+                    AppConfig.Instance.OverlayOffsetX = value;
+                    OnPropertyChanged(nameof(OverlayOffsetX));
+                }
+            }
+        }
+
+        public double OverlayOffsetY
+        {
+            get { return AppConfig.Instance.OverlayOffsetY; }
+            set
+            {
+                if (AppConfig.Instance.OverlayOffsetY != value)
+                {
+                    AppConfig.Instance.OverlayOffsetY = value;
+                    OnPropertyChanged(nameof(OverlayOffsetY));
+                }
+            }
+        }
+
         /// <summary>
         /// Stops timers and network monitors owned by this view model.
         /// </summary>

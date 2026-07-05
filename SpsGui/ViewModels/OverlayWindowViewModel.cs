@@ -67,6 +67,16 @@ namespace SpsGui.ViewModels
             get { return AppConfig.Instance.OverlayEnabled; }
         }
 
+        public double OverlayOffsetX
+        {
+            get { return AppConfig.Instance.OverlayOffsetX; }
+        }
+
+        public double OverlayOffsetY
+        {
+            get { return AppConfig.Instance.OverlayOffsetY; }
+        }
+
         public Visibility ShowNameVisibility
         {
             get { return AppConfig.Instance.OverlayShowName ? Visibility.Visible : Visibility.Collapsed; }
@@ -136,6 +146,16 @@ namespace SpsGui.ViewModels
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(AppConfig.OverlayEnabled))
             {
                 OnPropertyChanged(nameof(OverlayEnabled));
+            }
+
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(AppConfig.OverlayOffsetX))
+            {
+                OnPropertyChanged(nameof(OverlayOffsetX));
+            }
+
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(AppConfig.OverlayOffsetY))
+            {
+                OnPropertyChanged(nameof(OverlayOffsetY));
             }
 
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(AppConfig.OverlayShowName))

@@ -20,6 +20,8 @@
     <sys:String x:Key="OverlayShowAverageLabel">Overlay average</sys:String>
     <sys:String x:Key="OverlayShowLossLabel">Overlay loss</sys:String>
     <sys:String x:Key="OverlayShowChartLabel">Show recent chart</sys:String>
+    <sys:String x:Key="OverlayOffsetXLabel">Overlay X offset</sys:String>
+    <sys:String x:Key="OverlayOffsetYLabel">Overlay Y offset</sys:String>
     <sys:String x:Key="PingNameHeader">name</sys:String>
     <sys:String x:Key="PingAverageHeader">avg</sys:String>
     <sys:String x:Key="PingLossHeader">loss%</sys:String>
