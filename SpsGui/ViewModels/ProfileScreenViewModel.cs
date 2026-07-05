@@ -540,7 +540,13 @@ namespace SpsGui.ViewModels
         public double Max
         {
             get { return max; }
-            private set { SetProperty(ref max, value); }
+            private set
+            {
+                if (SetProperty(ref max, value))
+                {
+                    OnPropertyChanged(nameof(Limit));
+                }
+            }
         }
 
         /// <summary>
@@ -616,6 +622,22 @@ namespace SpsGui.ViewModels
         {
             get { return packetArchive; }
             private set { SetProperty(ref packetArchive, value); }
+        }
+
+        /// <summary>
+        /// Gets the left edge scale value for box plots.
+        /// </summary>
+        public double Origin
+        {
+            get { return 0.0; }
+        }
+
+        /// <summary>
+        /// Gets the right edge scale value for box plots.
+        /// </summary>
+        public double Limit
+        {
+            get { return Max + 10.0; }
         }
 
         /// <summary>

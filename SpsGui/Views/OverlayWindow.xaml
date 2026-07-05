@@ -56,49 +56,66 @@
                        Style="{StaticResource OverlayTitleTextStyle}"
                        Visibility="{Binding EmptyTitleVisibility}" />
             <ItemsControl ItemsSource="{Binding Profiles}"
+                          HorizontalAlignment="Right"
+                          Grid.IsSharedSizeScope="True"
                           Visibility="{Binding TableVisibility}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0,2"
-                                    VerticalAlignment="Center">
+                        <Grid Margin="0,2"
+                              VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="OverlayNameColumn" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
                             <TextBlock Text="{Binding StatusText}"
+                                       Grid.Column="0"
                                        Width="40"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayCellTextStyle}"
                                        Visibility="{Binding DataContext.ShowStatusVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <TextBlock Text="{Binding Name}"
-                                       Width="150"
+                                       Grid.Column="1"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayCellTextStyle}"
                                        Visibility="{Binding DataContext.ShowNameVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <TextBlock Text="{Binding AverageText}"
+                                       Grid.Column="2"
                                        Width="30"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayAverageTextStyle}"
                                        Visibility="{Binding DataContext.ShowAverageVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <TextBlock Text="{Binding LossText}"
+                                       Grid.Column="3"
                                        Width="40"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayLossTextStyle}"
                                        Visibility="{Binding DataContext.ShowLossVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                             <controls:BoxPlotControl Width="220"
+                                                     Grid.Column="4"
                                                      Height="34"
                                                      Margin="0,0,8,0"
                                                      Effect="{StaticResource OverlayShadowEffect}"
+                                                     Origin="{Binding Origin}"
                                                      Minimum="{Binding Min}"
                                                      FirstQuartile="{Binding Q1}"
                                                      Median="{Binding Med}"
                                                      ThirdQuartile="{Binding Q3}"
                                                      Maximum="{Binding Max}"
+                                                     Limit="{Binding Limit}"
                                                      Visibility="{Binding DataContext.ShowBoxPlotVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                            <controls:BarChartControl Width="180"
+                            <controls:BarChartControl Width="100"
+                                                      Grid.Column="5"
                                                       Height="34"
                                                       Effect="{StaticResource OverlayShadowEffect}"
                                                       Samples="{Binding RecentPings}"
                                                       Average="{Binding Avg}"
                                                       Visibility="{Binding DataContext.ShowChartVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                        </StackPanel>
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -115,6 +115,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="SnapshotChartDemoTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="WindowSelectDialogTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -183,6 +187,10 @@
     </Compile>
     <Compile Include="SteamPacketScanTest.xaml.cs">
       <DependentUpon>SteamPacketScanTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SnapshotChartDemoTest.xaml.cs">
+      <DependentUpon>SnapshotChartDemoTest.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="WindowSelectDialogTest.xaml.cs">

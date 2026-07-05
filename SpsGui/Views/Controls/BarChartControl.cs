@@ -29,6 +29,13 @@ namespace SpsGui.Views.Controls
                 new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
         /// <summary>
+        /// Font size dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FontSizeProperty =
+            DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(BarChartControl),
+                new FrameworkPropertyMetadata(12.0, FrameworkPropertyMetadataOptions.AffectsRender));
+
+        /// <summary>
         /// Bar brush dependency property.
         /// </summary>
         public static readonly DependencyProperty BarBrushProperty =
@@ -65,6 +72,15 @@ namespace SpsGui.Views.Controls
         {
             get { return (double)GetValue(AverageProperty); }
             set { SetValue(AverageProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the font size used by the right-side maximum label.
+        /// </summary>
+        public double FontSize
+        {
+            get { return (double)GetValue(FontSizeProperty); }
+            set { SetValue(FontSizeProperty, value); }
         }
 
         /// <summary>
@@ -112,13 +128,13 @@ namespace SpsGui.Views.Controls
                 return;
             }
 
-            double textSize = Math.Max(9.0, Math.Min(14.0, height * 0.12));
-            double labelWidth = Math.Min(70.0, Math.Max(34.0, width * 0.14));
-            double labelHeight = textSize + 4.0;
+            double textSize = Math.Max(1.0, FontSize);
+            double labelWidth = Math.Max(24.0, textSize * 3.4);
+            double labelGap = 6.0;
             double plotLeft = 2.0;
             double plotTop = 2.0;
-            double plotRight = Math.Max(plotLeft + 1.0, width - labelWidth);
-            double plotBottom = Math.Max(plotTop + 1.0, height - labelHeight);
+            double plotRight = Math.Max(plotLeft + 1.0, width - labelWidth - labelGap);
+            double plotBottom = Math.Max(plotTop + 1.0, height - 2.0);
             double plotWidth = plotRight - plotLeft;
             double plotHeight = plotBottom - plotTop;
             double max = Math.Max(1.0, samples.Where(sample => sample >= 0).DefaultIfEmpty(1.0).Max());
@@ -128,7 +144,6 @@ namespace SpsGui.Views.Controls
             var axisPen = new Pen(BarBrush, 1.0);
             var averagePen = new Pen(AverageBrush, 1.5);
 
-            drawingContext.DrawLine(axisPen, new Point(plotRight, plotTop), new Point(plotRight, plotBottom));
             drawingContext.DrawLine(axisPen, new Point(plotLeft, plotBottom), new Point(plotRight, plotBottom));
 
             for (int i = 0; i < samples.Length; i++)
@@ -152,8 +167,7 @@ namespace SpsGui.Views.Controls
             double averageY = plotBottom - Math.Max(0.0, Math.Min(max, Average)) / max * plotHeight;
             drawingContext.DrawLine(averagePen, new Point(plotLeft, averageY), new Point(plotRight, averageY));
 
-            DrawText(drawingContext, FormatValue(max), plotRight + 6.0, plotTop, BarBrush, textSize);
-            DrawText(drawingContext, "0", plotRight + 6.0, plotBottom - textSize, BarBrush, textSize);
+            DrawText(drawingContext, FormatValue(max), plotRight + labelGap, plotTop, BarBrush, textSize);
         }
 
         private static string FormatValue(double value)
