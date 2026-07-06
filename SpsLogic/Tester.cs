@@ -1,4 +1,4 @@
-﻿    using PacketDotNet;
+﻿using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
 using System;
@@ -23,7 +23,7 @@ namespace SpsLogic
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
 
-            TestClassicStunTransactionIdDictionary();
+            //TestClassicStunTransactionIdDictionary();
             // TestPacketAnalysis(args);
             // TestDnsPingDispose();
             // TestDnsPing();

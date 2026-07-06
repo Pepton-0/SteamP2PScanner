@@ -25,8 +25,7 @@
     <sys:String x:Key="PingNameHeader">name</sys:String>
     <sys:String x:Key="PingAverageHeader">avg</sys:String>
     <sys:String x:Key="PingLossHeader">loss%</sys:String>
-    <sys:String x:Key="PingRelayHeader">relay</sys:String>
-    <sys:String x:Key="PingDnsHeader">dns</sys:String>
+    <sys:String x:Key="PingStatusHeader">status</sys:String>
     <sys:String x:Key="PingBoxPlotHeader">box plot</sys:String>
     <sys:String x:Key="PingChartHeader">recent</sys:String>
     <sys:String x:Key="PingStartedAtHeader">startedAt</sys:String>

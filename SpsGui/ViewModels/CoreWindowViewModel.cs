@@ -53,7 +53,7 @@ namespace SpsGui.ViewModels
             initialScreen.ProfileRequested += OnProfileRequested;
             CurrentViewModel = initialScreen;
             ExitCommand = new RelayCommand<object>(OnExit);
-            TestCommand = new RelayCommand<object>((d) => RequestManualSteamConsoleCommand());
+            TestCommand = new RelayCommand<object>((d) => Logger.Log("something"));
         }
 
         /// <summary>

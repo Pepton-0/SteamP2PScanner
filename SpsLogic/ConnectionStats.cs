@@ -18,6 +18,11 @@ namespace SpsLogic
         /// </summary>
         public readonly string Name;
 
+        /// <summary>
+        /// Usually CSteamID
+        /// </summary>
+        public readonly ulong Id;
+
         private double _min = -1;
         /// <summary>
         /// Min value among pings
@@ -105,9 +110,10 @@ namespace SpsLogic
         private Queue<double> RecentPingQueue;
         private readonly int RecentPingLimit;
 
-        public ConnectionStats(int recentPingLimit, string name)
+        public ConnectionStats(int recentPingLimit, string name, ulong id)
         {
             this.Name = name;
+            this.Id = id;
             RecentPingQueue = new Queue<double>();
             sortedPings = new List<double>();
             this.RecentPingLimit = recentPingLimit;

@@ -208,6 +208,7 @@
     <Compile Include="ViewModels\CoreWindowViewModel.cs" />
     <Compile Include="ViewModels\InitialScreenViewModel.cs" />
     <Compile Include="ViewModels\OverlayWindowViewModel.cs" />
+    <Compile Include="ViewModels\PingProfileSnapshot.cs" />
     <Compile Include="ViewModels\ProfileScreenViewModel.cs" />
     <Compile Include="Views\Controls\BarChartControl.cs" />
     <Compile Include="Views\Controls\BoxPlotControl.cs" />
