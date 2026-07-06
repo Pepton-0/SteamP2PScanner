@@ -89,6 +89,10 @@ namespace SpsGui.ViewModels
 
         private void OnProfileRequested(object sender, SteamAppInfo appInfo)
         {
+            //maybe requesting the command faster than manager resolves
+            //the problem that manager cannot load ipc file somehow.
+            RequestManualSteamConsoleCommand();
+
             SteamPeerManager manager = null;
             try
             {
@@ -117,13 +121,9 @@ namespace SpsGui.ViewModels
             CurrentProcessName = appInfo.Info.ProcessName;
             CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan, dialogService, overlayService);
             overlayService.Show(appInfo.Info);
-
-            RequestManualSteamConsoleCommand();
-
-            // TODO create overlay
         }
 
-        private void RequestManualSteamConsoleCommand()
+        private int RequestManualSteamConsoleCommand()
         {
             int result = Conductor.RequestSteamConsole();
             if (result == 1)
@@ -134,6 +134,8 @@ namespace SpsGui.ViewModels
             {
                 dialogService.ShowMessage("Failed to show steam console for some reason.");
             }
+
+            return result;
         }
 
         private void OnExit(object sender)

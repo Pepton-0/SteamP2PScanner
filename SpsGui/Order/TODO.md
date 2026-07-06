@@ -15,6 +15,9 @@ appconfig‚ÌƒoƒCƒ“ƒfƒBƒ“ƒO‚É‚Â‚¢‚ÄAvm‚Å’†Œp‚ÌƒoƒCƒ“ƒfƒBƒ“ƒO‚ğ‚·‚é‚Ì‚Í‘å•Ï‚È‚Ì‚Å’
 
 ## ’²®“à—e
 
+Œ^ 'System.Windows.Markup.XamlParseException' ‚Ìƒnƒ“ƒhƒ‹‚³‚ê‚Ä‚¢‚È‚¢—áŠO‚ª PresentationFramework.dll ‚Å”­¶‚µ‚Ü‚µ‚½
+TwoWay ‚Ü‚½‚Í OneWayToSource ƒoƒCƒ“ƒh‚ÍAŒ^ 'SpsGui.ViewModels.PingProfileSnapshot' ‚Ì“Ç‚İæ‚èê—pƒvƒƒpƒeƒB 'SteamIDText' ‚Å‚Í“®ì‚Å‚«‚Ü‚¹‚ñB
+
 # ƒ†[ƒU[‚ª’m‚è‚½‚¢“à—e
 
 1. ‘Šè‚Æ‚Ìping(avg, l•ªˆÊ”)/packet loss
