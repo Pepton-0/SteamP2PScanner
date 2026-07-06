@@ -19,7 +19,7 @@ namespace SpsLogic
     public interface IPacketScan : IDisposable
     {
         void Update();
-        void Register(ulong netId, string name);
+        void Register(ulong netId, string name, ulong id);
         void Unregister(ulong netId);
         void ForEachActiveHistory(Action<string, ulong?, PacketScan.PlayerPingHistory> action);
         PacketScan.PlayerPingHistory[] TakeUnseenOldHistories();
@@ -155,10 +155,10 @@ namespace SpsLogic
             // or time elapse since registering
             private Dictionary<ClassicStunTransactionId, PosixTimeval> UnmatchedPackets;
 
-            public PlayerPingHistory(double patienceLimitMs, string name)
+            public PlayerPingHistory(double patienceLimitMs, string name, ulong id)
             {
                 Archive = new PacketArchive();
-                Stats = new ConnectionStats(10, name);
+                Stats = new ConnectionStats(10, name, id);
                 this.StartTime = new PosixTimeval(Stats.StartedAt);
                 UnmatchedPackets = new Dictionary<ClassicStunTransactionId, PosixTimeval>();
                 this.PatienceLimitMs = patienceLimitMs;
@@ -268,7 +268,6 @@ namespace SpsLogic
             UnseenOldHistories = new List<PlayerPingHistory>();
             Stopwatch = new Stopwatch();
             Stopwatch.Start();
-            var l0 = Logger.GetTimestamp();
             Logger.Log("Setting up network device listener", true);
 
             var devCandis = LibPcapLiveDeviceList.Instance;
@@ -380,12 +379,13 @@ namespace SpsLogic
         /// </summary>
         /// <param name="netId"></param>
         /// <param name="name"></param>
-        public void Register(ulong netId, string name)
+        /// <param name="id">CSteamID</param>
+        public void Register(ulong netId, string name, ulong id)
         {
             lock (Registries)
             {
                 Logger.DebugLog($"Registered new net id to scan: {netId}");
-                Registries[netId] = new PlayerPingHistory(PatienceLimitMs, name);
+                Registries[netId] = new PlayerPingHistory(PatienceLimitMs, name, id);
             }
         }
 

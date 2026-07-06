@@ -25,10 +25,10 @@ namespace SpsGui
             InitializeComponent();
             DataContext = this;
 
-            Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Player Bravo"), CreateInitialStats(36, 8, 0.05)));
-            Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Player Alpha"), CreateInitialStats(72, 22, 0.12)));
-            Profiles.Add(PingProfileSnapshot.CreateDns(new ConnectionStats(10, "Cloudflare DNS"), CreateInitialStats(18, 4, 0.02)));
-            Profiles.Add(PingProfileSnapshot.CreateDns(new ConnectionStats(10, "Google DNS"), CreateInitialStats(28, 6, 0.03)));
+            Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Player Bravo", 1717), CreateInitialStats(36, 8, 0.05)));
+            Profiles.Add(PingProfileSnapshot.CreateSteam(new ConnectionStats(10, "Player Alpha", 1192), CreateInitialStats(72, 22, 0.12)));
+            Profiles.Add(PingProfileSnapshot.CreateDns(new ConnectionStats(10, "Cloudflare DNS", 0), CreateInitialStats(18, 4, 0.02)));
+            Profiles.Add(PingProfileSnapshot.CreateDns(new ConnectionStats(10, "Google DNS", 0), CreateInitialStats(28, 6, 0.03)));
 
             updateTimer = new DispatcherTimer(DispatcherPriority.Background);
             updateTimer.Interval = TimeSpan.FromMilliseconds(900);
@@ -131,12 +131,10 @@ namespace SpsGui
             ConnectionStats stats,
             IEnumerable<int> initialPings,
             PacketScan.PacketArchive packetArchive = null,
-            ulong steamId = 0,
             bool usingRelay = false)
         {
             var snapshot = new PingProfileSnapshot(stats);
             snapshot.PacketArchive = packetArchive;
-            snapshot.SteamID = steamId;
             snapshot.UsingRelay = usingRelay;
             snapshot.UsingDns = false;
             foreach (int ping in initialPings)
@@ -152,7 +150,6 @@ namespace SpsGui
         {
             var snapshot = new PingProfileSnapshot(stats);
             snapshot.PacketArchive = null;
-            snapshot.SteamID = 0;
             snapshot.UsingRelay = false;
             snapshot.UsingDns = true;
             foreach (int ping in initialPings)
@@ -168,7 +165,6 @@ namespace SpsGui
             string state,
             ulong? netId,
             PacketScan.PlayerPingHistory history,
-            ulong steamId = 0,
             bool usingRelay = false)
         {
             if (history == null)
@@ -180,7 +176,6 @@ namespace SpsGui
             snapshot.State = state;
             snapshot.NetIdValue = netId;
             snapshot.PacketArchive = history.Archive;
-            snapshot.SteamID = steamId;
             snapshot.UsingRelay = usingRelay;
             snapshot.UsingDns = false;
             snapshot.RefreshFromStats();
@@ -200,7 +195,6 @@ namespace SpsGui
         private double[] recentPings = new double[0];
         private ulong? netIdValue;
         private PacketScan.PacketArchive packetArchive;
-        private ulong steamID;
         private bool usingRelay;
         private bool usingDns;
 
@@ -290,8 +284,7 @@ namespace SpsGui
 
         public ulong SteamID
         {
-            get => steamID;
-            private set => SetProperty(ref steamID, value);
+            get => sourceStats.Id;
         }
 
         public bool UsingRelay

@@ -154,7 +154,7 @@ namespace SpsGui
 
                 IPEndPoint endpoint = ResolveEndpointFromUi();
                 ulong netId = PacketScan.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
-                packetScan.Register(netId, GetServiceHostText());
+                packetScan.Register(netId, GetServiceHostText(), 0);
 
                 registeredNetId = netId;
                 lastEndpoint = endpoint;

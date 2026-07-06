@@ -9,11 +9,9 @@ archiveを記憶し過ぎるとメモリ圧迫の可能性がある
 csteamの情報をpacketscanに渡して、snapshotでも表示されるようにしたい。
 boxplotとbarchartの表示非表示はoverlay専用か確認
 
-overlayの相対ポジションのxyを+-できるところが欲しい
-
-configはscroll付ける
-
 ipc読み込みはコマンド入力ダイアログ閉じた後にしないと安全でない…？
+
+appconfigのバインディングについて、vmで中継のバインディングをするのは大変なので直接にしたい
 
 ## 調整内容
 

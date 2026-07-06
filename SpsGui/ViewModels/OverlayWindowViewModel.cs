@@ -41,8 +41,8 @@ namespace SpsGui.ViewModels
         /// <summary>
         /// Gets rows displayed in the overlay.
         /// </summary>
-        public ObservableCollection<OverlayProfileSnapshot> Profiles { get; } =
-            new ObservableCollection<OverlayProfileSnapshot>();
+        public ObservableCollection<PingProfileSnapshot> Profiles { get; } =
+            new ObservableCollection<PingProfileSnapshot>();
 
         /// <summary>
         /// Gets the title text shown while there are no overlay rows.
@@ -119,7 +119,10 @@ namespace SpsGui.ViewModels
             {
                 foreach (PingProfileSnapshot snapshot in snapshots)
                 {
-                    Profiles.Add(new OverlayProfileSnapshot(snapshot));
+                    if (snapshot != null)
+                    {
+                        Profiles.Add(snapshot);
+                    }
                 }
             }
 
@@ -187,75 +190,6 @@ namespace SpsGui.ViewModels
             {
                 OnPropertyChanged(nameof(ShowChartVisibility));
             }
-        }
-    }
-
-    /// <summary>
-    /// Immutable overlay row copied from a profile snapshot.
-    /// </summary>
-    public class OverlayProfileSnapshot
-    {
-        public OverlayProfileSnapshot(PingProfileSnapshot snapshot)
-        {
-            if (snapshot == null)
-            {
-                throw new ArgumentNullException(nameof(snapshot));
-            }
-
-            Name = snapshot.Name;
-            AverageText = snapshot.AverageText;
-            LossText = snapshot.LossText;
-            StatusText = CreateStatusText(snapshot.UsingRelay, snapshot.UsingDns);
-            Min = snapshot.Min;
-            Max = snapshot.Max;
-            Q1 = snapshot.Q1;
-            Med = snapshot.Med;
-            Q3 = snapshot.Q3;
-            Origin = snapshot.Origin;
-            Limit = snapshot.Limit;
-            Avg = snapshot.Avg;
-            RecentPings = snapshot.RecentPings ?? new double[0];
-        }
-
-        public string Name { get; private set; }
-
-        public string StatusText { get; private set; }
-
-        public string AverageText { get; private set; }
-
-        public string LossText { get; private set; }
-
-        public double Min { get; private set; }
-
-        public double Max { get; private set; }
-
-        public double Origin { get; private set; }
-
-        public double Limit { get; private set; }
-
-        public double Q1 { get; private set; }
-
-        public double Med { get; private set; }
-
-        public double Q3 { get; private set; }
-
-        public double Avg { get; private set; }
-
-        public double[] RecentPings { get; private set; }
-
-        private static string CreateStatusText(bool usingRelay, bool usingDns)
-        {
-            if (usingRelay && usingDns)
-            {
-                return "relay/dns";
-            }
-
-            if (usingRelay)
-            {
-                return "relay";
-            }
-
-            return usingDns ? "dns" : string.Empty;
         }
     }
 }

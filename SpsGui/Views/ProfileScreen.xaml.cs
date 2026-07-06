@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace SpsGui.Views
 {
@@ -13,6 +15,17 @@ namespace SpsGui.Views
         public ProfileScreen()
         {
             InitializeComponent();
+        }
+
+        private void OnSteamProfileNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            if (e.Uri == null)
+            {
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
         }
     }
 }

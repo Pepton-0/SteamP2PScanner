@@ -54,7 +54,7 @@ namespace SpsLogic
                 byte[] ipBytes = BitConverter.GetBytes(mSessionState.m_nRemoteIP).Reverse().ToArray();
                 mNetIdentity = ((ulong)mSessionState.m_nRemotePort << 32) | BitConverter.ToUInt32(ipBytes, 0);
 
-                PacketScan.Register(mNetIdentity, Name);
+                PacketScan.Register(mNetIdentity, Name, SteamID.m_SteamID);
             }
 
             return true;

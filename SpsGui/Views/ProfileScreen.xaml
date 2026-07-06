@@ -33,17 +33,20 @@
                            Style="{StaticResource LossTextStyle}"
                            VerticalAlignment="Center"/>
             </DataTemplate>
-            <DataTemplate x:Key="RelayCellTemplate">
-                <TextBlock Text="{Binding UsingRelayText}"
+            <DataTemplate x:Key="StatusCellTemplate">
+                <TextBlock Text="{Binding StatusText}"
                            Style="{StaticResource CellTextStyle}"
-                           Visibility="{Binding UsingRelayVisibility}"
                            VerticalAlignment="Center"/>
             </DataTemplate>
-            <DataTemplate x:Key="DnsCellTemplate">
-                <TextBlock Text="{Binding UsingDnsText}"
-                           Style="{StaticResource CellTextStyle}"
-                           Visibility="{Binding UsingDnsVisibility}" 
-                           VerticalAlignment="Center"/>
+            <DataTemplate x:Key="SteamIdCellTemplate">
+                <TextBlock Style="{StaticResource CellTextStyle}"
+                           VerticalAlignment="Center">
+                    <Hyperlink NavigateUri="{Binding SteamProfileUrl}"
+                               IsEnabled="{Binding HasSteamProfileUrl}"
+                               RequestNavigate="OnSteamProfileNavigate">
+                        <Run Text="{Binding SteamIDText}" />
+                    </Hyperlink>
+                </TextBlock>
             </DataTemplate>
             <DataTemplate x:Key="BoxPlotCellTemplate">
                 <controls:BoxPlotControl Height="52"
@@ -79,8 +82,7 @@
                             <GridViewColumn Header="{StaticResource PingNameHeader}" Width="Auto" DisplayMemberBinding="{Binding Name}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingRelayHeader}" Width="82" CellTemplate="{StaticResource RelayCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingDnsHeader}" Width="64" CellTemplate="{StaticResource DnsCellTemplate}" />
+                            <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingBoxPlotHeader}" Width="270" CellTemplate="{StaticResource BoxPlotCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingChartHeader}" Width="220" CellTemplate="{StaticResource BarChartCellTemplate}" />
                         </GridView>
@@ -98,12 +100,12 @@
                             <GridViewColumn Header="{StaticResource PingStartedAtHeader}" Width="80" DisplayMemberBinding="{Binding StartedAtText}" />
                             <GridViewColumn Header="{StaticResource ArchiveHeader}" Width="92" CellTemplate="{StaticResource ArchiveButtonCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingNameHeader}" Width="170" DisplayMemberBinding="{Binding Name}" />
-                            <GridViewColumn Header="{StaticResource PingSteamIdHeader}" Width="150" DisplayMemberBinding="{Binding SteamIDText}" />
+                            <GridViewColumn Header="{StaticResource PingSteamIdHeader}" Width="150" CellTemplate="{StaticResource SteamIdCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingBoxPlotHeader}" Width="250" CellTemplate="{StaticResource BoxPlotCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingChartHeader}" Width="200" CellTemplate="{StaticResource BarChartCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingRelayHeader}" Width="82" CellTemplate="{StaticResource RelayCellTemplate}" />
+                            <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

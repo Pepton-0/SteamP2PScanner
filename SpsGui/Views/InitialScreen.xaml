@@ -32,6 +32,7 @@
                      Text="{Binding SteamExePath, UpdateSourceTrigger=PropertyChanged}"
                      VerticalContentAlignment="Center"
                      FontFamily="Consolas" />
+            <!-- Now i cannot realize auto input, comment these :<
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
                        Text="{StaticResource AutoIpcLabel}"
@@ -42,6 +43,7 @@
                       IsChecked="{Binding AutoIpc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       VerticalAlignment="Center"
                       Margin="0,10,0,0" />
+            !-->
         </Grid>
 
         <Grid Grid.Row="1">
