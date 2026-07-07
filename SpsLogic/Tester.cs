@@ -27,6 +27,14 @@ namespace SpsLogic
             // TestPacketAnalysis(args);
             // TestDnsPingDispose();
             // TestDnsPing();
+            TestWinPcap();
+        }
+
+        public static void TestWinPcap()
+        {
+            WinPcapInstallTest.TestDetection();
+            WinPcapInstallTest.LogLicenseCheckNotes();
+            Logger.Log(WinPcapInstallTest.GetBundledInstallerPath());
         }
 
         public static void TestSteamAppFinderEnumWindows(int iterationCount = 10)

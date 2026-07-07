@@ -6,17 +6,17 @@ overlayの根底の実装をして、codexが悩まないようにする
 archiveを記憶し過ぎるとメモリ圧迫の可能性がある
 圧縮したらいいんじゃね？
 
-csteamの情報をpacketscanに渡して、snapshotでも表示されるようにしたい。
-boxplotとbarchartの表示非表示はoverlay専用か確認
-
-ipc読み込みはコマンド入力ダイアログ閉じた後にしないと安全でない…？
-
 appconfigのバインディングについて、vmで中継のバインディングをするのは大変なので直接にしたい
 
-## 調整内容
+overlayのロジック変更
+フルスクに対応して表示できるようにしたい
 
-型 'System.Windows.Markup.XamlParseException' のハンドルされていない例外が PresentationFramework.dll で発生しました
-TwoWay または OneWayToSource バインドは、型 'SpsGui.ViewModels.PingProfileSnapshot' の読み取り専用プロパティ 'SteamIDText' では動作できません。
+インストーラの実装
+
+ファイル出力のオミット
+また、それに際してWinDivertの採用が現実的になったので、一般用はWindivertに変更
+
+## 調整内容
 
 # ユーザーが知りたい内容
 

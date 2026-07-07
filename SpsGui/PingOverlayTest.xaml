@@ -28,7 +28,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="{Binding Name}"
+                           Text="{Binding Name, Mode=OneWay}"
                            Foreground="{StaticResource TextBrush}"
                            FontSize="18"
                            FontWeight="SemiBold"
@@ -36,7 +36,7 @@
                            Margin="0,0,14,2" />
 
                 <TextBlock Grid.Column="1"
-                           Text="{Binding AverageText}"
+                           Text="{Binding AverageText, Mode=OneWay}"
                            Foreground="#22C55E"
                            FontSize="16"
                            HorizontalAlignment="Right"
@@ -44,7 +44,7 @@
                            Margin="0,0,14,2" />
 
                 <TextBlock Grid.Column="2"
-                           Text="{Binding LossText}"
+                           Text="{Binding LossText, Mode=OneWay}"
                            Foreground="#F87171"
                            FontSize="16"
                            HorizontalAlignment="Right"
@@ -55,13 +55,13 @@
                                    Height="46"
                                    Margin="0,0,12,2"
                                    VerticalAlignment="Center"
-                                   DataContext="{Binding}" />
+                                   DataContext="{Binding Mode=OneWay}" />
 
                 <local:RecentStatsBarsView Grid.Column="4"
                                            Height="46"
                                            Margin="0,0,0,2"
                                            VerticalAlignment="Center"
-                                           DataContext="{Binding}" />
+                                           DataContext="{Binding Mode=OneWay}" />
             </Grid>
         </DataTemplate>
     </Window.Resources>
@@ -79,7 +79,7 @@
 
             <ItemsControl Grid.Row="0"
                           Grid.IsSharedSizeScope="True"
-                          ItemsSource="{Binding Profiles}"
+                          ItemsSource="{Binding Profiles, Mode=OneWay}"
                           ItemTemplate="{StaticResource ProfilerRowTemplate}" />
         </Grid>
     </Border>

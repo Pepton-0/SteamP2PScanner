@@ -194,18 +194,18 @@
                     <ListView ItemsSource="{Binding ActiveHistories}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="State" Width="80" DisplayMemberBinding="{Binding State}" />
-                                <GridViewColumn Header="Name" Width="180" DisplayMemberBinding="{Binding Name}" />
-                                <GridViewColumn Header="NetId" Width="150" DisplayMemberBinding="{Binding NetId}" />
-                                <GridViewColumn Header="Avg" Width="80" DisplayMemberBinding="{Binding AverageText}" />
-                                <GridViewColumn Header="Loss" Width="80" DisplayMemberBinding="{Binding LossText}" />
-                                <GridViewColumn Header="Min" Width="70" DisplayMemberBinding="{Binding MinText}" />
-                                <GridViewColumn Header="Q1" Width="70" DisplayMemberBinding="{Binding Q1Text}" />
-                                <GridViewColumn Header="Med" Width="70" DisplayMemberBinding="{Binding MedText}" />
-                                <GridViewColumn Header="Q3" Width="70" DisplayMemberBinding="{Binding Q3Text}" />
-                                <GridViewColumn Header="Max" Width="70" DisplayMemberBinding="{Binding MaxText}" />
-                                <GridViewColumn Header="Latest" Width="80" DisplayMemberBinding="{Binding Latest}" />
-                                <GridViewColumn Header="Recent" Width="220" DisplayMemberBinding="{Binding Recent}" />
+                                <GridViewColumn Header="State" Width="80" DisplayMemberBinding="{Binding State, Mode=OneWay}" />
+                                <GridViewColumn Header="Name" Width="180" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                                <GridViewColumn Header="NetId" Width="150" DisplayMemberBinding="{Binding NetId, Mode=OneWay}" />
+                                <GridViewColumn Header="Avg" Width="80" DisplayMemberBinding="{Binding AverageText, Mode=OneWay}" />
+                                <GridViewColumn Header="Loss" Width="80" DisplayMemberBinding="{Binding LossText, Mode=OneWay}" />
+                                <GridViewColumn Header="Min" Width="70" DisplayMemberBinding="{Binding MinText, Mode=OneWay}" />
+                                <GridViewColumn Header="Q1" Width="70" DisplayMemberBinding="{Binding Q1Text, Mode=OneWay}" />
+                                <GridViewColumn Header="Med" Width="70" DisplayMemberBinding="{Binding MedText, Mode=OneWay}" />
+                                <GridViewColumn Header="Q3" Width="70" DisplayMemberBinding="{Binding Q3Text, Mode=OneWay}" />
+                                <GridViewColumn Header="Max" Width="70" DisplayMemberBinding="{Binding MaxText, Mode=OneWay}" />
+                                <GridViewColumn Header="Latest" Width="80" DisplayMemberBinding="{Binding Latest, Mode=OneWay}" />
+                                <GridViewColumn Header="Recent" Width="220" DisplayMemberBinding="{Binding Recent, Mode=OneWay}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -219,18 +219,18 @@
                     <ListView ItemsSource="{Binding OldHistories}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="State" Width="80" DisplayMemberBinding="{Binding State}" />
-                                <GridViewColumn Header="Name" Width="180" DisplayMemberBinding="{Binding Name}" />
-                                <GridViewColumn Header="NetId" Width="150" DisplayMemberBinding="{Binding NetId}" />
-                                <GridViewColumn Header="Avg" Width="80" DisplayMemberBinding="{Binding AverageText}" />
-                                <GridViewColumn Header="Loss" Width="80" DisplayMemberBinding="{Binding LossText}" />
-                                <GridViewColumn Header="Min" Width="70" DisplayMemberBinding="{Binding MinText}" />
-                                <GridViewColumn Header="Q1" Width="70" DisplayMemberBinding="{Binding Q1Text}" />
-                                <GridViewColumn Header="Med" Width="70" DisplayMemberBinding="{Binding MedText}" />
-                                <GridViewColumn Header="Q3" Width="70" DisplayMemberBinding="{Binding Q3Text}" />
-                                <GridViewColumn Header="Max" Width="70" DisplayMemberBinding="{Binding MaxText}" />
-                                <GridViewColumn Header="Latest" Width="80" DisplayMemberBinding="{Binding Latest}" />
-                                <GridViewColumn Header="Recent" Width="220" DisplayMemberBinding="{Binding Recent}" />
+                                <GridViewColumn Header="State" Width="80" DisplayMemberBinding="{Binding State, Mode=OneWay}" />
+                                <GridViewColumn Header="Name" Width="180" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                                <GridViewColumn Header="NetId" Width="150" DisplayMemberBinding="{Binding NetId, Mode=OneWay}" />
+                                <GridViewColumn Header="Avg" Width="80" DisplayMemberBinding="{Binding AverageText, Mode=OneWay}" />
+                                <GridViewColumn Header="Loss" Width="80" DisplayMemberBinding="{Binding LossText, Mode=OneWay}" />
+                                <GridViewColumn Header="Min" Width="70" DisplayMemberBinding="{Binding MinText, Mode=OneWay}" />
+                                <GridViewColumn Header="Q1" Width="70" DisplayMemberBinding="{Binding Q1Text, Mode=OneWay}" />
+                                <GridViewColumn Header="Med" Width="70" DisplayMemberBinding="{Binding MedText, Mode=OneWay}" />
+                                <GridViewColumn Header="Q3" Width="70" DisplayMemberBinding="{Binding Q3Text, Mode=OneWay}" />
+                                <GridViewColumn Header="Max" Width="70" DisplayMemberBinding="{Binding MaxText, Mode=OneWay}" />
+                                <GridViewColumn Header="Latest" Width="80" DisplayMemberBinding="{Binding Latest, Mode=OneWay}" />
+                                <GridViewColumn Header="Recent" Width="220" DisplayMemberBinding="{Binding Recent, Mode=OneWay}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
