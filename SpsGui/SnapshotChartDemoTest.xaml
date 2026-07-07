@@ -29,7 +29,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="{Binding Name}"
+                           Text="{Binding Name, Mode=OneWay}"
                            Foreground="{StaticResource TextBrush}"
                            FontSize="17"
                            FontWeight="SemiBold"
@@ -37,14 +37,14 @@
                            Margin="0,0,14,0" />
 
                 <TextBlock Grid.Column="1"
-                           Text="{Binding AverageText}"
+                           Text="{Binding AverageText, Mode=OneWay}"
                            Foreground="#22C55E"
                            FontSize="15"
                            HorizontalAlignment="Right"
                            Margin="0,0,14,0" />
 
                 <TextBlock Grid.Column="2"
-                           Text="{Binding LossText}"
+                           Text="{Binding LossText, Mode=OneWay}"
                            Foreground="#F87171"
                            FontSize="15"
                            HorizontalAlignment="Right"
@@ -53,18 +53,18 @@
                 <controls:BoxPlotControl Grid.Column="3"
                                          Height="58"
                                          Margin="0,0,18,0"
-                                         Origin="{Binding Origin}"
-                                         Minimum="{Binding Min}"
-                                         FirstQuartile="{Binding Q1}"
-                                         Median="{Binding Med}"
-                                         ThirdQuartile="{Binding Q3}"
-                                         Maximum="{Binding Max}"
-                                         Limit="{Binding Limit}" />
+                                         Origin="{Binding Origin, Mode=OneWay}"
+                                         Minimum="{Binding Min, Mode=OneWay}"
+                                         FirstQuartile="{Binding Q1, Mode=OneWay}"
+                                         Median="{Binding Med, Mode=OneWay}"
+                                         ThirdQuartile="{Binding Q3, Mode=OneWay}"
+                                         Maximum="{Binding Max, Mode=OneWay}"
+                                         Limit="{Binding Limit, Mode=OneWay}" />
 
                 <controls:BarChartControl Grid.Column="4"
                                           Height="58"
-                                          Samples="{Binding RecentPings}"
-                                          Average="{Binding Avg}" />
+                                          Samples="{Binding RecentPings, Mode=OneWay}"
+                                          Average="{Binding Avg, Mode=OneWay}" />
             </Grid>
         </DataTemplate>
     </Window.Resources>
@@ -87,7 +87,7 @@
                 BorderBrush="{StaticResource PanelBorderBrush}"
                 BorderThickness="1"
                 Padding="12">
-            <ItemsControl ItemsSource="{Binding Snapshots}"
+            <ItemsControl ItemsSource="{Binding Snapshots, Mode=OneWay}"
                           ItemTemplate="{StaticResource SnapshotRowTemplate}" />
         </Border>
     </Grid>

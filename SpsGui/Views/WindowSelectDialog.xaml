@@ -24,8 +24,8 @@
                   ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Title" Width="340" DisplayMemberBinding="{Binding Title}" />
-                    <GridViewColumn Header="Path" Width="520" DisplayMemberBinding="{Binding ProcessPath}" />
+                    <GridViewColumn Header="Title" Width="340" DisplayMemberBinding="{Binding Title, Mode=OneWay}" />
+                    <GridViewColumn Header="Path" Width="520" DisplayMemberBinding="{Binding ProcessPath, Mode=OneWay}" />
                 </GridView>
             </ListView.View>
         </ListView>

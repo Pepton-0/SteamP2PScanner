@@ -75,11 +75,11 @@
                                   ScrollViewer.HorizontalScrollBarVisibility="Auto">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="Name" Width="220" DisplayMemberBinding="{Binding Name}" />
-                                    <GridViewColumn Header="SteamAppId" Width="90" DisplayMemberBinding="{Binding SteamAppId}" />
-                                    <GridViewColumn Header="PID" Width="70" DisplayMemberBinding="{Binding ProcessId}" />
-                                    <GridViewColumn Header="Process" Width="130" DisplayMemberBinding="{Binding ProcessName}" />
-                                    <GridViewColumn Header="Path" Width="360" DisplayMemberBinding="{Binding ProcessPath}" />
+                                    <GridViewColumn Header="Name" Width="220" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                                    <GridViewColumn Header="SteamAppId" Width="90" DisplayMemberBinding="{Binding SteamAppId, Mode=OneWay}" />
+                                    <GridViewColumn Header="PID" Width="70" DisplayMemberBinding="{Binding ProcessId, Mode=OneWay}" />
+                                    <GridViewColumn Header="Process" Width="130" DisplayMemberBinding="{Binding ProcessName, Mode=OneWay}" />
+                                    <GridViewColumn Header="Path" Width="360" DisplayMemberBinding="{Binding ProcessPath, Mode=OneWay}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
@@ -121,12 +121,12 @@
                               ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Name" Width="260" DisplayMemberBinding="{Binding Name}" />
-                                <GridViewColumn Header="SteamAppId" Width="100" DisplayMemberBinding="{Binding SteamAppId}" />
-                                <GridViewColumn Header="PID" Width="80" DisplayMemberBinding="{Binding ProcessId}" />
-                                <GridViewColumn Header="Process" Width="150" DisplayMemberBinding="{Binding ProcessName}" />
-                                <GridViewColumn Header="HWND" Width="110" DisplayMemberBinding="{Binding WindowHandle}" />
-                                <GridViewColumn Header="Path" Width="460" DisplayMemberBinding="{Binding ProcessPath}" />
+                                <GridViewColumn Header="Name" Width="260" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                                <GridViewColumn Header="SteamAppId" Width="100" DisplayMemberBinding="{Binding SteamAppId, Mode=OneWay}" />
+                                <GridViewColumn Header="PID" Width="80" DisplayMemberBinding="{Binding ProcessId, Mode=OneWay}" />
+                                <GridViewColumn Header="Process" Width="150" DisplayMemberBinding="{Binding ProcessName, Mode=OneWay}" />
+                                <GridViewColumn Header="HWND" Width="110" DisplayMemberBinding="{Binding WindowHandle, Mode=OneWay}" />
+                                <GridViewColumn Header="Path" Width="460" DisplayMemberBinding="{Binding ProcessPath, Mode=OneWay}" />
                             </GridView>
                         </ListView.View>
                     </ListView>

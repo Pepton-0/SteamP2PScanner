@@ -54,13 +54,13 @@
             Padding="8"
             CornerRadius="0">
         <Grid>
-            <TextBlock Text="{Binding ApplicationTitle}"
+            <TextBlock Text="{Binding ApplicationTitle, Mode=OneWay}"
                        Style="{StaticResource OverlayTitleTextStyle}"
-                       Visibility="{Binding EmptyTitleVisibility}" />
-            <ItemsControl ItemsSource="{Binding Profiles}"
+                       Visibility="{Binding EmptyTitleVisibility, Mode=OneWay}" />
+            <ItemsControl ItemsSource="{Binding Profiles, Mode=OneWay}"
                           HorizontalAlignment="Right"
                           Grid.IsSharedSizeScope="True"
-                          Visibility="{Binding TableVisibility}">
+                          Visibility="{Binding TableVisibility, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0,2"
@@ -74,49 +74,49 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="{Binding StatusText}"
+                            <TextBlock Text="{Binding StatusText, Mode=OneWay}"
                                        Grid.Column="0"
                                        Width="40"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayCellTextStyle}"
-                                       Visibility="{Binding DataContext.ShowStatusVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                            <TextBlock Text="{Binding Name}"
+                                       Visibility="{Binding DataContext.ShowStatusVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
+                            <TextBlock Text="{Binding Name, Mode=OneWay}"
                                        Grid.Column="1"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayCellTextStyle}"
-                                       Visibility="{Binding DataContext.ShowNameVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                            <TextBlock Text="{Binding AverageText}"
+                                       Visibility="{Binding DataContext.ShowNameVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
+                            <TextBlock Text="{Binding AverageText, Mode=OneWay}"
                                        Grid.Column="2"
                                        Width="30"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayAverageTextStyle}"
-                                       Visibility="{Binding DataContext.ShowAverageVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                            <TextBlock Text="{Binding LossText}"
+                                       Visibility="{Binding DataContext.ShowAverageVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
+                            <TextBlock Text="{Binding LossText, Mode=OneWay}"
                                        Grid.Column="3"
                                        Width="40"
                                        Margin="0,0,8,0"
                                        Style="{StaticResource OverlayLossTextStyle}"
-                                       Visibility="{Binding DataContext.ShowLossVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                       Visibility="{Binding DataContext.ShowLossVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
                             <controls:BoxPlotControl Width="220"
                                                      Grid.Column="4"
                                                      Height="34"
                                                      Margin="0,0,8,0"
                                                      Effect="{StaticResource OverlayShadowEffect}"
-                                                     Origin="{Binding Origin}"
-                                                     Minimum="{Binding Min}"
-                                                     FirstQuartile="{Binding Q1}"
-                                                     Median="{Binding Med}"
-                                                     ThirdQuartile="{Binding Q3}"
-                                                     Maximum="{Binding Max}"
-                                                     Limit="{Binding Limit}"
-                                                     Visibility="{Binding DataContext.ShowBoxPlotVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                                     Origin="{Binding Origin, Mode=OneWay}"
+                                                     Minimum="{Binding Min, Mode=OneWay}"
+                                                     FirstQuartile="{Binding Q1, Mode=OneWay}"
+                                                     Median="{Binding Med, Mode=OneWay}"
+                                                     ThirdQuartile="{Binding Q3, Mode=OneWay}"
+                                                     Maximum="{Binding Max, Mode=OneWay}"
+                                                     Limit="{Binding Limit, Mode=OneWay}"
+                                                     Visibility="{Binding DataContext.ShowBoxPlotVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
                             <controls:BarChartControl Width="100"
                                                       Grid.Column="5"
                                                       Height="34"
                                                       Effect="{StaticResource OverlayShadowEffect}"
-                                                      Samples="{Binding RecentPings}"
-                                                      Average="{Binding Avg}"
-                                                      Visibility="{Binding DataContext.ShowChartVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                                      Samples="{Binding RecentPings, Mode=OneWay}"
+                                                      Average="{Binding Avg, Mode=OneWay}"
+                                                      Visibility="{Binding DataContext.ShowChartVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

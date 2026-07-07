@@ -35,28 +35,28 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="{Binding State}"
+                           Text="{Binding State, Mode=OneWay}"
                            Foreground="{StaticResource MutedTextBrush}"
                            FontFamily="Consolas"
                            FontSize="13"
                            Margin="0,0,10,2" />
 
                 <TextBlock Grid.Column="1"
-                           Text="{Binding Name}"
+                           Text="{Binding Name, Mode=OneWay}"
                            Foreground="{StaticResource TextBrush}"
                            FontSize="18"
                            FontWeight="SemiBold"
                            Margin="0,0,14,2" />
 
                 <TextBlock Grid.Column="2"
-                           Text="{Binding AverageText}"
+                           Text="{Binding AverageText, Mode=OneWay}"
                            Foreground="#22C55E"
                            FontSize="16"
                            HorizontalAlignment="Right"
                            Margin="0,0,14,2" />
 
                 <TextBlock Grid.Column="3"
-                           Text="{Binding LossText}"
+                           Text="{Binding LossText, Mode=OneWay}"
                            Foreground="#F87171"
                            FontSize="16"
                            HorizontalAlignment="Right"
@@ -66,16 +66,16 @@
                                    Height="46"
                                    Margin="0,0,12,2"
                                    VerticalAlignment="Center"
-                                   DataContext="{Binding}" />
+                                   DataContext="{Binding Mode=OneWay}" />
 
                 <local:RecentStatsBarsView Grid.Column="5"
                                            Height="46"
                                            Margin="0,0,12,2"
                                            VerticalAlignment="Center"
-                                           DataContext="{Binding}" />
+                                           DataContext="{Binding Mode=OneWay}" />
 
                 <TextBlock Grid.Column="6"
-                           Text="{Binding NetId}"
+                           Text="{Binding NetId, Mode=OneWay}"
                            Foreground="{StaticResource MutedTextBrush}"
                            FontFamily="Consolas"
                            FontSize="12"
@@ -118,7 +118,7 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Game process" Margin="0,0,8,6" />
                 <TextBlock Grid.Row="0"
                            Grid.Column="1"
-                           Text="{Binding GameProcessName}"
+                           Text="{Binding GameProcessName, Mode=OneWay}"
                            FontFamily="Consolas"
                            FontWeight="SemiBold"
                            Margin="0,0,16,6" />
@@ -134,7 +134,7 @@
                 <TextBlock Grid.Row="0" Grid.Column="4" Text="Steam log" Margin="0,0,8,6" />
                 <TextBlock Grid.Row="0"
                            Grid.Column="5"
-                           Text="{Binding SteamLogPath}"
+                           Text="{Binding SteamLogPath, Mode=OneWay}"
                            FontFamily="Consolas"
                            TextTrimming="CharacterEllipsis"
                            Margin="0,0,0,6" />
@@ -229,7 +229,7 @@
                            Margin="0,0,0,8" />
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                     <ItemsControl Grid.IsSharedSizeScope="True"
-                                  ItemsSource="{Binding PacketProfiles}"
+                                  ItemsSource="{Binding PacketProfiles, Mode=OneWay}"
                                   ItemTemplate="{StaticResource ProfilerRowTemplate}" />
                 </ScrollViewer>
             </DockPanel>
@@ -246,13 +246,13 @@
                            Text="Steam peers"
                            FontWeight="SemiBold"
                            Margin="0,0,0,8" />
-                <ListView ItemsSource="{Binding Peers}">
+                <ListView ItemsSource="{Binding Peers, Mode=OneWay}">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Name" Width="220" DisplayMemberBinding="{Binding Name}" />
-                            <GridViewColumn Header="SteamID" Width="180" DisplayMemberBinding="{Binding SteamIDText}" />
-                            <GridViewColumn Header="API" Width="170" DisplayMemberBinding="{Binding ConnectionTypeName}" />
-                            <GridViewColumn Header="Route" Width="90" DisplayMemberBinding="{Binding RouteText}" />
+                            <GridViewColumn Header="Name" Width="220" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                            <GridViewColumn Header="SteamID" Width="180" DisplayMemberBinding="{Binding SteamIDText, Mode=OneWay}" />
+                            <GridViewColumn Header="API" Width="170" DisplayMemberBinding="{Binding ConnectionTypeName, Mode=OneWay}" />
+                            <GridViewColumn Header="Route" Width="90" DisplayMemberBinding="{Binding RouteText, Mode=OneWay}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

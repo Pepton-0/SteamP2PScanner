@@ -24,44 +24,44 @@
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
             <DataTemplate x:Key="AverageCellTemplate">
-                <TextBlock Text="{Binding AverageText}" 
+                <TextBlock Text="{Binding AverageText, Mode=OneWay}" 
                            Style="{StaticResource AverageTextStyle}" 
                            VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="LossCellTemplate">
-                <TextBlock Text="{Binding LossText}" 
+                <TextBlock Text="{Binding LossText, Mode=OneWay}" 
                            Style="{StaticResource LossTextStyle}"
                            VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="StatusCellTemplate">
-                <TextBlock Text="{Binding StatusText}"
+                <TextBlock Text="{Binding StatusText, Mode=OneWay}"
                            Style="{StaticResource CellTextStyle}"
                            VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="SteamIdCellTemplate">
                 <TextBlock Style="{StaticResource CellTextStyle}"
                            VerticalAlignment="Center">
-                    <Hyperlink NavigateUri="{Binding SteamProfileUrl}"
-                               IsEnabled="{Binding HasSteamProfileUrl}"
+                    <Hyperlink NavigateUri="{Binding SteamProfileUrl, Mode=OneWay}"
+                               IsEnabled="{Binding HasSteamProfileUrl, Mode=OneWay}"
                                RequestNavigate="OnSteamProfileNavigate">
-                        <Run Text="{Binding SteamIDText}" />
+                        <Run Text="{Binding SteamIDText, Mode=OneWay}" />
                     </Hyperlink>
                 </TextBlock>
             </DataTemplate>
             <DataTemplate x:Key="BoxPlotCellTemplate">
                 <controls:BoxPlotControl Height="52"
-                                         Origin="{Binding Origin}"
-                                         Minimum="{Binding Min}"
-                                         FirstQuartile="{Binding Q1}"
-                                         Median="{Binding Med}"
-                                         ThirdQuartile="{Binding Q3}"
-                                         Maximum="{Binding Max}"
-                                         Limit="{Binding Limit}" />
+                                         Origin="{Binding Origin, Mode=OneWay}"
+                                         Minimum="{Binding Min, Mode=OneWay}"
+                                         FirstQuartile="{Binding Q1, Mode=OneWay}"
+                                         Median="{Binding Med, Mode=OneWay}"
+                                         ThirdQuartile="{Binding Q3, Mode=OneWay}"
+                                         Maximum="{Binding Max, Mode=OneWay}"
+                                         Limit="{Binding Limit, Mode=OneWay}" />
             </DataTemplate>
             <DataTemplate x:Key="BarChartCellTemplate">
                 <controls:BarChartControl Height="52"
-                                          Samples="{Binding RecentPings}"
-                                          Average="{Binding Avg}" />
+                                          Samples="{Binding RecentPings, Mode=OneWay}"
+                                          Average="{Binding Avg, Mode=OneWay}" />
             </DataTemplate>
             <DataTemplate x:Key="ArchiveButtonCellTemplate">
                 <Button Content="{StaticResource ArchiveButton}"
@@ -79,7 +79,7 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="{StaticResource PingNameHeader}" Width="Auto" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="{StaticResource PingNameHeader}" Width="Auto" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
@@ -97,9 +97,9 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="{StaticResource PingStartedAtHeader}" Width="80" DisplayMemberBinding="{Binding StartedAtText}" />
+                            <GridViewColumn Header="{StaticResource PingStartedAtHeader}" Width="80" DisplayMemberBinding="{Binding StartedAtText, Mode=OneWay}" />
                             <GridViewColumn Header="{StaticResource ArchiveHeader}" Width="92" CellTemplate="{StaticResource ArchiveButtonCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingNameHeader}" Width="170" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="{StaticResource PingNameHeader}" Width="170" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
                             <GridViewColumn Header="{StaticResource PingSteamIdHeader}" Width="150" CellTemplate="{StaticResource SteamIdCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
@@ -202,7 +202,7 @@
 
                         <TextBlock Grid.Row="5"
                                    Grid.Column="0"
-                                   Text="{StaticResource ShowBoxPlotLabel}"
+                                   Text="{StaticResource OverlayBoxPlotLabel}"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Center"
                                    Margin="0,8,0,0" />

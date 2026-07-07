@@ -13,13 +13,13 @@
     <sys:String x:Key="HistoryPingTab">History</sys:String>
     <sys:String x:Key="ConfigTab">Config</sys:String>
     <sys:String x:Key="HistoryPlaceholder">Historical ping monitor is not implemented yet.</sys:String>
-    <sys:String x:Key="ShowBoxPlotLabel">Show box plot</sys:String>
+    <sys:String x:Key="OverlayBoxPlotLabel">Overlay box plot</sys:String>
     <sys:String x:Key="OverlayEnabledLabel">Show overlay</sys:String>
     <sys:String x:Key="OverlayShowNameLabel">Overlay name</sys:String>
     <sys:String x:Key="OverlayShowStatusLabel">Overlay relay/DNS</sys:String>
     <sys:String x:Key="OverlayShowAverageLabel">Overlay average</sys:String>
     <sys:String x:Key="OverlayShowLossLabel">Overlay loss</sys:String>
-    <sys:String x:Key="OverlayShowChartLabel">Show recent chart</sys:String>
+    <sys:String x:Key="OverlayShowChartLabel">Overlay bar chart</sys:String>
     <sys:String x:Key="OverlayOffsetXLabel">Overlay X offset</sys:String>
     <sys:String x:Key="OverlayOffsetYLabel">Overlay Y offset</sys:String>
     <sys:String x:Key="PingNameHeader">name</sys:String>
