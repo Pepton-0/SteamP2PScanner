@@ -130,7 +130,7 @@ namespace SpsGui
         public static PingProfileSnapshot CreateSteam(
             ConnectionStats stats,
             IEnumerable<int> initialPings,
-            PacketScan.PacketArchive packetArchive = null,
+            BasePacketArchive packetArchive = null,
             bool usingRelay = false)
         {
             var snapshot = new PingProfileSnapshot(stats);
@@ -164,7 +164,7 @@ namespace SpsGui
         public static PingProfileSnapshot FromPacketScan(
             string state,
             ulong? netId,
-            PacketScan.PlayerPingHistory history,
+            BasePlayerPingHistory history,
             bool usingRelay = false)
         {
             if (history == null)
@@ -194,7 +194,7 @@ namespace SpsGui
         private double q3;
         private double[] recentPings = new double[0];
         private ulong? netIdValue;
-        private PacketScan.PacketArchive packetArchive;
+        private BasePacketArchive packetArchive;
         private bool usingRelay;
         private bool usingDns;
 
@@ -276,7 +276,7 @@ namespace SpsGui
             private set => SetProperty(ref recentPings, value);
         }
 
-        public PacketScan.PacketArchive PacketArchive
+        public BasePacketArchive PacketArchive
         {
             get => packetArchive;
             private set => SetProperty(ref packetArchive, value);

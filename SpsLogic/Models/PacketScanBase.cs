@@ -1,0 +1,24 @@
+using SharpPcap;
+using SpsLogic.Utils;
+using System;
+using System.Threading.Tasks;
+
+namespace SpsLogic
+{
+    public abstract class BasePacketArchive : IDisposable
+    {
+        public abstract void AddCapture(object capture);
+        public abstract Task SaveCaptureAsync(string fileName);
+        public abstract void Dispose();
+    }
+
+    public abstract class BasePlayerPingHistory : IDisposable
+    {
+        public abstract BasePacketArchive Archive { get; }
+        public abstract ConnectionStats Stats { get; }
+        public abstract void ReportSend(ClassicStunTransactionId id, PosixTimeval time);
+        public abstract void ReportReceive(ClassicStunTransactionId id, PosixTimeval time);
+        public abstract void Update();
+        public abstract void Dispose();
+    }
+}

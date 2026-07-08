@@ -25,9 +25,10 @@ namespace SpsLogic
 
             //TestClassicStunTransactionIdDictionary();
             // TestPacketAnalysis(args);
+            TestPacketScanDivert(args);
             // TestDnsPingDispose();
             // TestDnsPing();
-            TestWinPcap();
+            // TestWinPcap();
         }
 
         public static void TestWinPcap()
@@ -35,6 +36,216 @@ namespace SpsLogic
             WinPcapInstallTest.TestDetection();
             WinPcapInstallTest.LogLicenseCheckNotes();
             Logger.Log(WinPcapInstallTest.GetBundledInstallerPath());
+        }
+
+        public static void TestPacketScanDivert(string[] args = null)
+        {
+            string host = args != null && args.Length >= 1 && !string.IsNullOrWhiteSpace(args[0])
+                ? args[0]
+                : "stunserver2025.stunprotocol.org";
+
+            int port = 3478;
+            if (args != null &&
+                args.Length >= 2 &&
+                int.TryParse(args[1], out int parsedPort) &&
+                parsedPort > 0 &&
+                parsedPort <= ushort.MaxValue)
+            {
+                port = parsedPort;
+            }
+
+            int runMilliseconds = 5000;
+            if (args != null &&
+                args.Length >= 3 &&
+                int.TryParse(args[2], out int parsedRunMilliseconds) &&
+                parsedRunMilliseconds > 0)
+            {
+                runMilliseconds = parsedRunMilliseconds;
+            }
+
+            double patienceMilliseconds = 3000;
+            if (args != null &&
+                args.Length >= 4 &&
+                double.TryParse(args[3], out double parsedPatienceMilliseconds) &&
+                parsedPatienceMilliseconds > 0)
+            {
+                patienceMilliseconds = parsedPatienceMilliseconds;
+            }
+
+            IPAddress address = ResolveIpv4AddressForTest(host);
+            var endpoint = new IPEndPoint(address, port);
+            ulong netId = PacketScan.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
+
+            Logger.Log(
+                $"Starting PacketScanDivert test: endpoint={endpoint}, netId={netId}, " +
+                $"run={runMilliseconds}ms, patience={patienceMilliseconds}ms",
+                true);
+
+            PacketScanDivert scan = null;
+
+            try
+            {
+                scan = new PacketScanDivert(patienceMilliseconds);
+                scan.Register(netId, host, 0);
+                LogPacketScanHistoriesForTest(scan, "after register");
+
+                Thread.Sleep(300);
+
+                string sendResult = SendClassicStunForDivertTest(endpoint);
+                Logger.Log("PacketScanDivert STUN send result: " + sendResult, true);
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                while (stopwatch.ElapsedMilliseconds < runMilliseconds)
+                {
+                    scan.Update();
+                    Thread.Sleep(500);
+                }
+
+                scan.Update();
+                LogPacketScanHistoriesForTest(scan, "before unregister");
+
+                scan.Unregister(netId);
+                scan.Update();
+                LogPacketScanHistoriesForTest(scan, "after unregister active");
+
+                BasePlayerPingHistory[] oldHistories = scan.TakeUnseenOldHistories();
+                Logger.Log("PacketScanDivert old histories: count=" + oldHistories.Length, true);
+                for (int i = 0; i < oldHistories.Length; i++)
+                {
+                    LogHistoryStatsForTest("old[" + i + "]", oldHistories[i]);
+                    oldHistories[i].Archive.SaveCaptureAsync("packet_divert_noop.pcap").Wait();
+                    Logger.Log("PacketScanDivert archive no-op save completed for old[" + i + "].", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("PacketScanDivert test failed: " + ex.GetType().Name + ": " + ex.Message, true);
+                if (ex.InnerException != null)
+                {
+                    Logger.Log("  Inner: " + ex.InnerException.GetType().Name + ": " + ex.InnerException.Message, true);
+                }
+            }
+            finally
+            {
+                try
+                {
+                    scan?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("PacketScanDivert dispose failed: " + ex.GetType().Name + ": " + ex.Message, true);
+                }
+            }
+
+            Logger.Log("PacketScanDivert test finished.", true);
+        }
+
+        private static IPAddress ResolveIpv4AddressForTest(string host)
+        {
+            if (IPAddress.TryParse(host, out IPAddress address))
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return address;
+                }
+
+                throw new InvalidOperationException("Only IPv4 endpoints are supported by PacketScanDivert test.");
+            }
+
+            IPAddress resolved = Dns.GetHostAddresses(host)
+                .FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork);
+
+            if (resolved == null)
+            {
+                throw new InvalidOperationException("Could not resolve IPv4 address: " + host);
+            }
+
+            return resolved;
+        }
+
+        private static string SendClassicStunForDivertTest(IPEndPoint endpoint)
+        {
+            byte[] request = BuildClassicStunRequestForTest();
+            ClassicStunTransactionId id = new ClassicStunTransactionId(request, 4);
+
+            using (var client = new UdpClient())
+            {
+                client.Client.ReceiveTimeout = 1500;
+                client.Connect(endpoint);
+                client.Send(request, request.Length);
+
+                try
+                {
+                    IPEndPoint remote = null;
+                    byte[] response = client.Receive(ref remote);
+                    return $"Response received: remote={remote}, bytes={response.Length}, id={id}";
+                }
+                catch (SocketException ex)
+                {
+                    if (ex.SocketErrorCode == SocketError.TimedOut)
+                    {
+                        return "No UDP response within 1500ms. id=" + id;
+                    }
+
+                    throw;
+                }
+            }
+        }
+
+        private static byte[] BuildClassicStunRequestForTest()
+        {
+            const int classicStunRequestLength = 56;
+            const int classicStunHeaderLength = 20;
+
+            var bytes = new byte[classicStunRequestLength];
+            WriteUInt16BigEndianForTest(bytes, 0, 0x0001);
+            WriteUInt16BigEndianForTest(bytes, 2, classicStunRequestLength - classicStunHeaderLength);
+
+            var transactionBytes = new byte[16];
+            new Random().NextBytes(transactionBytes);
+            Buffer.BlockCopy(transactionBytes, 0, bytes, 4, transactionBytes.Length);
+
+            WriteUInt16BigEndianForTest(bytes, 20, 0x8022);
+            WriteUInt16BigEndianForTest(bytes, 22, 32);
+
+            return bytes;
+        }
+
+        private static void WriteUInt16BigEndianForTest(byte[] bytes, int offset, int value)
+        {
+            bytes[offset] = (byte)((value >> 8) & 0xFF);
+            bytes[offset + 1] = (byte)(value & 0xFF);
+        }
+
+        private static void LogPacketScanHistoriesForTest(IPacketScan scan, string label)
+        {
+            int count = 0;
+            scan.ForEachActiveHistory((state, netId, history) =>
+            {
+                count++;
+                LogHistoryStatsForTest(label + " active netId=" + (netId.HasValue ? netId.Value.ToString() : "none"), history);
+            });
+
+            Logger.Log("PacketScanDivert " + label + ": activeCount=" + count, true);
+        }
+
+        private static void LogHistoryStatsForTest(string label, BasePlayerPingHistory history)
+        {
+            if (history == null)
+            {
+                Logger.Log("PacketScanDivert " + label + ": history=null", true);
+                return;
+            }
+
+            history.Stats.ReadValues((name, startedAt, min, max, avg, loss, q1, med, q3, recentPings) =>
+            {
+                Logger.Log(
+                    $"PacketScanDivert {label}: name={name}, startedAt={startedAt:HH:mm:ss}, " +
+                    $"min={min:F1}, max={max:F1}, avg={avg:F1}, loss={loss:F1}, " +
+                    $"q1={q1:F1}, med={med:F1}, q3={q3:F1}, recent=[{string.Join(",", recentPings ?? new double[0])}]",
+                    true);
+                return 0;
+            });
         }
 
         public static void TestSteamAppFinderEnumWindows(int iterationCount = 10)

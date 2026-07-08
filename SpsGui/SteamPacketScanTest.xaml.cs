@@ -328,7 +328,7 @@ namespace SpsGui
                 profiles.Add(PingProfileSnapshot.FromPacketScan(state, netId, history));
             });
 
-            foreach (PacketScan.PlayerPingHistory history in packetScan.TakeUnseenOldHistories())
+            foreach (BasePlayerPingHistory history in packetScan.TakeUnseenOldHistories())
             {
                 oldProfiles.Add(PingProfileSnapshot.FromPacketScan("Old", null, history));
             }

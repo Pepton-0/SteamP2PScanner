@@ -21,8 +21,8 @@ namespace SpsLogic
         void Update();
         void Register(ulong netId, string name, ulong id);
         void Unregister(ulong netId);
-        void ForEachActiveHistory(Action<string, ulong?, PacketScan.PlayerPingHistory> action);
-        PacketScan.PlayerPingHistory[] TakeUnseenOldHistories();
+        void ForEachActiveHistory(Action<string, ulong?, BasePlayerPingHistory> action);
+        BasePlayerPingHistory[] TakeUnseenOldHistories();
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ namespace SpsLogic
         /// Stocks captures and write to pcap 
         /// you can execute save task only once
         /// </summary>
-        public class PacketArchive : IDisposable
+        public class PacketArchive : BasePacketArchive
         {
             private static readonly string ArchiveDir = "archives";
             private readonly BlockingCollection<RawCapture> Captures;
@@ -58,7 +58,17 @@ namespace SpsLogic
                 Captures = new BlockingCollection<RawCapture>();
             }
 
-            public void AddCapture(RawCapture capture)
+            public override void AddCapture(object capture)
+            {
+                if (!(capture is RawCapture rawCapture))
+                {
+                    throw new ArgumentException("Capture must be a SharpPcap RawCapture.", nameof(capture));
+                }
+
+                AddCapture(rawCapture);
+            }
+
+            internal void AddCapture(RawCapture capture)
             {
                 if (capture == null)
                 {
@@ -68,7 +78,7 @@ namespace SpsLogic
                 Captures.Add(capture);
             }
 
-            public void Dispose()
+            public override void Dispose()
             {
                 Captures.CompleteAdding();
 
@@ -90,7 +100,7 @@ namespace SpsLogic
             /// <exception cref="ArgumentException"></exception>
             /// <exception cref="InvalidOperationException"></exception>
             /// <exception cref="Exception"></exception>
-            public Task SaveCaptureAsync(string fileName)
+            public override Task SaveCaptureAsync(string fileName)
             {
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
@@ -136,15 +146,25 @@ namespace SpsLogic
             }
         }
 
-        public class PlayerPingHistory : IDisposable
+        public class PlayerPingHistory : BasePlayerPingHistory
         {
             /// <summary>
             /// ignore packet loss in a few seconds since the scan begins
             /// </summary>
             private const double LossDetectPatience = 9.0d;
 
-            public readonly PacketArchive Archive;
-            public readonly ConnectionStats Stats;
+            private readonly PacketArchive archive;
+            private readonly ConnectionStats stats;
+
+            public override BasePacketArchive Archive
+            {
+                get { return archive; }
+            }
+
+            public override ConnectionStats Stats
+            {
+                get { return stats; }
+            }
 
             private readonly double PatienceLimitMs;
             private readonly PosixTimeval StartTime;
@@ -157,8 +177,8 @@ namespace SpsLogic
 
             public PlayerPingHistory(double patienceLimitMs, string name, ulong id)
             {
-                Archive = new PacketArchive();
-                Stats = new ConnectionStats(10, name, id);
+                archive = new PacketArchive();
+                stats = new ConnectionStats(10, name, id);
                 this.StartTime = new PosixTimeval(Stats.StartedAt);
                 UnmatchedPackets = new Dictionary<ClassicStunTransactionId, PosixTimeval>();
                 this.PatienceLimitMs = patienceLimitMs;
@@ -170,7 +190,7 @@ namespace SpsLogic
             /// </summary>
             /// <param name="id"></param>
             /// <param name="time"></param>
-            public void ReportSend(ClassicStunTransactionId id, PosixTimeval time)
+            public override void ReportSend(ClassicStunTransactionId id, PosixTimeval time)
             {
                 if (!UnmatchedPackets.ContainsKey(id))
                 {
@@ -183,7 +203,7 @@ namespace SpsLogic
             /// </summary>
             /// <param name="id"></param>
             /// <param name="time"></param>
-            public void ReportReceive(ClassicStunTransactionId id, PosixTimeval time)
+            public override void ReportReceive(ClassicStunTransactionId id, PosixTimeval time)
             {
                 if (UnmatchedPackets.TryGetValue(id, out var begin))
                 {
@@ -202,7 +222,7 @@ namespace SpsLogic
             /// <summary>
             /// Called this repeatedly like each 1s.
             /// </summary>
-            public void Update()
+            public override void Update()
             {
                 var now = new PosixTimeval(DateTime.Now);
                 List<ClassicStunTransactionId> removeCandidates = new List<ClassicStunTransactionId>();
@@ -227,7 +247,7 @@ namespace SpsLogic
                 }
             }
 
-            public void Dispose()
+            public override void Dispose()
             {
                 Archive.Dispose();
             }
@@ -407,7 +427,7 @@ namespace SpsLogic
             }
         }
 
-        public void ForEachActiveHistory(Action<string, ulong?, PlayerPingHistory> action)
+        public void ForEachActiveHistory(Action<string, ulong?, BasePlayerPingHistory> action)
         {
             if (action == null)
             {
@@ -423,13 +443,13 @@ namespace SpsLogic
             }
         }
 
-        public PlayerPingHistory[] TakeUnseenOldHistories()
+        public BasePlayerPingHistory[] TakeUnseenOldHistories()
         {
             lock (Registries)
             {
                 var histories = UnseenOldHistories.ToArray();
                 UnseenOldHistories.Clear();
-                return histories;
+                return histories.Cast<BasePlayerPingHistory>().ToArray();
             }
         }
 
