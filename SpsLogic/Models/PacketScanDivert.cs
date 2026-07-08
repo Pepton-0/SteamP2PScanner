@@ -164,6 +164,11 @@ namespace SpsLogic
             receiveTask = Task.Run(() => ReceiveLoop());
         }
 
+        public bool IsArchiveUsable()
+        {
+            return false;
+        }
+
         public void Update()
         {
             lock (registries)

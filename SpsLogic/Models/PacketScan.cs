@@ -18,6 +18,7 @@ namespace SpsLogic
     /// </summary>
     public interface IPacketScan : IDisposable
     {
+        bool IsArchiveUsable();
         void Update();
         void Register(ulong netId, string name, ulong id);
         void Unregister(ulong netId);
@@ -308,6 +309,11 @@ namespace SpsLogic
                 device.Filter = "udp";
                 device.StartCapture();
             }
+        }
+
+        public bool IsArchiveUsable()
+        {
+            return true;
         }
 
         private void OnPacketArrival(object sender, PacketCapture e)
