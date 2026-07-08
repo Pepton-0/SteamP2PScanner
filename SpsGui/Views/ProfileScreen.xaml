@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:SpsGui.Views.Controls"
              xmlns:vm="clr-namespace:SpsGui.ViewModels"
              mc:Ignorable="d"
+             Loaded="OnLoaded"
              d:DataContext="{d:DesignInstance vm:ProfileScreenViewModel}">
     <Grid Margin="18">
         <Grid.Resources>
@@ -96,9 +97,9 @@
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
-                        <GridView>
+                        <GridView x:Name="HistoryGridView">
                             <GridViewColumn Header="{StaticResource PingStartedAtHeader}" Width="80" DisplayMemberBinding="{Binding StartedAtText, Mode=OneWay}" />
-                            <GridViewColumn Header="{StaticResource ArchiveHeader}" Width="92" CellTemplate="{StaticResource ArchiveButtonCellTemplate}" />
+                            <GridViewColumn x:Name="ArchiveColumn" Header="{StaticResource ArchiveHeader}" Width="92" CellTemplate="{StaticResource ArchiveButtonCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingNameHeader}" Width="170" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
                             <GridViewColumn Header="{StaticResource PingSteamIdHeader}" Width="150" CellTemplate="{StaticResource SteamIdCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />

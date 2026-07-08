@@ -59,6 +59,7 @@ namespace SpsGui.ViewModels
             this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
 
+            IsArchiveUsable = packetScan.IsArchiveUsable();
             ExportArchiveCommand = new AsyncRelayCommand<PingProfileSnapshot>(ExportArchiveAsync, CanExportArchive);
 
             updateTimer = new DispatcherTimer(DispatcherPriority.Background);
@@ -78,6 +79,11 @@ namespace SpsGui.ViewModels
         /// </summary>
         public ObservableCollection<PingProfileSnapshot> HistoryProfiles { get; } =
             new ObservableCollection<PingProfileSnapshot>();
+
+        /// <summary>
+        /// Gets whether packet archives can be exported by the selected scanner.
+        /// </summary>
+        public bool IsArchiveUsable { get; }
 
         /// <summary>
         /// Gets the command that saves a packet archive and shows its path.
@@ -377,7 +383,7 @@ namespace SpsGui.ViewModels
 
         private async Task ExportArchiveAsync(PingProfileSnapshot snapshot)
         {
-            if (snapshot == null || snapshot.PacketArchive == null)
+            if (!IsArchiveUsable || snapshot == null || snapshot.PacketArchive == null)
             {
                 return;
             }
@@ -398,7 +404,7 @@ namespace SpsGui.ViewModels
 
         private bool CanExportArchive(PingProfileSnapshot snapshot)
         {
-            return snapshot != null && snapshot.PacketArchive != null;
+            return IsArchiveUsable && snapshot != null && snapshot.PacketArchive != null;
         }
 
         private static void ReplaceCollection<T>(ObservableCollection<T> collection, IEnumerable<T> items)

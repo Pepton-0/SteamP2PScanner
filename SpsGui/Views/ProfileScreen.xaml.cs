@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using SpsGui.ViewModels;
 
 namespace SpsGui.Views
 {
@@ -15,6 +16,17 @@ namespace SpsGui.Views
         public ProfileScreen()
         {
             InitializeComponent();
+        }
+
+        private void OnLoaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var viewModel = DataContext as ProfileScreenViewModel;
+            if (viewModel != null &&
+                !viewModel.IsArchiveUsable &&
+                HistoryGridView.Columns.Contains(ArchiveColumn))
+            {
+                HistoryGridView.Columns.Remove(ArchiveColumn);
+            }
         }
 
         private void OnSteamProfileNavigate(object sender, RequestNavigateEventArgs e)
