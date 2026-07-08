@@ -31,7 +31,23 @@ namespace SpsLogic.Utils
                 return false;
             }
 
-            byte[] payload = udp.PayloadData;
+            return TryGetClassicStunTransactionIdFromUdpPayload(
+                udp.PayloadData,
+                out transactionId,
+                out isRequestPacket,
+                out isResponsePacket);
+        }
+
+        public static bool TryGetClassicStunTransactionIdFromUdpPayload(
+            byte[] payload,
+            out ClassicStunTransactionId transactionId,
+            out bool isRequestPacket,
+            out bool isResponsePacket)
+        {
+            transactionId = default;
+            isRequestPacket = false;
+            isResponsePacket = false;
+
             if (payload == null || payload.Length < HeaderLength)
             {
                 return false;

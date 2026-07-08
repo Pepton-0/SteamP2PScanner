@@ -307,7 +307,7 @@ namespace SpsGui.ViewModels
 
         private void RefreshHistoryProfiles()
         {
-            foreach (PacketScan.PlayerPingHistory history in packetScan.TakeUnseenOldHistories())
+            foreach (BasePlayerPingHistory history in packetScan.TakeUnseenOldHistories())
             {
                 var snapshot = PingProfileSnapshot.FromPacketScan("Old", null, history);
                 HistoryProfiles.Insert(0, snapshot);
@@ -410,7 +410,7 @@ namespace SpsGui.ViewModels
             }
         }
 
-        private static string CreateSnapshotKey(ulong? netId, PacketScan.PlayerPingHistory history)
+        private static string CreateSnapshotKey(ulong? netId, BasePlayerPingHistory history)
         {
             if (netId.HasValue)
             {

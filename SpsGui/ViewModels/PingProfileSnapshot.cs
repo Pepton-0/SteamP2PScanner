@@ -24,7 +24,7 @@ namespace SpsGui.ViewModels
         private double q3;
         private double[] recentPings = new double[0];
         private ulong? netIdValue;
-        private PacketScan.PacketArchive packetArchive;
+        private BasePacketArchive packetArchive;
         private bool usingRelay;
         private bool usingDns;
 
@@ -67,7 +67,7 @@ namespace SpsGui.ViewModels
         public static PingProfileSnapshot FromPacketScan(
             string state,
             ulong? netId,
-            PacketScan.PlayerPingHistory history)
+            BasePlayerPingHistory history)
         {
             if (history == null)
             {
@@ -210,7 +210,7 @@ namespace SpsGui.ViewModels
         /// <summary>
         /// Gets the packet archive associated with this row, or null for DNS rows.
         /// </summary>
-        public PacketScan.PacketArchive PacketArchive
+        public BasePacketArchive PacketArchive
         {
             get { return packetArchive; }
             private set { SetProperty(ref packetArchive, value); }

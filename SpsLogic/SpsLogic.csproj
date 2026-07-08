@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <RuntimeIdentifiers>win;win-x64</RuntimeIdentifiers>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -79,7 +80,9 @@
     <Compile Include="DnsPing.cs" />
     <Compile Include="GameConfig.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Models\PacketScanBase.cs" />
     <Compile Include="Models\PacketScan.cs" />
+    <Compile Include="Models\PacketScanDivert.cs" />
     <Compile Include="Models\SteamAppFinder.cs" />
     <Compile Include="ReverseTextReader.cs" />
     <Compile Include="SteamPeerBase.cs" />
@@ -95,10 +98,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="app.manifest" />
+    <Content Include="WinDivert64.sys">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="steamworks_bin\Steamworks.NET.dll" />
-    <Content Include="steamworks_bin\steam_api64.dll">
+    <Content Include="libs\Steamworks.NET.dll" />
+    <Content Include="libs\steam_api64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WinDivert.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

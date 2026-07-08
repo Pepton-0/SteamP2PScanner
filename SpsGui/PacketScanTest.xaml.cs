@@ -491,7 +491,7 @@ namespace SpsGui
                 ActiveHistories.Add(snapshot);
             }
 
-            foreach (PacketScan.PlayerPingHistory history in packetScan.TakeUnseenOldHistories())
+            foreach (BasePlayerPingHistory history in packetScan.TakeUnseenOldHistories())
             {
                 OldHistories.Add(PingProfileSnapshot.FromPacketScan("Old", null, history));
             }
