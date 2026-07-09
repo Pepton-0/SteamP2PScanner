@@ -13,6 +13,8 @@ overlayのロジック変更
 
 ## 調整内容
 
+overlayの上限を揃える
+
 # ユーザーが知りたい内容
 
 1. 相手とのping(avg, 四分位数)/packet loss

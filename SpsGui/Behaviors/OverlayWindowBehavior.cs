@@ -13,7 +13,6 @@ namespace SpsGui.Behaviors
     public class OverlayWindowBehavior : Behavior<Window>
     {
         private const int GwlExStyle = -20;
-        private const int WsExTopmost = 0x00000008;
         private const int WsExToolWindow = 0x00000080;
         private const int WsExTransparent = 0x00000020;
         private const int WsExNoActivate = 0x08000000;
@@ -252,9 +251,6 @@ namespace SpsGui.Behaviors
             bool targetForeground = foregroundTargetHandle != IntPtr.Zero;
             bool shouldShow =
                 IsOverlayEnabled &&
-                WinApi.IsWindow(TargetWindowInfo.Handle) &&
-                WinApi.IsWindowVisible(TargetWindowInfo.Handle) &&
-                !WinApi.IsIconic(TargetWindowInfo.Handle) &&
                 targetForeground;
 
             if (shouldShow && !AssociatedObject.IsVisible)
@@ -276,20 +272,9 @@ namespace SpsGui.Behaviors
                 return;
             }
 
-            bool shouldTopmost = targetForeground || AssociatedObject.IsActive;
-            int exStyle = WinApi.GetWindowLongPtr(interopHelper.Handle, GwlExStyle).ToInt32();
-            bool isTopmost = (exStyle & WsExTopmost) != 0;
-
-            if (shouldTopmost && !isTopmost)
-            {
-                WinApi.SetWindowZOrder(interopHelper.Handle, HwndTopmost, SwpNoActivate);
-            }
-            else if (!shouldTopmost && isTopmost)
-            {
-                WinApi.SetWindowZOrder(interopHelper.Handle, TargetWindowInfo.Handle, SwpNoActivate);
-                WinApi.SetWindowZOrder(TargetWindowInfo.Handle, interopHelper.Handle, SwpNoActivate);
-                ApplyExtendedStyle();
-            }
+            // A fullscreen target can enter the topmost band after the overlay.
+            // Reassert the overlay's order even when WS_EX_TOPMOST is already set.
+            WinApi.SetWindowZOrder(interopHelper.Handle, HwndTopmost, SwpNoActivate);
         }
 
         private void UpdatePosition()
