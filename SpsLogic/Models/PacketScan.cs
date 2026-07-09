@@ -152,7 +152,7 @@ namespace SpsLogic
             /// <summary>
             /// ignore packet loss in a few seconds since the scan begins
             /// </summary>
-            private const double LossDetectPatience = 9.0d;
+            private const double LossDetectPatience = 12.0d;
 
             private readonly PacketArchive archive;
             private readonly ConnectionStats stats;

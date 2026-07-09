@@ -1,21 +1,60 @@
 # SteamP2PScanner
 
-This is fork of SteamP2PInfo: https://github.com/tremwil/SteamP2PInfo <br>
-and SteamP2PInfo-rubiconian: https://github.com/saw44169/SteamP2PInfo-rubiconian <br>
-But with the following functions.
+SteamP2PScanner略してSpsは、SteamゲームにおいてP2P接続をしている相手とのpingやパケロスの状態が分かるようになります。<br>
+以下のリポジトリのフォークとなります。<br>
+重大な欠点を修正し、かつ操作性の改善を加えたものになります。
 
-## More precise ping monitoring for old steam peer api.
-SteamP2PInfo only checks the timing of sending/receiving classicstun packets without their transaction id, so if the receive packet is too much late, it will be taken as the response to the next send packet.<br>
-Also, due to missing the transaction id, it cannot detect packet loss and take it as "too much late ping".<br>
-SteamP2PScanner now can see the transaction id, so it can detect too late response and packet loss.
+[SteamP2PInfo](https://github.com/tremwil/SteamP2PInfo)<br>
+[SteamP2PInfo-rubiconian](https://github.com/saw44169/SteamP2PInfo-rubiconian)
 
-## More reliable statistics.
-SteamP2PInfo has two statistics: 
-1. Average ping(but include high ping due to packet loss)
-2. Connection quality(its good to know how much good the conenction is in an instant but none for further analysis).
+## インストールと使い方
 
-Instead, SteamP2PScanner has these info:
-1. Average ping(exclude packet loss)
-2. Packet loss ratio
-3. Box plot of pings
-4. Bar chart of recent packet loss and pings
+<TODO 動画>
+
+1. Releaseページにてzipをダウンロードし解凍し、中にあるSpsGui.exeを管理者権限で実行してください。<br>
+    1. TODO 蒼画面の突破の仕方。次の画像のように、"WindowsによってPCが保護されました"というシーンが出てくる場合があります。<br>"詳細情報" > "実行" により解決できます。<br>Windowsのセキュリティは、マイナーアプリを所かまわずブロックしちゃうお茶目さんであることが原因です。
+2. 計測したいSteamゲームを起動してください。<br>
+3. Spsがゲームを自動検知した場合、"Monitor そのゲーム名"というボタンが押せるようになります。<br>自動検知しない場合、"Manual detection"ボタンをかわりに押し、対象ゲームとそのSteam App Idの入力を行ってください。
+4. Steamのコンソールにコマンドを入力する段階に入ります。Spsにてコピーボタンを押すとコマンドをコピーしてくれるので、起動されたSteamのコンソール画面にペースト+Enterしてください。
+5. Spsにてコピー画面を閉じてください。Spsのウィンドウ右上に対象ゲームのタイトルが表示されるようになったら、完了です。
+
+### 詳細説明
+
+#### 1と2の順序は逆でも構いません。
+
+ただしEACなどを採用する形のゲームだと、Steamから起動の呼び出し > ランチャーが起動 > ゲーム本体が起動　の3段階を踏んでいます。<br>
+Spsはランチャーに含まれているSteam App IDを認識しないといけなくなるため、ゲームより前に起動する必要があります。
+なお、一度認識したゲームのSteam App IDはSpsが記憶するので以降は1と2の順序をどれにしても構いません。
+
+#### Steam App IDって何ぞ
+
+Steamのゲーム1つ1つに割り振られている固有のIDです。<br>
+基本的にはSpsが自動で取得するので問題ないですが、一部ゲームでは通用しない可能性があります。<br>
+変哲のない環境であれば、C:\Program Files (x86)\Steam\userdata\あなたのID\760\remote\ というフォルダ下に各ゲームのIDのフォルダが配置されていますので、それを参考にしてください。
+
+## SteamP2PInfoの欠点、Spsの利点
+
+SteamP2PInfoはかなり良くできた設計をしているのですが、同時に欠点を持ちます。
+
+1. SteamP2PInfoはパケロスの認知が出来ませんが、Spsはそれを検知し可視化させることができます。<br>
+<TODO 棒グラフの写真>
+
+2. SteamP2PInfoは遅すぎるping(約500ms以上)を早いping(数十ms)として計算してしまいますが、Spsは正確な数値を表示できます。<br>
+pingの定期的な送信とその返答について、SteamP2PInfoはタイミングこそ計りますが、返答が遅すぎる場合、次の送信に対する返答と誤認し、結果早いpingとして計算してしまいます。<br>ラグスイッチやVPNなどによるping調整を行う相手との対面で発生し得る問題でした。<br>Spsはペアとなる送信と返信には共通のIDが割り振られていることを確認するようにしているので、誤認を起こしません。
+
+3. SteamP2PInfoは数値のみですが、Spsはグラフ表示も行います。
+<TODO グラフの表示>
+
+4. SteamP2PInfoはゲームの自動検出が出来ませんが、SpsはSteam App IDを含め全部自動でやってくれます。
+
+5. SteamP2PInfoはフルスクリーンゲーム上にオーバーレイを上手く表示することはできませんが、Spsなら出来ます。
+
+6. SteamP2PInfoはP2P接続状況が悪くとも相手のせいか自分のせいか区別を付けられませんが、SpsはDNSサーバーとのpingもモニターすることにより、客観的な観測データが得られます。<br>安定した外部サーバーとのpingが悪ければ貴方のせいである可能性が高く、そうでなければ相手のせいである可能性が高いです。
+(基本的にDNSサーバーのほうが安定していますので、極端な差がつかなければ有意差を認めない方が良いです)
+<TODO 比較グラフの表示>
+
+
+## TODO 
+
+☑古いP2P APIへの対応(AC6など)<br>
+□新しいP2P APIへの対応
