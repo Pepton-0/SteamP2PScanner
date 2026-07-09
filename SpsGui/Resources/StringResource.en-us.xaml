@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <sys:String x:Key="SteamExeLabel">Steam executable</sys:String>
+    <sys:String x:Key="SteamExeLabel">steam.exe</sys:String>
     <sys:String x:Key="AutoIpcLabel">Auto enter steam command</sys:String>
     <sys:String x:Key="OkButton">OK</sys:String>
     <sys:String x:Key="CancelButton">Cancel</sys:String>
@@ -9,10 +9,11 @@
     <sys:String x:Key="ManualSelectButton">Select window manually</sys:String>
     <sys:String x:Key="ManualDetectionNote">Choose a game window, then confirm or enter its SteamAppId.</sys:String>
     <sys:String x:Key="AutoDetectionHeader">Auto detection</sys:String>
+    <sys:String x:Key="AutoDetectionNothing">Nothing detected</sys:String>
+    <sys:String x:Key="AutoDetectionSomething">Detected *</sys:String>
     <sys:String x:Key="CurrentPingTab">Current ping</sys:String>
     <sys:String x:Key="HistoryPingTab">History</sys:String>
     <sys:String x:Key="ConfigTab">Config</sys:String>
-    <sys:String x:Key="HistoryPlaceholder">Historical ping monitor is not implemented yet.</sys:String>
     <sys:String x:Key="OverlayBoxPlotLabel">Overlay box plot</sys:String>
     <sys:String x:Key="OverlayEnabledLabel">Show overlay</sys:String>
     <sys:String x:Key="OverlayShowNameLabel">Overlay name</sys:String>
@@ -38,5 +39,4 @@
     <sys:String x:Key="SteamConsoleCommandTitle">Steam console command</sys:String>
     <sys:String x:Key="WindowSelectTitle">Select Window</sys:String>
     <sys:String x:Key="SteamAppIdTitle">Steam AppID</sys:String>
-    <sys:String x:Key="OverlayPlaceholder">Overlay output will be connected after ping monitor data is available.</sys:String>
 </ResourceDictionary>
