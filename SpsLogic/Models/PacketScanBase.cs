@@ -5,6 +5,19 @@ using System.Threading.Tasks;
 
 namespace SpsLogic
 {
+    /// <summary>
+    /// Abstraction for packet scan operations used by UI/ViewModel layers.
+    /// </summary>
+    public interface IPacketScan : IDisposable
+    {
+        bool IsArchiveUsable();
+        void Update();
+        void Register(ulong netId, string name, ulong id);
+        void Unregister(ulong netId);
+        void ForEachActiveHistory(Action<string, ulong?, BasePlayerPingHistory> action);
+        BasePlayerPingHistory[] TakeUnseenOldHistories();
+    }
+
     public abstract class BasePacketArchive : IDisposable
     {
         public abstract void AddCapture(object capture);
