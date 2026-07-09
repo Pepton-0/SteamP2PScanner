@@ -4,6 +4,8 @@ SteamP2PScanner略してSpsは、SteamゲームにおいてP2P接続をしてい
 以下のリポジトリのフォークとなります。<br>
 重大な欠点を修正し、かつ操作性の改善を加えたものになります。
 
+<端的な画像>
+
 [SteamP2PInfo](https://github.com/tremwil/SteamP2PInfo)<br>
 [SteamP2PInfo-rubiconian](https://github.com/saw44169/SteamP2PInfo-rubiconian)
 
@@ -34,7 +36,7 @@ Steamのゲーム1つ1つに割り振られている固有のIDです。<br>
 
 ## SteamP2PInfoの欠点、Spsの利点
 
-SteamP2PInfoはかなり良くできた設計をしているのですが、同時に欠点を持ちます。
+SteamP2PInfoはかなり良くできた設計をしているのですが、同時に欠点を持っています。
 
 1. SteamP2PInfoはパケロスの認知が出来ませんが、Spsはそれを検知し可視化させることができます。<br>
 <TODO 棒グラフの写真>
@@ -42,7 +44,7 @@ SteamP2PInfoはかなり良くできた設計をしているのですが、同�
 2. SteamP2PInfoは遅すぎるping(約500ms以上)を早いping(数十ms)として計算してしまいますが、Spsは正確な数値を表示できます。<br>
 pingの定期的な送信とその返答について、SteamP2PInfoはタイミングこそ計りますが、返答が遅すぎる場合、次の送信に対する返答と誤認し、結果早いpingとして計算してしまいます。<br>ラグスイッチやVPNなどによるping調整を行う相手との対面で発生し得る問題でした。<br>Spsはペアとなる送信と返信には共通のIDが割り振られていることを確認するようにしているので、誤認を起こしません。
 
-3. SteamP2PInfoは数値のみですが、Spsはグラフ表示も行います。
+3. SteamP2PInfoは数値のみですが、Spsはグラフ表示も行います。<br>ゲーム中全体のサンプルの箱ひげ図と、直近サンプルの棒グラフになります。
 <TODO グラフの表示>
 
 4. SteamP2PInfoはゲームの自動検出が出来ませんが、SpsはSteam App IDを含め全部自動でやってくれます。

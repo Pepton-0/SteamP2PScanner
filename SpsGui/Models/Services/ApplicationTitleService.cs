@@ -12,9 +12,11 @@ namespace SpsGui.Models.Services
     /// </summary>
     public class ApplicationTitleService : IApplicationTitleService
     {
+        private const string Version = "1.0";
+
         public string CreateApplicationTitle()
         {
-            return "SteamP2PScanner " + Assembly.GetExecutingAssembly().GetName().Version;
+            return "SteamP2PScanner " + Version;
         }
     }
 }
