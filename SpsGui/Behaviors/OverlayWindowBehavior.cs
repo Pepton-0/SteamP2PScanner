@@ -20,10 +20,12 @@ namespace SpsGui.Behaviors
         private const uint EventObjectLocationChange = 0x800B;
         private const uint SwpNoActivate = 0x0010;
         private static readonly IntPtr HwndTopmost = new IntPtr(-1);
+        private static readonly TimeSpan UpdateInterval = TimeSpan.FromMilliseconds(250);
 
         private WindowInteropHelper interopHelper;
         private WinApi.WinEventDelegate locationChangedHook;
         private WinApi.WinEventDelegate foregroundChangedHook;
+        private DispatcherTimer updateTimer;
         private IntPtr locationHookHandle;
         private IntPtr foregroundHookHandle;
         private IntPtr activeTargetHandle;
@@ -89,11 +91,14 @@ namespace SpsGui.Behaviors
             AssociatedObject.ContentRendered += AssociatedObject_ContentRendered;
             AssociatedObject.SizeChanged += AssociatedObject_SizeChanged;
             AssociatedObject.Closed += AssociatedObject_Closed;
+
+            StartUpdateTimer();
         }
 
         protected override void OnDetaching()
         {
             UninstallHooks();
+            StopUpdateTimer();
 
             if (AssociatedObject != null)
             {
@@ -145,6 +150,7 @@ namespace SpsGui.Behaviors
         {
             isClosed = true;
             UninstallHooks();
+            StopUpdateTimer();
         }
 
         private void ReinstallHooks()
@@ -232,12 +238,48 @@ namespace SpsGui.Behaviors
             }
 
             AssociatedObject.Dispatcher.BeginInvoke(
-                DispatcherPriority.ContextIdle,
+                DispatcherPriority.Normal,
                 new Action(() =>
                 {
                     UpdateVisibility();
                     UpdatePosition();
                 }));
+        }
+
+        private void StartUpdateTimer()
+        {
+            if (AssociatedObject == null || updateTimer != null)
+            {
+                return;
+            }
+
+            updateTimer = new DispatcherTimer(DispatcherPriority.Background, AssociatedObject.Dispatcher);
+            updateTimer.Interval = UpdateInterval;
+            updateTimer.Tick += UpdateTimer_Tick;
+            updateTimer.Start();
+        }
+
+        private void StopUpdateTimer()
+        {
+            if (updateTimer == null)
+            {
+                return;
+            }
+
+            updateTimer.Stop();
+            updateTimer.Tick -= UpdateTimer_Tick;
+            updateTimer = null;
+        }
+
+        private void UpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (AssociatedObject == null || isClosed || TargetWindowInfo == null)
+            {
+                return;
+            }
+
+            UpdateVisibility();
+            UpdatePosition();
         }
 
         private void UpdateVisibility()
@@ -257,6 +299,7 @@ namespace SpsGui.Behaviors
             {
                 activeTargetHandle = foregroundTargetHandle;
                 AssociatedObject.Show();
+                ApplyExtendedStyle();
             }
             else if (!shouldShow && AssociatedObject.IsVisible)
             {
@@ -271,6 +314,8 @@ namespace SpsGui.Behaviors
             {
                 return;
             }
+
+            ApplyExtendedStyle();
 
             // A fullscreen target can enter the topmost band after the overlay.
             // Reassert the overlay's order even when WS_EX_TOPMOST is already set.
