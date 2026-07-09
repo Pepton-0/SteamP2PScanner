@@ -4,14 +4,14 @@ SteamP2PScanner略してSpsは、SteamゲームにおいてP2P接続をしてい
 以下のリポジトリのフォークとなります。<br>
 重大な欠点を修正し、かつ操作性の改善を加えたものになります。
 
-<端的な画像>
+![画像](https://github.com/user-attachments/assets/4126c09e-af3b-4e17-bbfd-4b00b2544b52)
 
 [SteamP2PInfo](https://github.com/tremwil/SteamP2PInfo)<br>
 [SteamP2PInfo-rubiconian](https://github.com/saw44169/SteamP2PInfo-rubiconian)
 
 ## インストールと使い方
 
-<TODO 動画>
+![動画](https://youtu.be/A686F3xC_w8)
 
 1. Releaseページにてzipをダウンロードし解凍し、中にあるSpsGui.exeを管理者権限で実行してください。<br>
     i. TODO 蒼画面の突破の仕方。次の画像のように、"WindowsによってPCが保護されました"というシーンが出てくる場合があります。<br>"詳細情報" > "実行" により解決できます。<br>Windowsのセキュリティは、マイナーアプリを所かまわずブロックしちゃうお茶目さんであることが原因です。
@@ -54,7 +54,7 @@ pingの定期的な送信とその返答について、SteamP2PInfoはタイミ�
 
 4. SteamP2PInfoはゲームの自動検出が出来ませんが、SpsはSteam App IDを含め全部自動でやってくれます。
 
-5. SteamP2PInfoはフルスクリーンゲーム上にオーバーレイを上手く表示することはできませんが、Spsなら出来ます。
+5. SteamP2PInfoはフルスクリーンゲーム上にオーバーレイを上手く表示することはできませんが、Spsならある程度できます。<br>ゲーム中Winキーによりウィンドウズメニューを開けば、Spsのオーバーレイが再表示されるようになります。
 
 6. SteamP2PInfoはP2P接続状況が悪くとも相手のせいか自分のせいか区別を付けられませんが、SpsはDNSサーバーとのpingもモニターすることにより、客観的な観測データが得られます。<br>安定した外部サーバーとのpingが悪ければ貴方のせいである可能性が高く、そうでなければ相手のせいである可能性が高いです。
 (基本的にDNSサーバーのほうが安定していますので、極端な差がつかなければ有意差を認めない方が良いです)
