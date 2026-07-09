@@ -11,6 +11,7 @@ namespace SpsGui.Behaviors
     /// Keeps the overlay window aligned with and visible only for its target window.
     /// </summary>
     public class OverlayWindowBehavior : Behavior<Window>
+
     {
         private sealed class OverlayVisibilityState : IEquatable<OverlayVisibilityState>
         {
