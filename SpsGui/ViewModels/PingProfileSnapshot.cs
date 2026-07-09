@@ -22,6 +22,7 @@ namespace SpsGui.ViewModels
         private double q1;
         private double med;
         private double q3;
+        private double? limitOverride;
         private double[] recentPings = new double[0];
         private ulong? netIdValue;
         private BasePacketArchive packetArchive;
@@ -229,7 +230,7 @@ namespace SpsGui.ViewModels
         /// </summary>
         public double Limit
         {
-            get { return Max + 10.0; }
+            get { return limitOverride.HasValue ? limitOverride.Value : Max + 10.0; }
         }
 
         /// <summary>
@@ -361,6 +362,27 @@ namespace SpsGui.ViewModels
         {
             sourceStats.PushPing(value);
             RefreshFromStats();
+        }
+
+        /// <summary>
+        /// Creates a copy for overlay rows with a shared box plot scale.
+        /// </summary>
+        /// <param name="limit">Shared right edge scale value in milliseconds.</param>
+        /// <returns>A snapshot backed by the same statistics source with a fixed limit.</returns>
+        public PingProfileSnapshot CreateOverlaySnapshot(double limit)
+        {
+            var snapshot = new PingProfileSnapshot(sourceStats)
+            {
+                State = State,
+                PacketArchive = PacketArchive,
+                UsingRelay = UsingRelay,
+                UsingDns = UsingDns,
+                NetIdValue = NetIdValue,
+                limitOverride = NormalizeMetric(limit)
+            };
+
+            snapshot.RefreshFromStats();
+            return snapshot;
         }
 
         /// <summary>

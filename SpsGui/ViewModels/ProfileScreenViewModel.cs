@@ -271,11 +271,13 @@ namespace SpsGui.ViewModels
         {
             var next = new List<PingProfileSnapshot>();
             var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            double overlayBoxPlotLimit = 0.0;
 
             packetScan.ForEachActiveHistory((state, netId, history) =>
             {
                 string key = CreateSnapshotKey(netId, history);
                 seenKeys.Add(key);
+                overlayBoxPlotLimit = Math.Max(overlayBoxPlotLimit, NormalizeLimitSource(history.Stats.Max));
 
                 PingProfileSnapshot snapshot;
                 if (!activeSnapshots.TryGetValue(key, out snapshot))
@@ -307,7 +309,7 @@ namespace SpsGui.ViewModels
             }
 
             ReplaceCollection(CurrentProfiles, next);
-            overlayService.UpdateProfiles(CurrentProfiles);
+            overlayService.UpdateProfiles(CreateOverlayProfiles(CurrentProfiles, overlayBoxPlotLimit));
             previousActiveCount = next.Count(snapshot => !snapshot.UsingDns);
         }
 
@@ -424,6 +426,18 @@ namespace SpsGui.ViewModels
             }
 
             return history.Stats.Name;
+        }
+
+        private static IEnumerable<PingProfileSnapshot> CreateOverlayProfiles(
+            IEnumerable<PingProfileSnapshot> snapshots,
+            double boxPlotLimit)
+        {
+            return snapshots.Select(snapshot => snapshot.CreateOverlaySnapshot(boxPlotLimit)).ToArray();
+        }
+
+        private static double NormalizeLimitSource(double value)
+        {
+            return value < 0 ? 0.0 : value;
         }
 
         private static string CreateArchiveFileName(PingProfileSnapshot snapshot)
