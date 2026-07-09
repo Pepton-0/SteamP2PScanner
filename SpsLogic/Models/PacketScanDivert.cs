@@ -30,7 +30,7 @@ namespace SpsLogic
 
     public sealed class PlayerPingHistoryDivert : BasePlayerPingHistory
     {
-        private const double LossDetectPatience = 9.0d;
+        private const double LossDetectPatience = 12.0d;
 
         private readonly PacketArchiveDivert archive;
         private readonly ConnectionStats stats;
