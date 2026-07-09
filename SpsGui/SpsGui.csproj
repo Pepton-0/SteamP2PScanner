@@ -115,6 +115,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\StringResource.ja-jp.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SteamPacketScanTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

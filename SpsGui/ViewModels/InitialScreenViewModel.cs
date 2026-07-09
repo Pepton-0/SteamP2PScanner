@@ -148,8 +148,9 @@ namespace SpsGui.ViewModels
             get
             {
                 return SelectedCandidate == null
-                    ? "Nothing detected"
-                    : "Monitor " + SelectedCandidate.DisplayName;
+                    ? App.Current.Resources["AutoDetectionNothing"].ToString()
+                    : App.Current.Resources["AutoDetectionSomething"].ToString()
+                    .Replace("*", SelectedCandidate.DisplayName);
             }
         }
 
