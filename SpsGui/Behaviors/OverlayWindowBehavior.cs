@@ -16,6 +16,7 @@ namespace SpsGui.Behaviors
         private const int WsExTopmost = 0x00000008;
         private const int WsExToolWindow = 0x00000080;
         private const int WsExTransparent = 0x00000020;
+        private const int WsExNoActivate = 0x08000000;
         private const uint EventSystemForeground = 0x0003;
         private const uint EventObjectLocationChange = 0x800B;
         private const uint SwpNoActivate = 0x0010;
@@ -26,6 +27,7 @@ namespace SpsGui.Behaviors
         private WinApi.WinEventDelegate foregroundChangedHook;
         private IntPtr locationHookHandle;
         private IntPtr foregroundHookHandle;
+        private IntPtr activeTargetHandle;
         private bool isClosed;
 
         public static readonly DependencyProperty TargetWindowInfoProperty =
@@ -42,12 +44,6 @@ namespace SpsGui.Behaviors
                 typeof(OverlayWindowBehavior),
                 new PropertyMetadata(true, OnIsOverlayEnabledChanged));
 
-        public WindowInfo TargetWindowInfo
-        {
-            get { return (WindowInfo)GetValue(TargetWindowInfoProperty); }
-            set { SetValue(TargetWindowInfoProperty, value); }
-        }
-
         public static readonly DependencyProperty OffsetXProperty =
             DependencyProperty.Register(
                 nameof(OffsetX),
@@ -62,6 +58,18 @@ namespace SpsGui.Behaviors
                 typeof(OverlayWindowBehavior),
                 new PropertyMetadata(0.0, OnOffsetChanged));
 
+        public WindowInfo TargetWindowInfo
+        {
+            get { return (WindowInfo)GetValue(TargetWindowInfoProperty); }
+            set { SetValue(TargetWindowInfoProperty, value); }
+        }
+
+        public bool IsOverlayEnabled
+        {
+            get { return (bool)GetValue(IsOverlayEnabledProperty); }
+            set { SetValue(IsOverlayEnabledProperty, value); }
+        }
+
         public double OffsetX
         {
             get { return (double)GetValue(OffsetXProperty); }
@@ -72,12 +80,6 @@ namespace SpsGui.Behaviors
         {
             get { return (double)GetValue(OffsetYProperty); }
             set { SetValue(OffsetYProperty, value); }
-        }
-
-        public bool IsOverlayEnabled
-        {
-            get { return (bool)GetValue(IsOverlayEnabledProperty); }
-            set { SetValue(IsOverlayEnabledProperty, value); }
         }
 
         protected override void OnAttached()
@@ -112,14 +114,14 @@ namespace SpsGui.Behaviors
             behavior.UpdateVisibility();
         }
 
-        private static void OnOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((OverlayWindowBehavior)d).UpdatePosition();
-        }
-
         private static void OnIsOverlayEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((OverlayWindowBehavior)d).UpdateVisibility();
+        }
+
+        private static void OnOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((OverlayWindowBehavior)d).UpdatePosition();
         }
 
         private void AssociatedObject_SourceInitialized(object sender, EventArgs e)
@@ -163,7 +165,7 @@ namespace SpsGui.Behaviors
                 IntPtr.Zero,
                 locationChangedHook,
                 TargetWindowInfo.ProcessId,
-                TargetWindowInfo.ThreadId,
+                0,
                 0);
             foregroundHookHandle = WinApi.SetWinEventHook(
                 EventSystemForeground,
@@ -201,7 +203,7 @@ namespace SpsGui.Behaviors
         {
             if (eventType == EventObjectLocationChange &&
                 TargetWindowInfo != null &&
-                hwnd == TargetWindowInfo.Handle &&
+                IsWindowFromTargetProcess(hwnd) &&
                 idObject == 0)
             {
                 BeginUpdate();
@@ -246,29 +248,35 @@ namespace SpsGui.Behaviors
                 return;
             }
 
+            IntPtr foregroundTargetHandle = GetForegroundTargetHandle();
+            bool targetForeground = foregroundTargetHandle != IntPtr.Zero;
             bool shouldShow =
                 IsOverlayEnabled &&
                 WinApi.IsWindow(TargetWindowInfo.Handle) &&
                 WinApi.IsWindowVisible(TargetWindowInfo.Handle) &&
                 !WinApi.IsIconic(TargetWindowInfo.Handle) &&
-                IsTargetForeground();
+                targetForeground;
 
             if (shouldShow && !AssociatedObject.IsVisible)
             {
+                activeTargetHandle = foregroundTargetHandle;
                 AssociatedObject.Show();
             }
             else if (!shouldShow && AssociatedObject.IsVisible)
             {
+                activeTargetHandle = IntPtr.Zero;
                 AssociatedObject.Hide();
                 return;
             }
+
+            activeTargetHandle = shouldShow ? foregroundTargetHandle : IntPtr.Zero;
 
             if (!shouldShow || interopHelper == null)
             {
                 return;
             }
 
-            bool shouldTopmost = IsTargetForeground() || AssociatedObject.IsActive;
+            bool shouldTopmost = targetForeground || AssociatedObject.IsActive;
             int exStyle = WinApi.GetWindowLongPtr(interopHelper.Handle, GwlExStyle).ToInt32();
             bool isTopmost = (exStyle & WsExTopmost) != 0;
 
@@ -304,7 +312,9 @@ namespace SpsGui.Behaviors
 
         private Rect GetTargetRect()
         {
-            if (!WinApi.GetWindowRect(TargetWindowInfo.Handle, out WinApi.RECT rect))
+            IntPtr targetHandle = GetPositionTargetHandle();
+
+            if (!WinApi.GetWindowRect(targetHandle, out WinApi.RECT rect))
             {
                 return Rect.Empty;
             }
@@ -336,13 +346,59 @@ namespace SpsGui.Behaviors
             WinApi.SetWindowLongPtr(
                 interopHelper.Handle,
                 GwlExStyle,
-                new IntPtr(exStyle | WsExToolWindow | WsExTransparent));
+                new IntPtr(exStyle | WsExToolWindow | WsExTransparent | WsExNoActivate));
         }
 
-        private bool IsTargetForeground()
+        private IntPtr GetForegroundTargetHandle()
         {
-            return TargetWindowInfo != null &&
-                WinApi.GetForegroundWindow() == TargetWindowInfo.Handle;
+            if (TargetWindowInfo == null)
+            {
+                return IntPtr.Zero;
+            }
+
+            IntPtr foreground = WinApi.GetForegroundWindow();
+            if (foreground == IntPtr.Zero)
+            {
+                return IntPtr.Zero;
+            }
+
+            if (foreground == TargetWindowInfo.Handle)
+            {
+                return TargetWindowInfo.Handle;
+            }
+
+            if (!IsWindowFromTargetProcess(foreground))
+            {
+                return IntPtr.Zero;
+            }
+
+            if (!WinApi.IsWindowVisible(foreground) || WinApi.IsIconic(foreground))
+            {
+                return IntPtr.Zero;
+            }
+
+            return foreground;
+        }
+
+        private IntPtr GetPositionTargetHandle()
+        {
+            if (activeTargetHandle != IntPtr.Zero && WinApi.IsWindow(activeTargetHandle))
+            {
+                return activeTargetHandle;
+            }
+
+            return TargetWindowInfo.Handle;
+        }
+
+        private bool IsWindowFromTargetProcess(IntPtr hwnd)
+        {
+            if (TargetWindowInfo == null || hwnd == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            WinApi.GetWindowThreadProcessId(hwnd, out uint processId);
+            return processId == TargetWindowInfo.ProcessId;
         }
     }
 }
