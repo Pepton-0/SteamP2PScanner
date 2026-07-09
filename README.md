@@ -59,7 +59,7 @@ pingの定期的な送信とその返答について、SteamP2PInfoはタイミ�
 
 6. SteamP2PInfoはP2P接続状況が悪くとも相手のせいか自分のせいか区別を付けられませんが、SpsはDNSサーバーとのpingもモニターすることにより、客観的な観測データが得られます。<br>安定した外部サーバーとのpingが悪ければ貴方のせいである可能性が高く、そうでなければ相手のせいである可能性が高いです。<br>
 (基本的にDNSサーバーのほうが安定していますので、極端な差がつかなければ有意差を認めない方が良いです)<br>
-![比較](https://github.com/user-attachments/assets/8920e359-1be2-4c3b-993c-890de5476374)
+![比較](https://github.com/user-attachments/assets/0883b5a2-d447-4220-aff7-b3ea41caa70c)
 
 ## TODO 
 
