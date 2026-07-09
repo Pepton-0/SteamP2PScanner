@@ -48,6 +48,32 @@ namespace SpsGui.Behaviors
             set { SetValue(TargetWindowInfoProperty, value); }
         }
 
+        public static readonly DependencyProperty OffsetXProperty =
+            DependencyProperty.Register(
+                nameof(OffsetX),
+                typeof(double),
+                typeof(OverlayWindowBehavior),
+                new PropertyMetadata(0.0, OnOffsetChanged));
+
+        public static readonly DependencyProperty OffsetYProperty =
+            DependencyProperty.Register(
+                nameof(OffsetY),
+                typeof(double),
+                typeof(OverlayWindowBehavior),
+                new PropertyMetadata(0.0, OnOffsetChanged));
+
+        public double OffsetX
+        {
+            get { return (double)GetValue(OffsetXProperty); }
+            set { SetValue(OffsetXProperty, value); }
+        }
+
+        public double OffsetY
+        {
+            get { return (double)GetValue(OffsetYProperty); }
+            set { SetValue(OffsetYProperty, value); }
+        }
+
         public bool IsOverlayEnabled
         {
             get { return (bool)GetValue(IsOverlayEnabledProperty); }
@@ -84,6 +110,11 @@ namespace SpsGui.Behaviors
             var behavior = (OverlayWindowBehavior)d;
             behavior.ReinstallHooks();
             behavior.UpdateVisibility();
+        }
+
+        private static void OnOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((OverlayWindowBehavior)d).UpdatePosition();
         }
 
         private static void OnIsOverlayEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -267,8 +298,8 @@ namespace SpsGui.Behaviors
             }
 
             const double margin = 12;
-            AssociatedObject.Left = targetRect.Right - AssociatedObject.ActualWidth - margin;
-            AssociatedObject.Top = targetRect.Top + margin;
+            AssociatedObject.Left = targetRect.Right - AssociatedObject.ActualWidth - margin + OffsetX;
+            AssociatedObject.Top = targetRect.Top + margin + OffsetY;
         }
 
         private Rect GetTargetRect()
