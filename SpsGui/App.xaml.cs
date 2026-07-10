@@ -25,7 +25,7 @@ namespace SpsGui
     {
         public App()
         {
-            Logger.DebugLog("Hello world!");
+            Logger.Log("Application setup is called", true);
 
             // Prepare MVVM application
 #if MVVM_APP
@@ -57,15 +57,20 @@ namespace SpsGui
 #if MVVM_APP
             Ioc.Default.GetRequiredService<IConductor>();
 
+            Logger.Log("Loaded background models", true);
+
             var window = new CoreWindow();
             MainWindow = window;
             window.Show();
+
+            Logger.Log("Now you can see the window", true);
 #endif
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
+            Logger.Log("Exit the app", true);
 #if MVVM_APP
             Ioc.Default.GetRequiredService<IOverlayService>().Close();
             Ioc.Default.GetRequiredService<IPacketScan>().Dispose();

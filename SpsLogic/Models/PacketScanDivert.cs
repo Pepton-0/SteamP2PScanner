@@ -147,18 +147,18 @@ namespace SpsLogic
             {
                 handle = WinDivertOpen(Filter, 0, 0, WinDivertFlagSniff);
             }
-            catch (DllNotFoundException ex)
+            catch (DllNotFoundException)
             {
-                throw new InvalidOperationException("WinDivert.dll was not found. Put WinDivert.dll and WinDivert64.sys next to the executable or install WinDivert.", ex);
+                Logger.Log("WinDivert.dll was not found. Put WinDivert.dll and WinDivert64.sys next to the executable or install WinDivert.", true);
             }
-            catch (BadImageFormatException ex)
+            catch (BadImageFormatException)
             {
-                throw new InvalidOperationException("WinDivert.dll architecture does not match this process.", ex);
+                Logger.Log("WinDivert.dll architecture does not match this process.", true);
             }
 
             if (handle == IntPtr.Zero || handle == InvalidHandleValue)
             {
-                throw new InvalidOperationException("WinDivertOpen failed: " + CreateLastWin32ErrorMessage());
+                Logger.Log("WinDivertOpen failed: " + CreateLastWin32ErrorMessage(), true);
             }
 
             receiveTask = Task.Run(() => ReceiveLoop());

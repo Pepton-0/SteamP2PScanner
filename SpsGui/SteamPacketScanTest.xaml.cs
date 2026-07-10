@@ -147,7 +147,7 @@ namespace SpsGui
                     return false;
                 }
 
-                packetScan = new PacketScan(ReadPatienceMilliseconds());
+                packetScan = new PacketScanDivert(ReadPatienceMilliseconds());
                 steamPeerManager = new SteamPeerManager(packetScan, testAppInfo.Info.ProcessName);
 
                 monitoringStarted = true;

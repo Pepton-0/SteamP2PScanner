@@ -128,7 +128,7 @@ namespace SpsGui
                     return true;
                 }
 
-                packetScan = new PacketScan(ReadPatienceMilliseconds());
+                packetScan = new PacketScanDivert(ReadPatienceMilliseconds());
                 StateTextBlock.Text = "PacketScan: constructed";
                 AppendLog("Construct succeeded.");
                 RefreshHistories();
