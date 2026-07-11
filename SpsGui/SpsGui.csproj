@@ -219,6 +219,7 @@
     <Compile Include="ViewModels\PingProfileSnapshot.cs" />
     <Compile Include="ViewModels\ProfileScreenViewModel.cs" />
     <Compile Include="Views\Controls\BarChartControl.cs" />
+    <Compile Include="Views\Controls\BoolToAnyVisibilityConverter.cs" />
     <Compile Include="Views\Controls\BoxPlotControl.cs" />
     <Compile Include="Views\CoreWindow.xaml.cs">
       <DependentUpon>CoreWindow.xaml</DependentUpon>

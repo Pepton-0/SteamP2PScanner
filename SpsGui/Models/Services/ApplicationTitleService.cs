@@ -12,7 +12,7 @@ namespace SpsGui.Models.Services
     /// </summary>
     public class ApplicationTitleService : IApplicationTitleService
     {
-        private const string Version = "1.0";
+        private const string Version = "1.1";
 
         public string CreateApplicationTitle()
         {
