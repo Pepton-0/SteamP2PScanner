@@ -4,6 +4,7 @@ using SpsGui.Models;
 using SpsGui.Models.Services;
 using SpsLogic;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace SpsGui.ViewModels
@@ -36,7 +37,8 @@ namespace SpsGui.ViewModels
             IConductor conductor,
             IApplicationTitleService applicationTitleService,
             IDialogService dialogService,
-            IOverlayService overlayService)
+            IOverlayService overlayService,
+            IVersionCheckService verCheckService)
         {
             Conductor = conductor ?? throw new ArgumentNullException(nameof(conductor));
             if (applicationTitleService == null)
@@ -54,6 +56,23 @@ namespace SpsGui.ViewModels
             CurrentViewModel = initialScreen;
             ExitCommand = new RelayCommand<object>(OnExit);
             TestCommand = new RelayCommand<object>((d) => Logger.Log("something"));
+
+            Task.Run(() =>
+            {
+                if (verCheckService.FetchLatest())
+                {
+                    string v = verCheckService.GetLatestRelease()["tag_name"].ToString();
+                    if (string.Compare(verCheckService.GetVersion(), v) < 0)
+                    {
+                        App.Current.Dispatcher.Invoke(() =>
+                        {
+                            linkUpdate.NavigateUri = new Uri("https://github.com/" + VersionCheck.repositoryName + "/releases/tag/" + v);
+                            textUpdate.Text = string.Format("NEW VERSION ({0}), DOWNLOAD HERE", v);
+                            this.ShowMessageAsync("New Version Available", string.Format("{0} is out! Click the link in the title bar to download it.", v));
+                        });
+                    }
+                }
+            });
         }
 
         /// <summary>

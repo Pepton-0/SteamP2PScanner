@@ -185,6 +185,7 @@
     <Compile Include="Models\Services\ApplicationTitleService.cs" />
     <Compile Include="Models\Services\DialogService.cs" />
     <Compile Include="Models\Services\OverlayService.cs" />
+    <Compile Include="Models\Services\VersionCheckService.cs" />
     <Compile Include="PingOverlayTest.xaml.cs">
       <DependentUpon>PingOverlayTest.xaml</DependentUpon>
       <SubType>Code</SubType>
