@@ -29,14 +29,14 @@
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
-            <!-- Used for test
             <TextBlock Text="{Binding CurrentProcessName}"
                        Margin="12,0,12,0"
                        VerticalAlignment="Center"
                        Foreground="#C8C8C8"
                        TextTrimming="CharacterEllipsis"
                        MaxWidth="220" />
-            <Button Command="{Binding TestCommand}" Content="Test"/>!-->
+            <!--
+            <Button Command="{Binding TestCommand}" Content="Test"/>-->
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 
