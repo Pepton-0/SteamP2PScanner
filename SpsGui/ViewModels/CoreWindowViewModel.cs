@@ -48,6 +48,10 @@ namespace SpsGui.ViewModels
 
             this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
+            if (verCheckService == null)
+            {
+                throw new ArgumentNullException(nameof(verCheckService));
+            }
 
             ApplicationTitle = applicationTitleService.CreateApplicationTitle();
 
@@ -59,18 +63,24 @@ namespace SpsGui.ViewModels
 
             Task.Run(() =>
             {
-                if (verCheckService.FetchLatest())
+                try
                 {
-                    string v = verCheckService.GetLatestRelease()["tag_name"].ToString();
-                    if (string.Compare(verCheckService.GetVersion(), v) < 0)
+                    if (verCheckService.FetchLatest())
                     {
-                        App.Current.Dispatcher.Invoke(() =>
+                        string v = verCheckService.GetLatestRelease()["tag_name"].ToString();
+                        if (IsNewerVersion(verCheckService.GetVersion(), v))
                         {
-                            linkUpdate.NavigateUri = new Uri("https://github.com/" + VersionCheck.repositoryName + "/releases/tag/" + v);
-                            textUpdate.Text = string.Format("NEW VERSION ({0}), DOWNLOAD HERE", v);
-                            this.ShowMessageAsync("New Version Available", string.Format("{0} is out! Click the link in the title bar to download it.", v));
-                        });
+                            Uri downloadUri = new Uri("https://github.com/" + verCheckService.GetRepoName() + "/releases/tag/" + v);
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+                                dialogService.ShowNewVersionDownloadDialog(v, downloadUri);
+                            });
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Failed to check latest version because " + ex.Message, true);
                 }
             });
         }
@@ -155,6 +165,29 @@ namespace SpsGui.ViewModels
             }
 
             return result;
+        }
+
+        private static bool IsNewerVersion(string currentVersionText, string latestVersionText)
+        {
+            Version currentVersion;
+            Version latestVersion;
+            if (Version.TryParse(NormalizeVersion(currentVersionText), out currentVersion) &&
+                Version.TryParse(NormalizeVersion(latestVersionText), out latestVersion))
+            {
+                return currentVersion.CompareTo(latestVersion) < 0;
+            }
+
+            return string.Compare(currentVersionText, latestVersionText, StringComparison.OrdinalIgnoreCase) < 0;
+        }
+
+        private static string NormalizeVersion(string versionText)
+        {
+            if (string.IsNullOrWhiteSpace(versionText))
+            {
+                return string.Empty;
+            }
+
+            return versionText.Trim().TrimStart('v', 'V');
         }
 
         private void OnExit(object sender)

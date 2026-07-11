@@ -39,4 +39,7 @@
     <sys:String x:Key="SteamConsoleCommandTitle">Steam console command</sys:String>
     <sys:String x:Key="WindowSelectTitle">Select Window</sys:String>
     <sys:String x:Key="SteamAppIdTitle">Steam AppID</sys:String>
+    <sys:String x:Key="NewVersionDownload">Download</sys:String>
+    <sys:String x:Key="NewVersionDecline">Decline</sys:String>
+    <sys:String x:Key="NewVersionTitle">Download new version @ -> *</sys:String>
 </ResourceDictionary>

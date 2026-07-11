@@ -11,9 +11,10 @@ namespace SpsGui.Models.Services
         bool FetchLatest();
         string GetVersion();
         JObject GetLatestRelease();
+        string GetRepoName();
     }
 
-    public class VersionCheck : IVersionCheckService
+    public class VersionCheckService : IVersionCheckService
     {
         private static readonly string CurrentVersion = "1.1";
         private static readonly string repositoryName = "Pepton-0/SteamP2PScanner";
@@ -69,6 +70,11 @@ namespace SpsGui.Models.Services
         public JObject GetLatestRelease()
         {
             return LatestRelease;
+        }
+
+        public string GetRepoName()
+        {
+            return repositoryName;
         }
     }
 }

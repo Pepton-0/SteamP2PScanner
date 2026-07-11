@@ -1,5 +1,7 @@
 using SpsGui.Views;
 using SpsLogic;
+using System;
+using System.Diagnostics;
 using System.Windows;
 
 namespace SpsGui.Models.Services
@@ -37,6 +39,13 @@ namespace SpsGui.Models.Services
         void ShowSteamConsoleCommandDialog(string command);
 
         /// <summary>
+        /// Shows a new version dialog and opens the release page when accepted.
+        /// </summary>
+        /// <param name="version">Available release version.</param>
+        /// <param name="downloadUri">Release page URI.</param>
+        void ShowNewVersionDownloadDialog(string version, Uri downloadUri);
+
+        /// <summary>
         /// Shows a plain message owned by the application main window when possible.
         /// </summary>
         /// <param name="message">Message text to display.</param>
@@ -48,6 +57,13 @@ namespace SpsGui.Models.Services
     /// </summary>
     public class DialogService : IDialogService
     {
+        private readonly IVersionCheckService VerCheckServ;
+
+        public DialogService(IVersionCheckService verCheckServ)
+        {
+            this.VerCheckServ = verCheckServ;
+        }
+
         /// <inheritdoc />
         public WindowInfo ShowWindowSelectDialog(WindowInfo[] windows)
         {
@@ -72,6 +88,30 @@ namespace SpsGui.Models.Services
         public void ShowSteamConsoleCommandDialog(string command)
         {
             ShowDialog(new SteamConsoleCommandDialog(command));
+        }
+
+        /// <inheritdoc />
+        public void ShowNewVersionDownloadDialog(string version, Uri downloadUri)
+        {
+            if (downloadUri == null)
+            {
+                return;
+            }
+
+            var dialog = new NewVersionDialog(VerCheckServ.GetVersion(), version);
+            if (ShowDialog(dialog) != true)
+            {
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(downloadUri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Failed to open download page: " + ex.Message);
+            }
         }
 
         /// <inheritdoc />
