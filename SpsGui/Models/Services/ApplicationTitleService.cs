@@ -12,11 +12,16 @@ namespace SpsGui.Models.Services
     /// </summary>
     public class ApplicationTitleService : IApplicationTitleService
     {
-        private const string Version = "1.1";
+        private readonly IVersionCheckService VerService;
+
+        public ApplicationTitleService(IVersionCheckService verServ)
+        {
+            VerService = verServ;
+        }
 
         public string CreateApplicationTitle()
         {
-            return "SteamP2PScanner " + Version;
+            return "SteamP2PScanner " + VerService.GetVersion();
         }
     }
 }
