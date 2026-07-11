@@ -54,12 +54,39 @@
         </Style>
         <Style x:Key="OverlayDataGridCellStyle" TargetType="DataGridCell">
             <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="SnapsToDevicePixels" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style x:Key="OverlayDataGridRowStyle" TargetType="DataGridRow">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="SnapsToDevicePixels" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridRow">
+                        <DataGridCellsPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="OverlayDataGridRowHeaderStyle" TargetType="DataGridRowHeader">
+            <Setter Property="Width" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Visibility" Value="Collapsed" />
         </Style>
     </Window.Resources>
 
@@ -80,6 +107,11 @@
                       RowBackground="Transparent"
                       AlternatingRowBackground="Transparent"
                       BorderThickness="0"
+                      BorderBrush="Transparent"
+                      HorizontalGridLinesBrush="Transparent"
+                      VerticalGridLinesBrush="Transparent"
+                      RowHeaderWidth="0"
+                      ColumnHeaderHeight="0"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       CanUserReorderColumns="False"
@@ -88,9 +120,11 @@
                       CanUserSortColumns="False"
                       IsReadOnly="True"
                       Focusable="False"
+                      IsTabStop="False"
                       ColumnWidth="SizeToCells"
                       CellStyle="{StaticResource OverlayDataGridCellStyle}"
                       RowStyle="{StaticResource OverlayDataGridRowStyle}"
+                      RowHeaderStyle="{StaticResource OverlayDataGridRowHeaderStyle}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
                 <DataGrid.Columns>
