@@ -34,6 +34,7 @@ namespace SpsGui
                 .AddSingleton<IApplicationTitleService, ApplicationTitleService>()
                 .AddSingleton<IDialogService, DialogService>()
                 .AddSingleton<IOverlayService, OverlayService>()
+                .AddSingleton<IVersionCheckService, VersionCheckService>()
                 .AddSingleton<ISteamAppFinder, SteamAppFinder>()
                 .AddSingleton<IPacketScan, PacketScanDivert>()
                 .AddTransient<CoreWindowViewModel>()
