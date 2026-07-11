@@ -4,6 +4,7 @@
         xmlns:behaviors="clr-namespace:SpsGui.Behaviors"
         xmlns:controls="clr-namespace:SpsGui.Views.Controls"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:logic="clr-namespace:SpsLogic;assembly=SpsLogic"
         Title="SteamP2PScanner Overlay"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -23,6 +24,9 @@
     </i:Interaction.Behaviors>
 
     <Window.Resources>
+        <controls:BoolToAnyVisibilityConverter x:Key="VisibleIfTrueConverter"
+                                               TrueTo="Visible"
+                                               FalseTo="Collapsed" />
         <DropShadowEffect x:Key="OverlayShadowEffect"
                           Color="Black"
                           BlurRadius="2"
@@ -48,6 +52,15 @@
             <Setter Property="FontSize" Value="24" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
+        <Style x:Key="OverlayDataGridCellStyle" TargetType="DataGridCell">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+        <Style x:Key="OverlayDataGridRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
     </Window.Resources>
 
     <Border Background="Transparent"
@@ -57,70 +70,117 @@
             <TextBlock Text="{Binding ApplicationTitle, Mode=OneWay}"
                        Style="{StaticResource OverlayTitleTextStyle}"
                        Visibility="{Binding EmptyTitleVisibility, Mode=OneWay}" />
-            <ItemsControl ItemsSource="{Binding Profiles, Mode=OneWay}"
-                          HorizontalAlignment="Right"
-                          Grid.IsSharedSizeScope="True"
-                          Visibility="{Binding TableVisibility, Mode=OneWay}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,2"
-                              VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="OverlayNameColumn" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+            <DataGrid ItemsSource="{Binding Profiles, Mode=OneWay}"
+                      HorizontalAlignment="Right"
+                      Visibility="{Binding TableVisibility, Mode=OneWay}"
+                      AutoGenerateColumns="False"
+                      HeadersVisibility="None"
+                      GridLinesVisibility="None"
+                      Background="Transparent"
+                      RowBackground="Transparent"
+                      AlternatingRowBackground="Transparent"
+                      BorderThickness="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="False"
+                      CanUserResizeRows="False"
+                      CanUserSortColumns="False"
+                      IsReadOnly="True"
+                      Focusable="False"
+                      ColumnWidth="SizeToCells"
+                      CellStyle="{StaticResource OverlayDataGridCellStyle}"
+                      RowStyle="{StaticResource OverlayDataGridRowStyle}"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Status"
+                                            Width="48"
+                                            Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowStatus, Converter={StaticResource VisibleIfTrueConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding StatusText, Mode=OneWay}"
+                                           Width="40"
+                                           Margin="0,2,8,2"
+                                           Style="{StaticResource OverlayCellTextStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                            <TextBlock Text="{Binding StatusText, Mode=OneWay}"
-                                       Grid.Column="0"
-                                       Width="40"
-                                       Margin="0,0,8,0"
-                                       Style="{StaticResource OverlayCellTextStyle}"
-                                       Visibility="{Binding DataContext.ShowStatusVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
-                            <TextBlock Text="{Binding Name, Mode=OneWay}"
-                                       Grid.Column="1"
-                                       Margin="0,0,8,0"
-                                       Style="{StaticResource OverlayCellTextStyle}"
-                                       Visibility="{Binding DataContext.ShowNameVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
-                            <TextBlock Text="{Binding AverageText, Mode=OneWay}"
-                                       Grid.Column="2"
-                                       Width="30"
-                                       Margin="0,0,8,0"
-                                       Style="{StaticResource OverlayAverageTextStyle}"
-                                       Visibility="{Binding DataContext.ShowAverageVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
-                            <TextBlock Text="{Binding LossText, Mode=OneWay}"
-                                       Grid.Column="3"
-                                       Width="40"
-                                       Margin="0,0,8,0"
-                                       Style="{StaticResource OverlayLossTextStyle}"
-                                       Visibility="{Binding DataContext.ShowLossVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
-                            <controls:BoxPlotControl Width="220"
-                                                     Grid.Column="4"
-                                                     Height="34"
-                                                     Margin="0,0,8,0"
-                                                     Effect="{StaticResource OverlayShadowEffect}"
-                                                     Origin="{Binding Origin, Mode=OneWay}"
-                                                     Minimum="{Binding Min, Mode=OneWay}"
-                                                     FirstQuartile="{Binding Q1, Mode=OneWay}"
-                                                     Median="{Binding Med, Mode=OneWay}"
-                                                     ThirdQuartile="{Binding Q3, Mode=OneWay}"
-                                                     Maximum="{Binding Max, Mode=OneWay}"
-                                                     Limit="{Binding Limit, Mode=OneWay}"
-                                                     Visibility="{Binding DataContext.ShowBoxPlotVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
-                            <controls:BarChartControl Width="100"
-                                                      Grid.Column="5"
-                                                      Height="34"
-                                                      Effect="{StaticResource OverlayShadowEffect}"
-                                                      Samples="{Binding RecentPings, Mode=OneWay}"
-                                                      Average="{Binding Avg, Mode=OneWay}"
-                                                      Visibility="{Binding DataContext.ShowChartVisibility, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}" />
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                    <DataGridTemplateColumn Header="Name"
+                                            Width="SizeToCells"
+                                            Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowName, Converter={StaticResource VisibleIfTrueConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name, Mode=OneWay}"
+                                           Margin="0,2,8,2"
+                                           Style="{StaticResource OverlayCellTextStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Average"
+                                            Width="38"
+                                            Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowAverage, Converter={StaticResource VisibleIfTrueConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding AverageText, Mode=OneWay}"
+                                           Width="30"
+                                           Margin="0,2,8,2"
+                                           Style="{StaticResource OverlayAverageTextStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Loss"
+                                            Width="48"
+                                            Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowLoss, Converter={StaticResource VisibleIfTrueConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding LossText, Mode=OneWay}"
+                                           Width="40"
+                                           Margin="0,2,8,2"
+                                           Style="{StaticResource OverlayLossTextStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="BoxPlot"
+                                            Width="228"
+                                            Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=ShowBoxPlot, Converter={StaticResource VisibleIfTrueConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <controls:BoxPlotControl Width="220"
+                                                         Height="34"
+                                                         Margin="0,2,8,2"
+                                                         Effect="{StaticResource OverlayShadowEffect}"
+                                                         Origin="{Binding Origin, Mode=OneWay}"
+                                                         Minimum="{Binding Min, Mode=OneWay}"
+                                                         FirstQuartile="{Binding Q1, Mode=OneWay}"
+                                                         Median="{Binding Med, Mode=OneWay}"
+                                                         ThirdQuartile="{Binding Q3, Mode=OneWay}"
+                                                         Maximum="{Binding Max, Mode=OneWay}"
+                                                         Limit="{Binding Limit, Mode=OneWay}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Chart"
+                                            Width="100"
+                                            Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowChart, Converter={StaticResource VisibleIfTrueConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <controls:BarChartControl Width="100"
+                                                          Height="34"
+                                                          Margin="0,2,0,2"
+                                                          Effect="{StaticResource OverlayShadowEffect}"
+                                                          Samples="{Binding RecentPings, Mode=OneWay}"
+                                                          Average="{Binding Avg, Mode=OneWay}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </Border>
 </Window>
