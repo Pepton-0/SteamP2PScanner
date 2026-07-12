@@ -42,4 +42,8 @@
     <sys:String x:Key="NewVersionDownload">Download</sys:String>
     <sys:String x:Key="NewVersionDecline">Decline</sys:String>
     <sys:String x:Key="NewVersionTitle">Download new version @ -> *</sys:String>
+    <sys:String x:Key="SteamExePathDialogTitle">Set steam.exe path</sys:String>
+    <sys:String x:Key="SteamExePathDialogMessage">Enter the full path to steam.exe.</sys:String>
+    <sys:String x:Key="SteamExePathSaveButton">Save</sys:String>
+    <sys:String x:Key="SteamExePathInvalidMessage">steam.exe was not found at this path.</sys:String>
 </ResourceDictionary>

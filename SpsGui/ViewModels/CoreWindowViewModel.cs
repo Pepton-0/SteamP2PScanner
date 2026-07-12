@@ -4,6 +4,7 @@ using SpsGui.Models;
 using SpsGui.Models.Services;
 using SpsLogic;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -118,6 +119,24 @@ namespace SpsGui.ViewModels
 
         private void OnProfileRequested(object sender, SteamAppInfo appInfo)
         {
+            // Check steam paths faster than steam command and manager
+            LogSteamPathDiagnostics();
+            if (!File.Exists(AppConfig.Instance.SteamExe))
+            {
+                string steamExe = dialogService.ShowSteamExePathDialog(AppConfig.Instance.SteamExe);
+                if (string.IsNullOrWhiteSpace(steamExe))
+                {
+                    return;
+                }
+
+                AppConfig.Instance.SteamExe = steamExe;
+                LogSteamPathDiagnostics();
+                if (!File.Exists(AppConfig.Instance.SteamExe))
+                {
+                    return;
+                }
+            }
+
             //maybe requesting the command faster than manager resolves
             //the problem that manager cannot load ipc file somehow.
             RequestManualSteamConsoleCommand();
@@ -165,6 +184,14 @@ namespace SpsGui.ViewModels
             }
 
             return result;
+        }
+
+        private static void LogSteamPathDiagnostics()
+        {
+            Logger.Log("AppConfig.SteamExe: " + AppConfig.Instance.SteamExe, true);
+            Logger.Log("AppConfig.SteamLogPath: " + AppConfig.Instance.SteamLogPath, true);
+            Logger.Log("AppConfig.SteamExe exists: " + File.Exists(AppConfig.Instance.SteamExe), true);
+            Logger.Log("AppConfig.SteamLogDir exists: " + Directory.Exists(AppConfig.Instance.SteamLogDir), true);
         }
 
         private static bool IsNewerVersion(string currentVersionText, string latestVersionText)

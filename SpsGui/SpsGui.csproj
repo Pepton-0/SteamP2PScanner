@@ -175,6 +175,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\SteamExePathDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -260,6 +264,10 @@
     </Compile>
     <Compile Include="Views\NewVersionDialog.xaml.cs">
       <DependentUpon>NewVersionDialog.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\SteamExePathDialog.xaml.cs">
+      <DependentUpon>SteamExePathDialog.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Resources\StringResource.en-us.xaml">

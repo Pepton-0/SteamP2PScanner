@@ -46,6 +46,13 @@ namespace SpsGui.Models.Services
         void ShowNewVersionDownloadDialog(string version, Uri downloadUri);
 
         /// <summary>
+        /// Shows the Steam executable path reset dialog.
+        /// </summary>
+        /// <param name="initialSteamExePath">Initial path text.</param>
+        /// <returns>The entered path, or null when the dialog is closed without saving.</returns>
+        string ShowSteamExePathDialog(string initialSteamExePath);
+
+        /// <summary>
         /// Shows a plain message owned by the application main window when possible.
         /// </summary>
         /// <param name="message">Message text to display.</param>
@@ -112,6 +119,13 @@ namespace SpsGui.Models.Services
             {
                 ShowMessage("Failed to open download page: " + ex.Message);
             }
+        }
+
+        /// <inheritdoc />
+        public string ShowSteamExePathDialog(string initialSteamExePath)
+        {
+            var dialog = new SteamExePathDialog(initialSteamExePath);
+            return ShowDialog(dialog) == true ? dialog.SteamExePath : null;
         }
 
         /// <inheritdoc />
