@@ -1,6 +1,7 @@
 using SharpPcap;
 using SpsLogic.Utils;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SpsLogic
@@ -33,5 +34,13 @@ namespace SpsLogic
         public abstract void ReportReceive(ClassicStunTransactionId id, PosixTimeval time);
         public abstract void Update();
         public abstract void Dispose();
+    }
+
+    public static class PacketScanUtil
+    {
+        public static ulong CalcNetId(IPAddress addr, ushort port)
+        {
+            return (ulong)port << 32 | BitConverter.ToUInt32(addr.GetAddressBytes(), 0);
+        }
     }
 }

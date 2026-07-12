@@ -69,8 +69,17 @@ namespace SpsGui.ViewModels
                     if (verCheckService.FetchLatest())
                     {
                         string v = verCheckService.GetLatestRelease()["tag_name"].ToString();
-                        if (IsNewerVersion(verCheckService.GetVersion(), v))
+                        string currentVersion = verCheckService.GetVersion();
+                        if (IsNewerVersion(currentVersion, v))
                         {
+                            if (AppConfig.Instance.IgnoreLatest)
+                            {
+                                Logger.Log(
+                                    $"New version dialog was ignored because IgnoreLatest is enabled. {currentVersion} -> {v}",
+                                    true);
+                                return;
+                            }
+
                             Uri downloadUri = new Uri("https://github.com/" + verCheckService.GetRepoName() + "/releases/tag/" + v);
                             App.Current.Dispatcher.Invoke(() =>
                             {

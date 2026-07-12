@@ -81,7 +81,7 @@
     <Compile Include="GameConfig.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Models\PacketScanBase.cs" />
-    <Compile Include="Models\PacketScan.cs" />
+    <Compile Include="Models\PacketScanNcap.cs" />
     <Compile Include="Models\PacketScanDivert.cs" />
     <Compile Include="Models\SteamAppFinder.cs" />
     <Compile Include="ReverseTextReader.cs" />

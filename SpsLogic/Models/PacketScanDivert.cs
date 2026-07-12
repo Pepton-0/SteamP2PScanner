@@ -145,6 +145,8 @@ namespace SpsLogic
 
             try
             {
+                // call extern function
+                // remain this to ensure that we can get LastWin32ErrorMessage
                 handle = WinDivertOpen(Filter, 0, 0, WinDivertFlagSniff);
             }
             catch (DllNotFoundException)
@@ -311,8 +313,8 @@ namespace SpsLogic
                 return;
             }
 
-            ulong srcNetId = PacketScan.CalcNetId(sourceAddress, sourcePort);
-            ulong destNetId = PacketScan.CalcNetId(destinationAddress, destinationPort);
+            ulong srcNetId = PacketScanUtil.CalcNetId(sourceAddress, sourcePort);
+            ulong destNetId = PacketScanUtil.CalcNetId(destinationAddress, destinationPort);
 
             PlayerPingHistoryDivert history = null;
             bool found = false;
@@ -420,8 +422,9 @@ namespace SpsLogic
 
         private static string CreateLastWin32ErrorMessage()
         {
-            var exception = new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-            return exception.Message;
+            var err = Marshal.GetLastWin32Error();
+            var exception = new System.ComponentModel.Win32Exception(err);
+            return $"{exception.NativeErrorCode} : { exception.Message }";
         }
 
         [DllImport("WinDivert.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true, CharSet = CharSet.Ansi)]

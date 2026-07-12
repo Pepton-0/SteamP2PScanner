@@ -233,6 +233,19 @@ namespace SpsGui.ViewModels
             }
         }
 
+        public bool IgnoreLatest
+        {
+            get { return AppConfig.Instance.IgnoreLatest; }
+            set
+            {
+                if (AppConfig.Instance.IgnoreLatest != value)
+                {
+                    AppConfig.Instance.IgnoreLatest = value;
+                    OnPropertyChanged(nameof(IgnoreLatest));
+                }
+            }
+        }
+
         /// <summary>
         /// Stops timers and network monitors owned by this view model.
         /// </summary>

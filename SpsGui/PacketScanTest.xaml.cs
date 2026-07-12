@@ -153,7 +153,7 @@ namespace SpsGui
                 }
 
                 IPEndPoint endpoint = ResolveEndpointFromUi();
-                ulong netId = PacketScan.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
+                ulong netId = PacketScanUtil.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
                 packetScan.Register(netId, GetServiceHostText(), 0);
 
                 registeredNetId = netId;
@@ -191,7 +191,7 @@ namespace SpsGui
                 else
                 {
                     IPEndPoint endpoint = ResolveEndpointFromUi();
-                    netId = PacketScan.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
+                    netId = PacketScanUtil.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
                 }
 
                 packetScan.Unregister(netId);
@@ -406,7 +406,7 @@ namespace SpsGui
             }
 
             var endpoint = new IPEndPoint(address, port);
-            ulong netId = PacketScan.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
+            ulong netId = PacketScanUtil.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
             EndpointTextBlock.Text = endpoint.ToString();
             NetIdTextBlock.Text = netId.ToString(CultureInfo.InvariantCulture);
             return endpoint;
