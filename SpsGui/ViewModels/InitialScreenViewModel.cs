@@ -79,8 +79,8 @@ namespace SpsGui.ViewModels
             get { return steamExePath; }
             set
             {
-                if (SetProperty(ref steamExePath, value) &&
-                    File.Exists(value))
+                // no need to check the file status yet. its when the request command called
+                if (SetProperty(ref steamExePath, value))
                 {
                     AppConfig.Instance.SteamExe = value;
                 }

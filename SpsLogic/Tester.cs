@@ -19,16 +19,135 @@ namespace SpsLogic
 {
     public class Tester
     {
+        private const string SteamPathResultFileName = "result.txt";
+
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
 
-            //TestClassicStunTransactionIdDictionary();
+            string command = args != null && args.Length >= 1 ? args[0] : "steam-path";
+            if (string.Equals(command, "steam-path", StringComparison.OrdinalIgnoreCase))
+            {
+                TestRunningSteamExePathByPowerShell();
+                return;
+            }
+
+            if (string.Equals(command, "packet-divert", StringComparison.OrdinalIgnoreCase))
+            {
+                TestPacketScanDivert(args.Skip(1).ToArray());
+                return;
+            }
+
+            // TestClassicStunTransactionIdDictionary();
             // TestPacketAnalysis(args);
-            TestPacketScanDivert(args);
+            // TestPacketScanDivert(args);
             // TestDnsPingDispose();
             // TestDnsPing();
             // TestWinPcap();
+        }
+
+        public static void TestRunningSteamExePathByPowerShell()
+        {
+            Logger.Log("Starting running steam.exe path lookup by PowerShell.", true);
+
+            try
+            {
+                string output;
+                string error;
+                int exitCode = RunPowerShellForTest(
+                    "Get-Process -Name steam -ErrorAction SilentlyContinue | Where-Object { $_.Path } | Select-Object -ExpandProperty Path",
+                    out output,
+                    out error);
+
+                Logger.Log("PowerShell exit code: " + exitCode, true);
+                if (!string.IsNullOrWhiteSpace(error))
+                {
+                    Logger.Log("PowerShell stderr: " + error.Trim(), true);
+                }
+
+                string[] paths = output
+                    .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Trim())
+                    .Where(line => line.Length > 0)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+
+                string resultPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SteamPathResultFileName);
+                WriteSteamPathResultForTest(resultPath, paths, exitCode, error);
+
+                if (paths.Length == 0)
+                {
+                    Logger.Log("No running steam.exe process was found.", true);
+                    Logger.Log("Steam path result was written to: " + resultPath, true);
+                    return;
+                }
+
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    Logger.Log("Running steam.exe path[" + i + "]: " + paths[i], true);
+                }
+
+                Logger.Log("Steam path result was written to: " + resultPath, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Running steam.exe path lookup failed: " + ex.GetType().Name + ": " + ex.Message, true);
+            }
+        }
+
+        private static void WriteSteamPathResultForTest(string resultPath, string[] paths, int exitCode, string error)
+        {
+            if (File.Exists(resultPath))
+            {
+                File.Delete(resultPath);
+            }
+
+            var lines = new List<string>
+            {
+                "PowerShell exit code: " + exitCode
+            };
+
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                lines.Add("PowerShell stderr:");
+                lines.Add(error.Trim());
+            }
+
+            if (paths == null || paths.Length == 0)
+            {
+                lines.Add("No running steam.exe process was found.");
+            }
+            else
+            {
+                lines.Add("Running steam.exe path:");
+                lines.AddRange(paths);
+            }
+
+            File.WriteAllLines(resultPath, lines, Encoding.UTF8);
+        }
+
+        private static int RunPowerShellForTest(string command, out string output, out string error)
+        {
+            string encodedCommand = Convert.ToBase64String(Encoding.Unicode.GetBytes(command));
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = "-NoProfile -ExecutionPolicy Bypass -EncodedCommand " + encodedCommand,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                output = process.StandardOutput.ReadToEnd();
+                error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return process.ExitCode;
+            }
         }
 
         public static void TestWinPcap()

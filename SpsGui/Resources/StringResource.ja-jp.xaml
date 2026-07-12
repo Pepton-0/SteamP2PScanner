@@ -42,4 +42,8 @@
     <sys:String x:Key="NewVersionDownload">ダウンロード</sys:String>
     <sys:String x:Key="NewVersionDecline">却下</sys:String>
     <sys:String x:Key="NewVersionTitle">新バージョンのダウンロード @ -> *</sys:String>
+    <sys:String x:Key="SteamExePathDialogTitle">steam.exeのパス設定</sys:String>
+    <sys:String x:Key="SteamExePathDialogMessage">steam.exeのフルパスを入力してください</sys:String>
+    <sys:String x:Key="SteamExePathSaveButton">保存</sys:String>
+    <sys:String x:Key="SteamExePathInvalidMessage">このパスにsteam.exeが見つかりません</sys:String>
 </ResourceDictionary>

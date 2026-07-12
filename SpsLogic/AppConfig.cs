@@ -33,14 +33,11 @@ namespace SpsLogic
             get { return _steamExe; }
             set
             {
-                if (File.Exists(value))
-                {
-                    _steamExe = value;
-                    Save();
-                    SteamProcessName = Path.GetFileNameWithoutExtension(_steamExe);
-                    SteamLogDir = Path.Combine(Path.GetDirectoryName(_steamExe), "logs");
-                    RaisePropertyChanged();
-                }
+                _steamExe = value ?? string.Empty;
+                SteamProcessName = Path.GetFileNameWithoutExtension(_steamExe);
+                SteamLogDir = CreateSteamLogDirFromSteamExe(_steamExe);
+                Save();
+                RaisePropertyChanged();
             }
         }
         private string _steamExe = "C:\\Program Files (x86)\\Steam\\steam.exe";
@@ -60,11 +57,19 @@ namespace SpsLogic
             get { return _steamLogDir; }
             set
             {
-                _steamLogDir = value;
+                _steamLogDir = value ?? string.Empty;
                 string logDir = SteamLogDir;
-                if (!logDir.EndsWith("\\")) { logDir += "\\"; }
-                SteamLogPath = logDir + "ipc_SteamClient.log";
-                SteamBootstrapLogPath = logDir + "bootstrap_log.txt";
+                if (string.IsNullOrEmpty(logDir))
+                {
+                    SteamLogPath = string.Empty;
+                    SteamBootstrapLogPath = string.Empty;
+                }
+                else
+                {
+                    if (!logDir.EndsWith("\\")) { logDir += "\\"; }
+                    SteamLogPath = logDir + "ipc_SteamClient.log";
+                    SteamBootstrapLogPath = logDir + "bootstrap_log.txt";
+                }
                 Save();
                 RaisePropertyChanged();
             }
@@ -279,6 +284,19 @@ namespace SpsLogic
         {
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(path, json);
+        }
+
+        private static string CreateSteamLogDirFromSteamExe(string steamExe)
+        {
+            try
+            {
+                string steamDir = Path.GetDirectoryName(steamExe);
+                return string.IsNullOrEmpty(steamDir) ? string.Empty : Path.Combine(steamDir, "logs");
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

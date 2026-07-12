@@ -25,7 +25,7 @@ namespace SpsGui
     {
         public App()
         {
-            Logger.Log("Application setup is called", true);
+            Logger.Log("---Application setup is called---", true);
 
             // Prepare MVVM application
 #if MVVM_APP
