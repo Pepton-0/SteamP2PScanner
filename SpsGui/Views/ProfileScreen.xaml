@@ -131,6 +131,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0"
@@ -264,6 +265,20 @@
                                            Interval="1"
                                            StringFormat="0"
                                            ChangeValueOnTextChanged="True" />
+
+                        <TextBlock Grid.Row="9"
+                                   Grid.Column="0"
+                                   Text="{StaticResource IgnoreLatestLabel}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"
+                                   Margin="0,8,0,0" />
+                        <mah:ToggleSwitch Grid.Row="9"
+                                          Grid.Column="1"
+                                          IsOn="{Binding IgnoreLatest, Mode=TwoWay}"
+                                          HorizontalAlignment="Right"
+                                          Margin="0,8,0,0"
+                                          OnContent=""
+                                          OffContent="" />
                     </Grid>
                 </ScrollViewer>
             </TabItem>

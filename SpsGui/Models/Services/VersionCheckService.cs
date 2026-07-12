@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Security.RightsManagement;
 using Newtonsoft.Json.Linq;
+using SpsLogic;
 
 namespace SpsGui.Models.Services
 {
@@ -16,12 +17,18 @@ namespace SpsGui.Models.Services
 
     public class VersionCheckService : IVersionCheckService
     {
-        private static readonly string CurrentVersion = "1.1";
+        private static readonly bool IgnoreLatestForDebug = false;
+        private static readonly string CurrentVersion = "1.1(Test)";
         private static readonly string repositoryName = "Pepton-0/SteamP2PScanner";
         private static JObject LatestRelease;
 
         public bool FetchLatest()
         {
+            if (IgnoreLatestForDebug)
+            {
+                return false;
+            }
+
             string query = "https://api.github.com/repos/" + repositoryName + "/releases";
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(query);
             req.UserAgent = "request";

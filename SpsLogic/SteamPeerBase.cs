@@ -28,7 +28,6 @@ namespace SpsLogic
 
         /// <summary>
         /// Steam persona name of the peer.
-        /// TODO remove to use Stats.Name
         /// </summary>
         public abstract string Name { get; }
 

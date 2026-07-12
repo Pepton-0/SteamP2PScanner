@@ -193,7 +193,7 @@ namespace SpsLogic
 
             IPAddress address = ResolveIpv4AddressForTest(host);
             var endpoint = new IPEndPoint(address, port);
-            ulong netId = PacketScan.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
+            ulong netId = PacketScanUtil.CalcNetId(endpoint.Address, checked((ushort)endpoint.Port));
 
             Logger.Log(
                 $"Starting PacketScanDivert test: endpoint={endpoint}, netId={netId}, " +

@@ -254,6 +254,19 @@ namespace SpsLogic
         }
         private bool _autoIpc = true;
 
+        [JsonProperty("ignore_latest")]
+        public bool IgnoreLatest
+        {
+            get { return _ignoreLatest; }
+            set
+            {
+                _ignoreLatest = value;
+                Save();
+                RaisePropertyChanged();
+            }
+        }
+        private bool _ignoreLatest;
+
         static AppConfig()
         {
             LoadOrCreate();

@@ -23,6 +23,7 @@
     <sys:String x:Key="OverlayShowChartLabel">オーバーレイにおける棒グラフ</sys:String>
     <sys:String x:Key="OverlayOffsetXLabel">オーバーレイのXオフセット</sys:String>
     <sys:String x:Key="OverlayOffsetYLabel">オーバーレイのYオフセット</sys:String>
+    <sys:String x:Key="IgnoreLatestLabel">新バージョン通知を無視</sys:String>
     <sys:String x:Key="PingNameHeader">名前</sys:String>
     <sys:String x:Key="PingAverageHeader">平均</sys:String>
     <sys:String x:Key="PingLossHeader">パケロス%</sys:String>
