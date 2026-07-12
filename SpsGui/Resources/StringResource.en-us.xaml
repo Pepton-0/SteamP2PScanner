@@ -41,6 +41,7 @@
     <sys:String x:Key="WindowSelectTitle">Select Window</sys:String>
     <sys:String x:Key="SteamAppIdTitle">Steam AppID</sys:String>
     <sys:String x:Key="NewVersionDownload">Download</sys:String>
+    <sys:String x:Key="NewVersionIgnoreForever">Ignore Forever</sys:String>
     <sys:String x:Key="NewVersionDecline">Decline</sys:String>
     <sys:String x:Key="NewVersionTitle">Download new version @ -> *</sys:String>
     <sys:String x:Key="SteamExePathDialogTitle">Set steam.exe path</sys:String>

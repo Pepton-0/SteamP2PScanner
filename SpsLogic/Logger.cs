@@ -4,11 +4,16 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SpsLogic
 {
     public static class Logger
     {
+        private const int LogRetentionDays = 7;
+        private const string LogDirectoryName = "logs";
+        private const string LogFileNamePrefix = "log-";
+        private const string LogFileSearchPattern = LogFileNamePrefix + "*.txt";
         private static StreamWriter fs = null;
         private static readonly Stopwatch stopwatch;
 
@@ -16,6 +21,7 @@ namespace SpsLogic
         {
             stopwatch = new Stopwatch();
             stopwatch.Start();
+            Task.Run(DeleteExpiredLogFiles);
         }
 
         /// <summary>
@@ -191,7 +197,7 @@ namespace SpsLogic
         private static void CreateLogFileIfNotExists()
         {
             DateTime now = DateTime.Now;
-            string logDir = $"logs";
+            string logDir = LogDirectoryName;
             string filePath = Path.Combine(logDir, $"log-{now:yyyy-MM-dd}.txt");
             if (fs == null)
             {
@@ -213,6 +219,68 @@ namespace SpsLogic
             {
                 fs.Dispose();
                 fs = File.AppendText(filePath);
+            }
+        }
+
+        private static void DeleteExpiredLogFiles()
+        {
+            bool ShouldDeleteLogFile(string filePath, DateTime cutoffDate)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(filePath);
+                if (string.IsNullOrEmpty(fileName) || !fileName.StartsWith(LogFileNamePrefix, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                string dateText = fileName.Substring(LogFileNamePrefix.Length);
+                DateTime logDate;
+                if (!DateTime.TryParseExact(
+                    dateText,
+                    "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out logDate))
+                {
+                    return false;
+                }
+
+                return logDate < cutoffDate;
+            }
+
+            try
+            {
+                if (!Directory.Exists(LogDirectoryName))
+                {
+                    return;
+                }
+
+                DateTime cutoffDate = DateTime.Today.AddDays(-LogRetentionDays);
+                foreach (string filePath in Directory.EnumerateFiles(LogDirectoryName, LogFileSearchPattern))
+                {
+                    if (!ShouldDeleteLogFile(filePath, cutoffDate))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        File.Delete(filePath);
+                    }
+                    catch (IOException ex)
+                    {
+                        // you can use Log(,false)
+                        Log("Failed to delete expired log file: " + ex.Message);
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        // you can use Log(,false)
+                        Log("Failed to delete expired log file: " + ex.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("Failed to clean up expired log files: " + ex.Message);
             }
         }
 

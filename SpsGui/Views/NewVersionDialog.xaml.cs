@@ -1,4 +1,5 @@
 using MahApps.Metro.Controls;
+using SpsLogic;
 using System.Windows;
 
 namespace SpsGui.Views
@@ -26,6 +27,12 @@ namespace SpsGui.Views
 
         private void DeclineButton_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
+        }
+
+        private void IgnoreForeverButton_Click(object sender, RoutedEventArgs e)
+        {
+            AppConfig.Instance.IgnoreLatest = true;
             DialogResult = false;
         }
     }

@@ -2,9 +2,9 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 Width="360"
+                 Width="480"
                  Height="118"
-                 MinWidth="320"
+                 MinWidth="480"
                  MinHeight="118"
                  WindowStartupLocation="CenterOwner"
                  GlowBrush="#C53A4C"
@@ -19,6 +19,10 @@
                     Margin="0,0,8,0"
                     IsDefault="True"
                     Click="DownloadButton_Click" />
+            <Button Content="{StaticResource NewVersionIgnoreForever}"
+                    Width="128"
+                    Margin="0,0,8,0"
+                    Click="IgnoreForeverButton_Click" />
             <Button Content="{StaticResource NewVersionDecline}"
                     Width="96"
                     IsCancel="True"
