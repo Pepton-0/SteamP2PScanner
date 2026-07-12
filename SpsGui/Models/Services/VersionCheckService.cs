@@ -18,7 +18,7 @@ namespace SpsGui.Models.Services
     public class VersionCheckService : IVersionCheckService
     {
         private static readonly bool IgnoreLatestForDebug = false;
-        private static readonly string CurrentVersion = "1.1(Test)";
+        private static readonly string CurrentVersion = "1.1";
         private static readonly string repositoryName = "Pepton-0/SteamP2PScanner";
         private static JObject LatestRelease;
 
