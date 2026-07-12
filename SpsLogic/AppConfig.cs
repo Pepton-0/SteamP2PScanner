@@ -38,6 +38,7 @@ namespace SpsLogic
                     _steamExe = value;
                     Save();
                     SteamProcessName = Path.GetFileNameWithoutExtension(_steamExe);
+                    SteamLogDir = Path.Combine(Path.GetDirectoryName(_steamExe), "logs");
                     RaisePropertyChanged();
                 }
             }
