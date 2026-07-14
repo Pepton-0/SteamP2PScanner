@@ -28,6 +28,12 @@ namespace SpsLogic
             string command = args != null && args.Length >= 1 ? args[0] : "steam-path";
             if (string.Equals(command, "steam-path", StringComparison.OrdinalIgnoreCase))
             {
+                TestFindSteamExeService();
+                return;
+            }
+
+            if (string.Equals(command, "steam-path-powershell", StringComparison.OrdinalIgnoreCase))
+            {
                 TestRunningSteamExePathByPowerShell();
                 return;
             }
@@ -46,6 +52,94 @@ namespace SpsLogic
             // TestWinPcap();
         }
 
+        /// <summary>
+        /// Tests steam.exe discovery through the C# service implementation.
+        /// </summary>
+        public static void TestFindSteamExeService()
+        {
+            Logger.Log("Starting steam.exe path lookup by FindSteamExeService.", true);
+
+            try
+            {
+                var service = new FindSteamExeService();
+                FindSteamExeResult result = service.Find();
+                string resultPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SteamPathResultFileName);
+                WriteSteamPathServiceResultForTest(resultPath, result);
+
+                if (result.Candidates.Length == 0)
+                {
+                    Logger.Log("No steam.exe candidate was found.", true);
+                    Logger.Log("Steam path result was written to: " + resultPath, true);
+                    return;
+                }
+
+                for (int i = 0; i < result.Candidates.Length; i++)
+                {
+                    SteamExeCandidate candidate = result.Candidates[i];
+                    Logger.Log(
+                        "steam.exe candidate[" + i + "]: " +
+                        candidate.Path +
+                        ", source=" +
+                        candidate.Source +
+                        ", pid=" +
+                        (candidate.ProcessId.HasValue ? candidate.ProcessId.Value.ToString() : "-"),
+                        true);
+                }
+
+                Logger.Log("Best steam.exe path: " + result.BestPath, true);
+                Logger.Log("Steam path result was written to: " + resultPath, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("FindSteamExeService lookup failed: " + ex.GetType().Name + ": " + ex.Message, true);
+            }
+        }
+
+        /// <summary>
+        /// Writes FindSteamExeService output to a result file for manual verification.
+        /// </summary>
+        /// <param name="resultPath">Destination file path. Existing files are replaced.</param>
+        /// <param name="result">Service result to write. It must not be null.</param>
+        private static void WriteSteamPathServiceResultForTest(string resultPath, FindSteamExeResult result)
+        {
+            if (File.Exists(resultPath))
+            {
+                File.Delete(resultPath);
+            }
+
+            var lines = new List<string>
+            {
+                "FindSteamExeService result",
+                "Best path: " + (string.IsNullOrWhiteSpace(result.BestPath) ? "-" : result.BestPath),
+                "Candidates:"
+            };
+
+            if (result.Candidates.Length == 0)
+            {
+                lines.Add("No steam.exe candidate was found.");
+            }
+            else
+            {
+                foreach (SteamExeCandidate candidate in result.Candidates)
+                {
+                    lines.Add(
+                        candidate.Path +
+                        " | source=" +
+                        candidate.Source +
+                        " | pid=" +
+                        (candidate.ProcessId.HasValue ? candidate.ProcessId.Value.ToString() : "-"));
+                }
+            }
+
+            lines.Add("Messages:");
+            lines.AddRange(result.Messages);
+
+            File.WriteAllLines(resultPath, lines, Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Tests steam.exe discovery through the legacy PowerShell command implementation.
+        /// </summary>
         public static void TestRunningSteamExePathByPowerShell()
         {
             Logger.Log("Starting running steam.exe path lookup by PowerShell.", true);

@@ -24,6 +24,11 @@
                 <Setter Property="Foreground" Value="#EF4444" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
+            <DataTemplate x:Key="StatusCellTemplate">
+                <TextBlock Text="{Binding StatusText, Mode=OneWay}"
+                           Style="{StaticResource CellTextStyle}"
+                           VerticalAlignment="Center"/>
+            </DataTemplate>
             <DataTemplate x:Key="AverageCellTemplate">
                 <TextBlock Text="{Binding AverageText, Mode=OneWay}" 
                            Style="{StaticResource AverageTextStyle}" 
@@ -32,11 +37,6 @@
             <DataTemplate x:Key="LossCellTemplate">
                 <TextBlock Text="{Binding LossText, Mode=OneWay}" 
                            Style="{StaticResource LossTextStyle}"
-                           VerticalAlignment="Center"/>
-            </DataTemplate>
-            <DataTemplate x:Key="StatusCellTemplate">
-                <TextBlock Text="{Binding StatusText, Mode=OneWay}"
-                           Style="{StaticResource CellTextStyle}"
                            VerticalAlignment="Center"/>
             </DataTemplate>
             <DataTemplate x:Key="SteamIdCellTemplate">
@@ -81,9 +81,9 @@
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="{StaticResource PingNameHeader}" Width="Auto" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                            <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingBoxPlotHeader}" Width="270" CellTemplate="{StaticResource BoxPlotCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingChartHeader}" Width="220" CellTemplate="{StaticResource BarChartCellTemplate}" />
                         </GridView>
@@ -101,12 +101,12 @@
                             <GridViewColumn Header="{StaticResource PingStartedAtHeader}" Width="80" DisplayMemberBinding="{Binding StartedAtText, Mode=OneWay}" />
                             <GridViewColumn x:Name="ArchiveColumn" Header="{StaticResource ArchiveHeader}" Width="92" CellTemplate="{StaticResource ArchiveButtonCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingNameHeader}" Width="170" DisplayMemberBinding="{Binding Name, Mode=OneWay}" />
+                            <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingSteamIdHeader}" Width="150" CellTemplate="{StaticResource SteamIdCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingBoxPlotHeader}" Width="250" CellTemplate="{StaticResource BoxPlotCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingChartHeader}" Width="200" CellTemplate="{StaticResource BarChartCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingStatusHeader}" Width="92" CellTemplate="{StaticResource StatusCellTemplate}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

@@ -36,6 +36,7 @@ namespace SpsGui
                 .AddSingleton<IOverlayService, OverlayService>()
                 .AddSingleton<IVersionCheckService, VersionCheckService>()
                 .AddSingleton<ISteamAppFinder, SteamAppFinder>()
+                .AddSingleton<IFindSteamExeService, FindSteamExeService>()
                 .AddSingleton<IPacketScan, PacketScanDivert>()
                 .AddTransient<CoreWindowViewModel>()
                 .BuildServiceProvider());
@@ -47,8 +48,10 @@ namespace SpsGui
             //new SteamDetectTest().Show();
             //new SteamDetectorV2Test().Show();
             // new SteamAppFinderTest().Show();
+            //new FindSteamExeServiceTest().Show();
             //new SteamPacketScanTest().Show();
-            new SnapshotChartDemoTest().Show();
+            // new SnapshotChartDemoTest().Show();
+            new FindSteamExeServiceTest().Show();
 #endif
         }
 

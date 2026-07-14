@@ -19,6 +19,7 @@ namespace SpsGui.ViewModels
         private readonly IConductor Conductor;
         private readonly IDialogService dialogService;
         private readonly IOverlayService overlayService;
+        private readonly IFindSteamExeService findSteamExeService;
         private bool isExiting;
 
         public IRelayCommand<object> ExitCommand { get; private set; }
@@ -33,13 +34,15 @@ namespace SpsGui.ViewModels
         /// <param name="applicationTitleService">Service used to create application title text.</param>
         /// <param name="dialogService">Service used to show modal dialogs.</param>
         /// <param name="overlayService">Service used to own the overlay window.</param>
+        /// <param name="findSteamExeService">Service used to find steam.exe candidates for path recovery.</param>
         public CoreWindowViewModel(
             ISteamAppFinder steamAppFinder,
             IConductor conductor,
             IApplicationTitleService applicationTitleService,
             IDialogService dialogService,
             IOverlayService overlayService,
-            IVersionCheckService verCheckService)
+            IVersionCheckService verCheckService,
+            IFindSteamExeService findSteamExeService)
         {
             Conductor = conductor ?? throw new ArgumentNullException(nameof(conductor));
             if (applicationTitleService == null)
@@ -49,6 +52,7 @@ namespace SpsGui.ViewModels
 
             this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
+            this.findSteamExeService = findSteamExeService ?? throw new ArgumentNullException(nameof(findSteamExeService));
             if (verCheckService == null)
             {
                 throw new ArgumentNullException(nameof(verCheckService));
@@ -132,7 +136,8 @@ namespace SpsGui.ViewModels
             LogSteamPathDiagnostics();
             if (!File.Exists(AppConfig.Instance.SteamExe))
             {
-                string steamExe = dialogService.ShowSteamExePathDialog(AppConfig.Instance.SteamExe);
+                SteamExeCandidate[] steamExeCandidates = FindSteamExeCandidates();
+                string steamExe = dialogService.ShowSteamExePathDialog(AppConfig.Instance.SteamExe, steamExeCandidates);
                 if (string.IsNullOrWhiteSpace(steamExe))
                 {
                     return;
@@ -193,6 +198,26 @@ namespace SpsGui.ViewModels
             }
 
             return result;
+        }
+
+        private SteamExeCandidate[] FindSteamExeCandidates()
+        {
+            try
+            {
+                FindSteamExeResult result = findSteamExeService.Find();
+                foreach (string message in result.Messages)
+                {
+                    Logger.Log("FindSteamExeService: " + message, true);
+                }
+
+                Logger.Log("FindSteamExeService candidates: " + result.Candidates.Length, true);
+                return result.Candidates;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Failed to find steam.exe candidates: " + ex.GetType().Name + ": " + ex.Message, true);
+                return new SteamExeCandidate[0];
+            }
         }
 
         private static void LogSteamPathDiagnostics()

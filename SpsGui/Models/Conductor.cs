@@ -1,4 +1,6 @@
-﻿using SpsLogic;
+﻿//#define INJECT_SPECIFIED_LANG
+
+using SpsLogic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -68,7 +70,11 @@ namespace SpsGui.Models
                 string local = CultureInfo.CreateSpecificCulture(culture).Name;
                 var localDictionary = new ResourceDictionary()
                 {
+#if INJECT_SPECIFIED_LANG
+                    Source = new Uri(@"Resources/StringResource." + "en-us" + @".xaml", UriKind.Relative)
+#else
                     Source = new Uri(@"Resources/StringResource." + local + @".xaml", UriKind.Relative)
+#endif
                 };
                 App.Current.Resources.MergedDictionaries.Add(localDictionary);
             }
