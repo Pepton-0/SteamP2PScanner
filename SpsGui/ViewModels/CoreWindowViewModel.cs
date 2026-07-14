@@ -90,6 +90,10 @@ namespace SpsGui.ViewModels
                                 dialogService.ShowNewVersionDownloadDialog(v, downloadUri);
                             });
                         }
+                        else
+                        {
+                            Logger.Log($"Its already latest version. {currentVersion}", true);
+                        }
                     }
                 }
                 catch (Exception ex)
