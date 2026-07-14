@@ -49,8 +49,9 @@ namespace SpsGui.Models.Services
         /// Shows the Steam executable path reset dialog.
         /// </summary>
         /// <param name="initialSteamExePath">Initial path text.</param>
+        /// <param name="autoCandidates">Auto-detected steam.exe candidates to show before manual input.</param>
         /// <returns>The entered path, or null when the dialog is closed without saving.</returns>
-        string ShowSteamExePathDialog(string initialSteamExePath);
+        string ShowSteamExePathDialog(string initialSteamExePath, SteamExeCandidate[] autoCandidates);
 
         /// <summary>
         /// Shows a plain message owned by the application main window when possible.
@@ -122,9 +123,9 @@ namespace SpsGui.Models.Services
         }
 
         /// <inheritdoc />
-        public string ShowSteamExePathDialog(string initialSteamExePath)
+        public string ShowSteamExePathDialog(string initialSteamExePath, SteamExeCandidate[] autoCandidates)
         {
-            var dialog = new SteamExePathDialog(initialSteamExePath);
+            var dialog = new SteamExePathDialog(initialSteamExePath, autoCandidates);
             return ShowDialog(dialog) == true ? dialog.SteamExePath : null;
         }
 

@@ -45,7 +45,15 @@
     <sys:String x:Key="NewVersionDecline">Decline</sys:String>
     <sys:String x:Key="NewVersionTitle">Download new version @ -> *</sys:String>
     <sys:String x:Key="SteamExePathDialogTitle">Set steam.exe path</sys:String>
-    <sys:String x:Key="SteamExePathDialogMessage">Enter the full path to steam.exe.</sys:String>
+    <sys:String x:Key="SteamExePathAutoHeader">Auto-detected candidates</sys:String>
+    <sys:String x:Key="SteamExePathCandidatePathHeader">Path</sys:String>
+    <sys:String x:Key="SteamExePathCandidateSourceHeader">Source</sys:String>
+    <sys:String x:Key="SteamExePathManualHeader">Manual input: When you don't want to use auto detection</sys:String>
+    <sys:String x:Key="SteamExePathConfirmButton">Confirm</sys:String>
+    <sys:String x:Key="SteamExePathNoSelectionStatus">Select an auto-detected candidate or enter a valid steam.exe path manually.</sys:String>
+    <sys:String x:Key="SteamExePathNoAutoCandidatesStatus">No auto-detected candidates were found. Enter a valid steam.exe path manually.</sys:String>
+    <sys:String x:Key="SteamExePathAutoSelectedStatus">Auto detected candidate selected: *</sys:String>
+    <sys:String x:Key="SteamExePathManualValidStatus">Manual input has valid path: *</sys:String>
+    <sys:String x:Key="SteamExePathManualInvalidStatus">Manual input has invalid path: *</sys:String>
     <sys:String x:Key="SteamExePathSaveButton">Save</sys:String>
-    <sys:String x:Key="SteamExePathInvalidMessage">steam.exe was not found at this path.</sys:String>
 </ResourceDictionary>

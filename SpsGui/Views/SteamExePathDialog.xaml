@@ -3,44 +3,111 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  Title="{StaticResource SteamExePathDialogTitle}"
-                 Width="620"
-                 Height="190"
-                 MinWidth="520"
-                 MinHeight="170"
+                 Width="760"
+                 Height="350"
+                 MinWidth="640"
+                 MinHeight="350"
                  WindowStartupLocation="CenterOwner"
                  GlowBrush="#C53A4C"
                  ShowCloseButton="False">
     <Grid Margin="14">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="250" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <Grid.Resources>
+            <Style x:Key="HiddenColumnHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Setter Property="Height" Value="0" />
+            </Style>
+            <DataTemplate x:Key="PathCellTemplate">
+                <TextBlock Text="{Binding Path, Mode=OneWay}"
+                           TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" />
+            </DataTemplate>
+            <DataTemplate x:Key="SourceCellTemplate">
+                <TextBlock Text="{Binding SourceText, Mode=OneWay}"
+                           Foreground="#8A8A8A"
+                           TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" />
+            </DataTemplate>
+        </Grid.Resources>
 
-        <TextBlock Grid.Row="0"
-                   Text="{StaticResource SteamExePathDialogMessage}"
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    BorderBrush="#D0D7DE"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="10">
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="{StaticResource SteamExePathAutoHeader}"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8" />
+                    <ListView x:Name="AutoCandidateListView"
+                              Margin="16,0,0,0"
+                              SelectionChanged="AutoCandidateListView_SelectionChanged"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                        <ListView.View>
+                            <GridView ColumnHeaderContainerStyle="{StaticResource HiddenColumnHeaderStyle}">
+                                <GridViewColumn Width="460"
+                                                CellTemplate="{StaticResource PathCellTemplate}" />
+                                <GridViewColumn Width="220"
+                                                CellTemplate="{StaticResource SourceCellTemplate}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Row="2"
+                    BorderBrush="#D0D7DE"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="10">
+                <StackPanel>
+                    <TextBlock Text="{StaticResource SteamExePathManualHeader}"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8" />
+                    <TextBox x:Name="SteamExePathTextBox"
+                             Margin="16,0,0,0"
+                             TextWrapping="NoWrap"
+                             HorizontalScrollBarVisibility="Auto"
+                             GotKeyboardFocus="SteamExePathTextBox_GotKeyboardFocus"
+                             TextChanged="SteamExePathTextBox_TextChanged" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="SelectionStatusTextBlock"
+                   Grid.Column="0"
                    TextWrapping="Wrap"
-                   Margin="0,0,0,8" />
+                   VerticalAlignment="Bottom"
+                   Margin="0,10,0,8" />
 
-        <TextBox x:Name="SteamExePathTextBox"
-                 Grid.Row="1"
-                 TextWrapping="NoWrap"
-                 HorizontalScrollBarVisibility="Auto"
-                 TextChanged="SteamExePathTextBox_TextChanged" />
-
-        <TextBlock x:Name="ValidationTextBlock"
-                   Grid.Row="2"
-                   Foreground="#C53A4C"
-                   TextWrapping="Wrap"
-                   Margin="0,8,0,0" />
-
-        <Button x:Name="SaveButton"
-                Grid.Row="3"
-                Content="{StaticResource SteamExePathSaveButton}"
+            <Button x:Name="SaveButton"
+                Grid.Column="1"
+                Content="{StaticResource SteamExePathConfirmButton}"
                 Width="92"
                 HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                IsEnabled="False"
                 IsDefault="True"
                 Click="SaveButton_Click" />
+        </Grid>
     </Grid>
 </mah:MetroWindow>

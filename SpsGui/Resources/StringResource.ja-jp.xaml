@@ -45,7 +45,15 @@
     <sys:String x:Key="NewVersionDecline">却下</sys:String>
     <sys:String x:Key="NewVersionTitle">新バージョンのダウンロード @ -> *</sys:String>
     <sys:String x:Key="SteamExePathDialogTitle">steam.exeのパス設定</sys:String>
-    <sys:String x:Key="SteamExePathDialogMessage">steam.exeのフルパスを入力してください</sys:String>
+    <sys:String x:Key="SteamExePathAutoHeader">自動検知候補</sys:String>
+    <sys:String x:Key="SteamExePathCandidatePathHeader">パス</sys:String>
+    <sys:String x:Key="SteamExePathCandidateSourceHeader">ソース</sys:String>
+    <sys:String x:Key="SteamExePathManualHeader">手動入力: 自動検知を使わないなら、steam.exeのフルパスを入力してください</sys:String>
+    <sys:String x:Key="SteamExePathConfirmButton">確定</sys:String>
+    <sys:String x:Key="SteamExePathNoSelectionStatus">自動検知候補を選択するか、手動でsteam.exeのフルパスを入力してください</sys:String>
+    <sys:String x:Key="SteamExePathNoAutoCandidatesStatus">自動検知候補は見つかりませんでした。手動でsteam.exeのフルパスを入力してください</sys:String>
+    <sys:String x:Key="SteamExePathAutoSelectedStatus">自動検知候補を選択しました: *</sys:String>
+    <sys:String x:Key="SteamExePathManualValidStatus">手動入力のファイルが見つかりました: *</sys:String>
+    <sys:String x:Key="SteamExePathManualInvalidStatus">このフルパスは有効ではありません: *</sys:String>
     <sys:String x:Key="SteamExePathSaveButton">保存</sys:String>
-    <sys:String x:Key="SteamExePathInvalidMessage">このパスにsteam.exeが見つかりません</sys:String>
 </ResourceDictionary>
