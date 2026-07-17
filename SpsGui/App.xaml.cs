@@ -1,4 +1,4 @@
-﻿//#define MVVM_APP
+﻿#define MVVM_APP
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +52,7 @@ namespace SpsGui
             //new SteamPacketScanTest().Show();
             // new SnapshotChartDemoTest().Show();
             //new FindSteamExeServiceTest().Show();
-            new OverlayWindowTest().Show();
+            //new OverlayWindowTest().Show();
 #endif
         }
 
@@ -80,6 +80,7 @@ namespace SpsGui
             Ioc.Default.GetRequiredService<IOverlayService>().Close();
             Ioc.Default.GetRequiredService<IPacketScan>().Dispose();
 #endif
+            AppConfig.Instance.Save();
         }
     }
 }

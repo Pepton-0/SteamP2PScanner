@@ -210,6 +210,78 @@ namespace SpsLogic
         }
         private double _overlayOffsetY;
 
+        [JsonProperty("core_window_placement_saved")]
+        public bool CoreWindowPlacementSaved
+        {
+            get { return _coreWindowPlacementSaved; }
+            set
+            {
+                _coreWindowPlacementSaved = value;
+                RaisePropertyChanged();
+            }
+        }
+        private bool _coreWindowPlacementSaved;
+
+        [JsonProperty("core_window_display_index")]
+        public int CoreWindowDisplayIndex
+        {
+            get { return _coreWindowDisplayIndex; }
+            set
+            {
+                _coreWindowDisplayIndex = value;
+                RaisePropertyChanged();
+            }
+        }
+        private int _coreWindowDisplayIndex = -1;
+
+        [JsonProperty("core_window_left")]
+        public double CoreWindowLeft
+        {
+            get { return _coreWindowLeft; }
+            set
+            {
+                _coreWindowLeft = value;
+                RaisePropertyChanged();
+            }
+        }
+        private double _coreWindowLeft;
+
+        [JsonProperty("core_window_top")]
+        public double CoreWindowTop
+        {
+            get { return _coreWindowTop; }
+            set
+            {
+                _coreWindowTop = value;
+                RaisePropertyChanged();
+            }
+        }
+        private double _coreWindowTop;
+
+        [JsonProperty("core_window_width")]
+        public double CoreWindowWidth
+        {
+            get { return _coreWindowWidth; }
+            set
+            {
+                _coreWindowWidth = value;
+                RaisePropertyChanged();
+            }
+        }
+        private double _coreWindowWidth;
+
+        [JsonProperty("core_window_height")]
+        public double CoreWindowHeight
+        {
+            get { return _coreWindowHeight; }
+            set
+            {
+                _coreWindowHeight = value;
+                RaisePropertyChanged();
+            }
+        }
+        private double _coreWindowHeight;
+
         [JsonProperty("dns_ip")]
         public string DnsIp
         {
