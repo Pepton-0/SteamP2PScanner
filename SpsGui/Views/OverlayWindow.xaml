@@ -113,6 +113,7 @@
                       VerticalGridLinesBrush="Transparent"
                       RowHeaderWidth="0"
                       ColumnHeaderHeight="0"
+                      ColumnWidth="SizeToCells"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       CanUserReorderColumns="False"
@@ -142,7 +143,7 @@
                     </DataGridTemplateColumn>
 
                     <DataGridTemplateColumn Header="Name"
-                                            Width="132"
+                                            Width="SizeToCells"
                                             Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowName, Converter={StaticResource VisibleIfTrueConverter}}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
