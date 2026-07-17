@@ -147,17 +147,9 @@
                                             Visibility="{Binding Source={x:Static logic:AppConfig.Instance}, Path=OverlayShowName, Converter={StaticResource VisibleIfTrueConverter}}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Viewbox Width="124"
-                                         Height="18"
-                                         Margin="0,2,8,2"
-                                         Stretch="Uniform"
-                                         StretchDirection="DownOnly"
-                                         HorizontalAlignment="Left"
-                                         VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Name, Mode=OneWay}"
+                                <TextBlock Text="{Binding Name, Mode=OneWay}"
                                                TextWrapping="NoWrap"
                                                Style="{StaticResource OverlayCellTextStyle}" />
-                                </Viewbox>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

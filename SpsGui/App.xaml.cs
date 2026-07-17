@@ -1,4 +1,4 @@
-﻿#define MVVM_APP
+﻿//#define MVVM_APP
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +51,8 @@ namespace SpsGui
             //new FindSteamExeServiceTest().Show();
             //new SteamPacketScanTest().Show();
             // new SnapshotChartDemoTest().Show();
-            new FindSteamExeServiceTest().Show();
+            //new FindSteamExeServiceTest().Show();
+            new OverlayWindowTest().Show();
 #endif
         }
 

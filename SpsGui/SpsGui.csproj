@@ -120,6 +120,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="OverlayWindowTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\StringResource.ja-jp.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -210,6 +214,10 @@
     </Compile>
     <Compile Include="PacketScanTest.xaml.cs">
       <DependentUpon>PacketScanTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="OverlayWindowTest.xaml.cs">
+      <DependentUpon>OverlayWindowTest.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SteamPacketScanTest.xaml.cs">
