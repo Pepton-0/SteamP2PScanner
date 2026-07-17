@@ -163,7 +163,7 @@ namespace SpsLogic
             return null;
         }
 
-        public async void UpdatePeerList()
+        public void UpdatePeerList()
         {
             // Make sure we're constantly writing to the IPC log to force Steam to eventually flush
             // This call was chosen because it's not something a game will call often
@@ -201,7 +201,7 @@ namespace SpsLogic
                 string line = null;
                 try
                 {
-                    line = await sr.ReadLineAsync();
+                    line = sr.ReadLine();
 
                     if (!string.IsNullOrEmpty(line))
                         Logger.DebugLog("new line; " + line);

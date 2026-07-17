@@ -23,6 +23,15 @@ namespace SteamMonitor
             Console.OutputEncoding = Encoding.UTF8;
 
             var interpreter = new SteamMonitorInterpreter(Console.Out);
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                interpreter.Error("Unhandled exception: " + SafeExceptionText(e.ExceptionObject as Exception));
+            };
+            TaskScheduler.UnobservedTaskException += (sender, e) =>
+            {
+                interpreter.Error("Unobserved task exception: " + SafeExceptionText(e.Exception));
+                e.SetObserved();
+            };
 
             try
             {
@@ -60,14 +69,14 @@ namespace SteamMonitor
                     RunCommandLoop(Console.In, manager, interpreter);
                 }
 
-                SteamPeerManager.ShutdownSteamApi();
+                SafeShutdownSteamApi();
                 interpreter.Exited("shutdown", Success);
                 return Success;
             }
             catch (Exception ex)
             {
-                interpreter.Error(ex.GetType().Name + ": " + ex.Message);
-                SteamPeerManager.ShutdownSteamApi();
+                interpreter.Error(SafeExceptionText(ex));
+                SafeShutdownSteamApi();
                 return UnhandledError;
             }
         }
@@ -92,7 +101,7 @@ namespace SteamMonitor
                 }
                 catch (Exception ex)
                 {
-                    interpreter.Error("Invalid command json: " + ex.Message);
+                    interpreter.Error("Invalid command json: " + SafeExceptionText(ex));
                     continue;
                 }
 
@@ -126,7 +135,7 @@ namespace SteamMonitor
                 }
                 catch (Exception ex)
                 {
-                    interpreter.Error(command.Type + " failed: " + ex.GetType().Name + ": " + ex.Message);
+                    interpreter.Error(command.Type + " failed: " + SafeExceptionText(ex));
                 }
             }
         }
@@ -135,25 +144,89 @@ namespace SteamMonitor
         {
             Task.Run(() =>
             {
-                while (true)
+                try
                 {
-                    Thread.Sleep(1000);
-
-                    if (options.ParentPid > 0 && !IsProcessAlive(options.ParentPid))
+                    while (true)
                     {
-                        interpreter.Exited("parent process exited", Success);
-                        SteamPeerManager.ShutdownSteamApi();
-                        Environment.Exit(Success);
-                    }
+                        Thread.Sleep(1000);
 
-                    if (options.TargetPid > 0 && !IsProcessAlive(options.TargetPid))
-                    {
-                        interpreter.Exited("target process exited", Success);
-                        SteamPeerManager.ShutdownSteamApi();
-                        Environment.Exit(Success);
+                        if (options.ParentPid > 0 && !IsProcessAlive(options.ParentPid))
+                        {
+                            ExitProcess(interpreter, "parent process exited", Success);
+                        }
+
+                        if (options.TargetPid > 0 && !IsProcessAlive(options.TargetPid))
+                        {
+                            ExitProcess(interpreter, "target process exited", Success);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    interpreter.Error("Lifetime watcher failed: " + SafeExceptionText(ex));
+                    ExitProcess(interpreter, "lifetime watcher failed", UnhandledError);
+                }
             });
+        }
+
+        private static void ExitProcess(SteamMonitorInterpreter interpreter, string reason, int exitCode)
+        {
+            interpreter.Exited(reason, exitCode);
+            SafeShutdownSteamApi();
+            Environment.Exit(exitCode);
+        }
+
+        private static void SafeShutdownSteamApi()
+        {
+            try
+            {
+                SteamPeerManager.ShutdownSteamApi();
+            }
+            catch
+            {
+            }
+        }
+
+        private static string SafeExceptionText(Exception ex)
+        {
+            if (ex == null)
+            {
+                return "Unknown exception";
+            }
+
+            string typeName;
+            try
+            {
+                typeName = ex.GetType().FullName;
+            }
+            catch
+            {
+                typeName = "UnknownException";
+            }
+
+            string message;
+            try
+            {
+                message = ex.Message;
+            }
+            catch
+            {
+                message = "(message unavailable)";
+            }
+
+            string stackTrace;
+            try
+            {
+                stackTrace = ex.StackTrace;
+            }
+            catch
+            {
+                stackTrace = null;
+            }
+
+            return string.IsNullOrWhiteSpace(stackTrace)
+                ? typeName + ": " + message
+                : typeName + ": " + message + Environment.NewLine + stackTrace;
         }
 
         private static bool IsProcessAlive(int processId)
