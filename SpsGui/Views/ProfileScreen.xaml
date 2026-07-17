@@ -106,7 +106,7 @@
                             <GridViewColumn Header="{StaticResource PingAverageHeader}" Width="64" CellTemplate="{StaticResource AverageCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingLossHeader}" Width="72" CellTemplate="{StaticResource LossCellTemplate}" />
                             <GridViewColumn Header="{StaticResource PingBoxPlotHeader}" Width="250" CellTemplate="{StaticResource BoxPlotCellTemplate}" />
-                            <GridViewColumn Header="{StaticResource PingChartHeader}" Width="200" CellTemplate="{StaticResource BarChartCellTemplate}" />
+                            <GridViewColumn Header="{StaticResource PingChartHeader}" Width="100" CellTemplate="{StaticResource BarChartCellTemplate}" />
                         </GridView>
                     </ListView.View>
                 </ListView>
