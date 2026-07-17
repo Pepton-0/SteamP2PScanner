@@ -54,7 +54,7 @@
   <ItemGroup>
     <Reference Include="Steamworks.NET, Version=20.1.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>steamworks_bin\Steamworks.NET.dll</HintPath>
+      <HintPath>.\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -107,8 +107,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="steamworks_bin\Steamworks.NET.dll" />
-    <Content Include="steamworks_bin\steam_api64.dll">
+    <Content Include="Steamworks.NET.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="steam_api64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="WinDivert.dll">
