@@ -21,6 +21,7 @@ namespace SpsGui.Models
         private int requestIndex;
         private bool disposed;
         private bool childReportedExit;
+        private bool communicationClosed;
 
         public SpsSteamMonitorInterpreter(IPacketScan packetScan, SteamAppInfo appInfo)
         {
@@ -161,7 +162,7 @@ namespace SpsGui.Models
                 return;
             }
 
-            if (process.HasExited)
+            if (communicationClosed || process.HasExited)
             {
                 return;
             }
@@ -172,38 +173,53 @@ namespace SpsGui.Models
                 RequestId = (++requestIndex).ToString(CultureInfo.InvariantCulture)
             };
 
-            string json = JsonConvert.SerializeObject(message);
-            lock (inputLock)
+            try
             {
-                process.StandardInput.WriteLine(json);
-                process.StandardInput.Flush();
+                string json = JsonConvert.SerializeObject(message);
+                lock (inputLock)
+                {
+                    process.StandardInput.WriteLine(json);
+                    process.StandardInput.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                communicationClosed = true;
+                Logger.Log("Failed to send SteamMonitor command: " + ex.GetType().Name + ": " + ex.Message, true);
             }
         }
 
         private void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(e.Data))
-            {
-                return;
-            }
-
-            SteamMonitorMessage message;
             try
             {
-                message = JsonConvert.DeserializeObject<SteamMonitorMessage>(e.Data);
+                if (string.IsNullOrWhiteSpace(e.Data))
+                {
+                    return;
+                }
+
+                SteamMonitorMessage message;
+                try
+                {
+                    message = JsonConvert.DeserializeObject<SteamMonitorMessage>(e.Data);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Invalid SteamMonitor message: " + ex.Message + " line=" + e.Data, true);
+                    return;
+                }
+
+                if (message == null)
+                {
+                    return;
+                }
+
+                HandleMessage(message);
             }
             catch (Exception ex)
             {
-                Logger.Log("Invalid SteamMonitor message: " + ex.Message + " line=" + e.Data, true);
-                return;
+                Logger.Log("Failed to handle SteamMonitor message: " + ex.GetType().Name + ": " + ex.Message, true);
             }
-
-            if (message == null)
-            {
-                return;
-            }
-
-            HandleMessage(message);
         }
 
         private void HandleMessage(SteamMonitorMessage message)
@@ -233,17 +249,30 @@ namespace SpsGui.Models
 
         private void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(e.Data))
+            try
             {
-                Logger.Log("SteamMonitor stderr: " + e.Data, true);
+                if (!string.IsNullOrWhiteSpace(e.Data))
+                {
+                    Logger.Log("SteamMonitor stderr: " + e.Data, true);
+                }
+            }
+            catch
+            {
             }
         }
 
         private void OnExited(object sender, EventArgs e)
         {
-            if (!disposed && !childReportedExit)
+            try
             {
-                Logger.Log("SteamMonitor process exited unexpectedly: code=" + process.ExitCode.ToString(CultureInfo.InvariantCulture), true);
+                if (!disposed && !childReportedExit)
+                {
+                    Logger.Log("SteamMonitor process exited unexpectedly: code=" + process.ExitCode.ToString(CultureInfo.InvariantCulture), true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Failed to observe SteamMonitor exit: " + ex.GetType().Name + ": " + ex.Message, true);
             }
         }
     }

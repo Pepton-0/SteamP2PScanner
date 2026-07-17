@@ -75,11 +75,26 @@ namespace SteamMonitor
 
         private void Write(SteamMonitorMessage message)
         {
-            string json = JsonConvert.SerializeObject(message);
-            lock (outputLock)
+            try
             {
-                output.WriteLine(json);
-                output.Flush();
+                string json = JsonConvert.SerializeObject(message);
+                lock (outputLock)
+                {
+                    output.WriteLine(json);
+                    output.Flush();
+                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            catch (Exception)
+            {
             }
         }
     }
