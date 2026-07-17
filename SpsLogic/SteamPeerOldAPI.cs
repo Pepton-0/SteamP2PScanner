@@ -28,7 +28,7 @@ namespace SpsLogic
 
         public override bool UsingRelay { get { return mSessionState.m_bUsingRelay != 0; } }
 
-        public SteamPeerOldAPI(CSteamID steamId, IPacketScan packetScan) : base(steamId, packetScan)
+        public SteamPeerOldAPI(CSteamID steamId, ISteamPeerInterpreter interpreter) : base(steamId, interpreter)
         {
             mSessionState = new P2PSessionState_t();
             _name = SteamFriends.GetFriendPersonaName(SteamID);
@@ -36,7 +36,7 @@ namespace SpsLogic
 
         public override void Dispose()
         {
-            PacketScan.Unregister(mNetIdentity);
+            Interpreter.Unregister(mNetIdentity);
         }
 
         public override bool UpdatePeerInfo()
@@ -49,12 +49,12 @@ namespace SpsLogic
 
             if (endpointChanged)
             {
-                PacketScan.Unregister(mNetIdentity);
+                Interpreter.Unregister(mNetIdentity);
 
                 byte[] ipBytes = BitConverter.GetBytes(mSessionState.m_nRemoteIP).Reverse().ToArray();
                 mNetIdentity = ((ulong)mSessionState.m_nRemotePort << 32) | BitConverter.ToUInt32(ipBytes, 0);
 
-                PacketScan.Register(mNetIdentity, Name, SteamID.m_SteamID);
+                Interpreter.Register(mNetIdentity, Name, SteamID.m_SteamID);
             }
 
             return true;

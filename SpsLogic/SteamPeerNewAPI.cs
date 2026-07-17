@@ -31,7 +31,7 @@ namespace SpsLogic
 
         private bool ShouldStartAccumulatingValue = false;
 
-        public SteamPeerNewAPI(CSteamID steamId, IPacketScan packetScan) : base(steamId, packetScan)
+        public SteamPeerNewAPI(CSteamID steamId, ISteamPeerInterpreter interpreter) : base(steamId, interpreter)
         {
             mConnInfo = new SteamNetConnectionInfo_t();
             mRealTimeStatus = new SteamNetConnectionRealTimeStatus_t();

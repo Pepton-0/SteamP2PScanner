@@ -1,5 +1,4 @@
 using SpsLogic;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -148,7 +147,9 @@ namespace SpsGui
                 }
 
                 packetScan = new PacketScanDivert(ReadPatienceMilliseconds());
-                steamPeerManager = new SteamPeerManager(packetScan, testAppInfo.Info.ProcessName);
+                steamPeerManager = new SteamPeerManager(
+                    new PacketScanSteamPeerInterpreter(packetScan),
+                    testAppInfo.Info.ProcessName);
 
                 monitoringStarted = true;
                 PacketScanTextBlock.Text = "constructed";
@@ -263,7 +264,6 @@ namespace SpsGui
                     return false;
                 }
 
-                SteamAPI.RunCallbacks();
                 steamPeerManager.UpdatePeerList();
                 steamPeerManager.UpdatePeerStats();
                 packetScan.Update();
@@ -422,7 +422,7 @@ namespace SpsGui
             return new SteamPeerDisplaySnapshot
             {
                 Name = peer.Name,
-                SteamIDText = peer.SteamID.m_SteamID.ToString(CultureInfo.InvariantCulture),
+                SteamIDText = peer.SteamIDValue.ToString(CultureInfo.InvariantCulture),
                 ConnectionTypeName = peer.ConnectionTypeName,
                 RouteText = peer.UsingRelay ? "relay" : "direct"
             };

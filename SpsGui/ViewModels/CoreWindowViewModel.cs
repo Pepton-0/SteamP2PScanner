@@ -159,23 +159,23 @@ namespace SpsGui.ViewModels
             //the problem that manager cannot load ipc file somehow.
             RequestManualSteamConsoleCommand();
 
-            SteamPeerManager manager = null;
+            ISteamMonitorInterpreter monitor = null;
             try
             {
-                manager = Conductor.CreateSteamPeerManager(appInfo);
+                monitor = Conductor.CreateSteamMonitorInterpreter(appInfo);
             }
             catch(Exception e)
             {
                 // TODO i18n
-                Logger.Log("Failed to initialize steam api because " + e.Message, true);
-                dialogService.ShowMessage("Initializing steam api is failed because " + e.Message);
+                Logger.Log("Failed to start SteamMonitor because " + e.Message, true);
+                dialogService.ShowMessage("Starting SteamMonitor is failed because " + e.Message);
                 return;
             }
 
-            if (manager == null)
+            if (monitor == null)
             {
-                Logger.Log("Failed to initialize steam api because SteamPeerManager was not created.", true);
-                dialogService.ShowMessage("Initializing steam api is failed.");
+                Logger.Log("Failed to start SteamMonitor because interpreter was not created.", true);
+                dialogService.ShowMessage("Starting SteamMonitor is failed.");
                 return;
             }
 
@@ -185,7 +185,7 @@ namespace SpsGui.ViewModels
                 GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
             }
             CurrentProcessName = appInfo.Info.ProcessName;
-            CurrentViewModel = new ProfileScreenViewModel(appInfo, manager, Conductor.PacketScan, dialogService, overlayService);
+            CurrentViewModel = new ProfileScreenViewModel(appInfo, monitor, Conductor.PacketScan, dialogService, overlayService);
             overlayService.Show(appInfo.Info);
         }
 
@@ -263,8 +263,13 @@ namespace SpsGui.ViewModels
             }
 
             isExiting = true;
+            IDisposable disposable = currentViewModel as IDisposable;
+            if (disposable != null)
+            {
+                disposable.Dispose();
+            }
+
             overlayService.Close();
-            SteamPeerManager.ShutdownSteamApi();
             if (Application.Current != null)
             {
                 Application.Current.Shutdown();
