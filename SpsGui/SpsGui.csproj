@@ -77,6 +77,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Steamworks.NET, Version=20.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SpsLogic\Steamworks.NET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -322,6 +326,10 @@
     <ProjectReference Include="..\SpsLogic\SpsLogic.csproj">
       <Project>{cea3613c-7f00-48ca-84f7-245bf757fdbd}</Project>
       <Name>SpsLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SteamMonitor\SteamMonitor.csproj">
+      <Project>{6cb0f3e9-8b95-4e2f-85b5-09e18f5d49a3}</Project>
+      <Name>SteamMonitor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
