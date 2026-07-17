@@ -23,11 +23,11 @@ namespace SpsGui.Models
         IPacketScan PacketScan { get; }
 
         /// <summary>
-        /// Creates a Steam peer manager for the selected application.
+        /// Creates a Steam monitor interpreter for the selected application.
         /// </summary>
         /// <param name="info">Selected Steam application information. Must not be null.</param>
-        /// <returns>A manager initialized for the selected application and shared packet scanner.</returns>
-        SteamPeerManager CreateSteamPeerManager(SteamAppInfo info);
+        /// <returns>An interpreter that owns the SteamMonitor child process.</returns>
+        ISteamMonitorInterpreter CreateSteamMonitorInterpreter(SteamAppInfo info);
 
         /// <summary>
         /// To observer steam p2p connection, we have to observe ipc log file.
@@ -111,23 +111,18 @@ namespace SpsGui.Models
         }
 
         /// <summary>
-        /// Creates a Steam peer manager and prepares the packet scanner for profiling.
+        /// Creates a Steam monitor interpreter and prepares the packet scanner for profiling.
         /// </summary>
         /// <param name="info">Selected Steam application information. Must not be null.</param>
-        /// <returns>A Steam peer manager using the conductor-owned packet scanner.</returns>
-        public SteamPeerManager CreateSteamPeerManager(SteamAppInfo info)
+        /// <returns>A Steam monitor interpreter using the conductor-owned packet scanner.</returns>
+        public ISteamMonitorInterpreter CreateSteamMonitorInterpreter(SteamAppInfo info)
         {
             if (info == null)
             {
                 throw new ArgumentNullException(nameof(info));
             }
 
-            if (!SteamPeerManager.InitializeSteamApi(info))
-            {
-                throw new InvalidOperationException("Steam API initialization returned false.");
-            }
-
-            return new SteamPeerManager(packetScan, info.Info.ProcessName);
+            return new SpsSteamMonitorInterpreter(packetScan, info);
         }
         
         public async Task<bool> AutoSteamConsoleAsync()

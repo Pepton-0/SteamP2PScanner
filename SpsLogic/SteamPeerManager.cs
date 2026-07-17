@@ -14,9 +14,9 @@ namespace SpsLogic
     /// Manage a list of active Steam P2P peers. The peers must be in a steam lobby with the current user to be detected.
     /// They will automatically be removed from the list if no packet was sent/recieved for a set amount of time.
     /// </summary>
-    public class SteamPeerManager
+    public class SteamPeerManager : IDisposable
     {
-        private readonly IPacketScan PacketScan;
+        private readonly ISteamPeerInterpreter Interpreter;
         private readonly string GameProcessName;
         private readonly Stopwatch sw;
         private FileStream fs = null;
@@ -29,11 +29,11 @@ namespace SpsLogic
         private const long STEAMID64_BASE = 0x0110_0001_0000_0000;
         private static bool SteamApiInitialized = false;
 
-        private static readonly Func<CSteamID, IPacketScan, SteamPeerBase>[] PEER_FACTORIES =
+        private static readonly Func<CSteamID, ISteamPeerInterpreter, SteamPeerBase>[] PEER_FACTORIES =
             Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(SteamPeerBase)))
-                .Select(t => new Func<CSteamID, IPacketScan, SteamPeerBase>((CSteamID sid, IPacketScan pc) => Activator.CreateInstance(t, sid, pc) as SteamPeerBase))
+                .Select(t => new Func<CSteamID, ISteamPeerInterpreter, SteamPeerBase>((CSteamID sid, ISteamPeerInterpreter interpreter) => Activator.CreateInstance(t, sid, interpreter) as SteamPeerBase))
                 .ToArray();
 
         /// <summary>
@@ -41,14 +41,14 @@ namespace SpsLogic
         /// </summary>
         private readonly Dictionary<CSteamID, SteamPeerInfo> mPeers = new Dictionary<CSteamID, SteamPeerInfo>();
 
-        public SteamPeerManager(IPacketScan packetScan, string gameProcessName)
+        public SteamPeerManager(ISteamPeerInterpreter interpreter, string gameProcessName)
         {
             if (!SteamApiInitialized)
             {
                 throw new InvalidOperationException("Call InitializeSteamApi() first");
             }
 
-            this.PacketScan = packetScan;
+            this.Interpreter = interpreter ?? throw new ArgumentNullException(nameof(interpreter));
             this.GameProcessName = gameProcessName;
             sw = new Stopwatch();
             sw.Reset();
@@ -146,7 +146,7 @@ namespace SpsLogic
             {
                 try
                 {
-                    peer = factory(player, PacketScan);
+                    peer = factory(player, Interpreter);
                     if (peer.UpdatePeerInfo())
                     {
                         Logger.Log($"[PEER CONNECT] \"{peer.Name}\" (https://steamcommunity.com/profiles/{(ulong)peer.SteamID}) has connected via {peer.ConnectionTypeName}",
@@ -386,6 +386,18 @@ namespace SpsLogic
         public IEnumerable<SteamPeerBase> GetPeers()
         {
             return mPeers.Values.Where(info => info.peer != null).Select(info => info.peer);
+        }
+
+        public void Dispose()
+        {
+            foreach (var sid in mPeers.Keys.ToArray())
+            {
+                RemovePeer(sid);
+            }
+
+            fsWatcher.Dispose();
+            sr?.Dispose();
+            fs?.Dispose();
         }
     }
 }

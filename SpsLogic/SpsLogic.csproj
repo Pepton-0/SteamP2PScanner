@@ -90,6 +90,7 @@
     <Compile Include="SteamPeerBase.cs" />
     <Compile Include="SteamPeerInfo.cs" />
     <Compile Include="SteamPeerManager.cs" />
+    <Compile Include="SteamMonitorContracts.cs" />
     <Compile Include="SteamPeerNewAPI.cs" />
     <Compile Include="SteamPeerOldAPI.cs" />
     <Compile Include="Tester.cs" />

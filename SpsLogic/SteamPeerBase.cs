@@ -14,6 +14,11 @@ namespace SpsLogic
         /// </summary>
         public CSteamID SteamID { get; protected set; }
 
+        public ulong SteamIDValue
+        {
+            get { return SteamID.m_SteamID; }
+        }
+
         // The following field is probably useless now that Steam appears to have disabled the IsPlayingSharedGame request
 
         /// <summary>
@@ -24,7 +29,7 @@ namespace SpsLogic
         /// <summary>
         /// Ping monitor
         /// </summary>
-        protected readonly IPacketScan PacketScan;
+        protected readonly ISteamPeerInterpreter Interpreter;
 
         /// <summary>
         /// Steam persona name of the peer.
@@ -46,10 +51,10 @@ namespace SpsLogic
         /// </summary>
         public abstract bool UsingRelay { get; }
 
-        protected SteamPeerBase(CSteamID steamID, IPacketScan packetScan)
+        protected SteamPeerBase(CSteamID steamID, ISteamPeerInterpreter interpreter)
         {
             SteamID = steamID;
-            this.PacketScan = packetScan;
+            this.Interpreter = interpreter ?? throw new ArgumentNullException(nameof(interpreter));
         }
 
         /// <summary>

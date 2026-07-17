@@ -74,12 +74,9 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
       <Version>1.1.142</Version>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Steamworks.NET, Version=20.1.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SpsLogic\steamworks_bin\Steamworks.NET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -198,6 +195,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\Conductor.cs" />
+    <Compile Include="Models\SpsSteamMonitorInterpreter.cs" />
     <Compile Include="Models\Services\ApplicationTitleService.cs" />
     <Compile Include="Models\Services\DialogService.cs" />
     <Compile Include="Models\Services\OverlayService.cs" />
@@ -316,10 +314,6 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\SpsLogic\steamworks_bin\steam_api64.dll">
-      <Link>steam_api64.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="WinDivert.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

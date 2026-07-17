@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpsGui", "SpsGui\SpsGui.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpsLogic", "SpsLogic\SpsLogic.csproj", "{CEA3613C-7F00-48CA-84F7-245BF757FDBD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamMonitor", "SteamMonitor\SteamMonitor.csproj", "{6CB0F3E9-8B95-4E2F-85B5-09E18F5D49A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEA3613C-7F00-48CA-84F7-245BF757FDBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CB0F3E9-8B95-4E2F-85B5-09E18F5D49A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CB0F3E9-8B95-4E2F-85B5-09E18F5D49A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CB0F3E9-8B95-4E2F-85B5-09E18F5D49A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CB0F3E9-8B95-4E2F-85B5-09E18F5D49A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

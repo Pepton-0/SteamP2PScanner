@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using SpsGui.Models.Services;
 using SpsLogic;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,7 +25,7 @@ namespace SpsGui.ViewModels
         private const string DnsQueryName = "example.com";
 
         private readonly SteamAppInfo appInfo;
-        private readonly SteamPeerManager manager;
+        private readonly ISteamMonitorInterpreter monitor;
         private readonly IPacketScan packetScan;
         private readonly IDialogService dialogService;
         private readonly IOverlayService overlayService;
@@ -42,19 +41,19 @@ namespace SpsGui.ViewModels
         /// Initializes the profiling screen and starts periodic packet monitor updates.
         /// </summary>
         /// <param name="appInfo">Selected Steam application information. Must not be null.</param>
-        /// <param name="manager">Steam peer manager prepared for the selected application. Must not be null.</param>
+        /// <param name="monitor">Steam monitor interpreter prepared for the selected application. Must not be null.</param>
         /// <param name="packetScan">Packet scanner shared with the peer manager. Must not be null.</param>
         /// <param name="dialogService">Service used to show modal dialogs.</param>
         /// <param name="overlayService">Service used to update overlay rows.</param>
         public ProfileScreenViewModel(
             SteamAppInfo appInfo,
-            SteamPeerManager manager,
+            ISteamMonitorInterpreter monitor,
             IPacketScan packetScan,
             IDialogService dialogService,
             IOverlayService overlayService)
         {
             this.appInfo = appInfo ?? throw new ArgumentNullException(nameof(appInfo));
-            this.manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            this.monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
             this.packetScan = packetScan ?? throw new ArgumentNullException(nameof(packetScan));
             this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
@@ -261,15 +260,15 @@ namespace SpsGui.ViewModels
             updateTimer.Tick -= UpdateTimer_Tick;
             overlayService.Close();
             StopDnsPing();
+            monitor.Dispose();
         }
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
             try
             {
-                SteamAPI.RunCallbacks();
-                manager.UpdatePeerList();
-                manager.UpdatePeerStats();
+                monitor.UpdatePeerList();
+                monitor.UpdatePeerStats();
                 packetScan.Update();
                 RefreshCurrentProfiles();
                 RefreshHistoryProfiles();
