@@ -21,6 +21,10 @@
                  ShowTitleBar="True"
                  ResizeMode="CanResizeWithGrip"
                  WindowStartupLocation="CenterScreen">
+    <i:Interaction.Behaviors>
+        <behaviors:CoreWindowPlacementBehavior />
+    </i:Interaction.Behaviors>
+
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding ExitCommand}" />

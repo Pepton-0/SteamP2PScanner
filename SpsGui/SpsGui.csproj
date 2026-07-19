@@ -84,6 +84,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -117,6 +118,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PacketScanTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OverlayWindowTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -189,6 +194,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Behaviors\IocHelper.cs" />
+    <Compile Include="Behaviors\CoreWindowPlacementBehavior.cs" />
     <Compile Include="Behaviors\OverlayWindowBehavior.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -210,6 +216,10 @@
     </Compile>
     <Compile Include="PacketScanTest.xaml.cs">
       <DependentUpon>PacketScanTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="OverlayWindowTest.xaml.cs">
+      <DependentUpon>OverlayWindowTest.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SteamPacketScanTest.xaml.cs">

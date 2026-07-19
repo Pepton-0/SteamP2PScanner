@@ -1,0 +1,116 @@
+<Window x:Class="SpsGui.OverlayWindowTest"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Overlay Window Test"
+        Width="920"
+        Height="620"
+        MinWidth="760"
+        MinHeight="480"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="{Binding SelectionStatus, Mode=OneWay}"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Refresh"
+                        Width="92"
+                        Margin="0,0,8,0"
+                        Click="RefreshButton_Click" />
+                <Button Content="Show"
+                        Width="92"
+                        Margin="0,0,8,0"
+                        Click="ShowButton_Click" />
+                <Button Content="Close"
+                        Width="92"
+                        Click="CloseOverlayButton_Click" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="220" />
+            </Grid.ColumnDefinitions>
+
+            <ListView Grid.Column="0"
+                      ItemsSource="{Binding Windows, Mode=OneWay}"
+                      SelectedItem="{Binding SelectedWindowRow, Mode=TwoWay}"
+                      MouseDoubleClick="WindowsListView_MouseDoubleClick"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Process" Width="130" DisplayMemberBinding="{Binding ProcessName, Mode=OneWay}" />
+                        <GridViewColumn Header="Title" Width="260" DisplayMemberBinding="{Binding Title, Mode=OneWay}" />
+                        <GridViewColumn Header="Path" Width="480" DisplayMemberBinding="{Binding ProcessPath, Mode=OneWay}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <Border Grid.Column="1"
+                    Margin="12,0,0,0"
+                    Padding="12"
+                    BorderBrush="#334155"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Visible Columns"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,8" />
+                    <CheckBox Content="Name"
+                              IsChecked="{Binding OverlayShowName, Mode=TwoWay}"
+                              Margin="0,0,0,6" />
+                    <CheckBox Content="Status"
+                              IsChecked="{Binding OverlayShowStatus, Mode=TwoWay}"
+                              Margin="0,0,0,6" />
+                    <CheckBox Content="Average"
+                              IsChecked="{Binding OverlayShowAverage, Mode=TwoWay}"
+                              Margin="0,0,0,6" />
+                    <CheckBox Content="Loss"
+                              IsChecked="{Binding OverlayShowLoss, Mode=TwoWay}"
+                              Margin="0,0,0,6" />
+                    <CheckBox Content="Box plot"
+                              IsChecked="{Binding ShowBoxPlot, Mode=TwoWay}"
+                              Margin="0,0,0,6" />
+                    <CheckBox Content="Chart"
+                              IsChecked="{Binding OverlayShowChart, Mode=TwoWay}"
+                              Margin="0,0,0,14" />
+
+                    <TextBlock Text="Offset"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,8" />
+                    <TextBlock Text="X" />
+                    <Slider Minimum="-400"
+                            Maximum="400"
+                            Value="{Binding OverlayOffsetX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="20"
+                            IsSnapToTickEnabled="False" />
+                    <TextBlock Text="Y"
+                               Margin="0,8,0,0" />
+                    <Slider Minimum="-240"
+                            Maximum="240"
+                            Value="{Binding OverlayOffsetY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TickFrequency="20"
+                            IsSnapToTickEnabled="False" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <TextBlock Grid.Row="2"
+                   Text="Select a visible window and click Show. Test snapshots update automatically."
+                   Foreground="#64748B"
+                   Margin="0,10,0,0" />
+    </Grid>
+</Window>
