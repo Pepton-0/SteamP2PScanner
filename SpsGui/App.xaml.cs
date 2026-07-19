@@ -51,7 +51,8 @@ namespace SpsGui
             //new FindSteamExeServiceTest().Show();
             //new SteamPacketScanTest().Show();
             // new SnapshotChartDemoTest().Show();
-            new FindSteamExeServiceTest().Show();
+            //new FindSteamExeServiceTest().Show();
+            //new OverlayWindowTest().Show();
 #endif
         }
 
@@ -79,6 +80,7 @@ namespace SpsGui
             Ioc.Default.GetRequiredService<IOverlayService>().Close();
             Ioc.Default.GetRequiredService<IPacketScan>().Dispose();
 #endif
+            AppConfig.Instance.Save();
         }
     }
 }
