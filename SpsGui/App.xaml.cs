@@ -12,7 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -60,6 +62,7 @@ namespace SpsGui
         {
             base.OnStartup(e);
 #if MVVM_APP
+            Logger.Log($"{Process.GetCurrentProcess().ProcessName} administrator privileges: {IsRunningAsAdministrator()}", true);
             Ioc.Default.GetRequiredService<IConductor>();
 
             Logger.Log("Loaded background models", true);
@@ -70,6 +73,15 @@ namespace SpsGui
 
             Logger.Log("Now you can see the window", true);
 #endif
+        }
+
+        private static bool IsRunningAsAdministrator()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)

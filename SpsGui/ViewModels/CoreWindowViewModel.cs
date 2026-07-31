@@ -184,6 +184,13 @@ namespace SpsGui.ViewModels
                 // overwrite the gameconfig file
                 GameConfig.Instance.RegisteredGames[appInfo.Info.ProcessPath] = appInfo.SteamAppId;
             }
+
+            Logger.Log(
+                "Begin monitoring a Steam app: steamAppId=" + appInfo.SteamAppId +
+                ", processPath=" + appInfo.Info.ProcessPath +
+                ", hwnd=0x" + appInfo.Info.Handle.ToInt64().ToString("X"),
+                true);
+
             CurrentProcessName = appInfo.Info.ProcessName;
             CurrentViewModel = new ProfileScreenViewModel(appInfo, monitor, Conductor.PacketScan, dialogService, overlayService);
             overlayService.Show(appInfo.Info);

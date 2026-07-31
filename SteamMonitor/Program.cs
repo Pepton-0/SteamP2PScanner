@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace SteamMonitor
             Console.OutputEncoding = Encoding.UTF8;
 
             var interpreter = new SteamMonitorInterpreter(Console.Out);
+            interpreter.Log($"{Process.GetCurrentProcess().ProcessName} administrator privileges: {IsRunningAsAdministrator()}", true);
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
             {
                 interpreter.Error("Unhandled exception: " + SafeExceptionText(e.ExceptionObject as Exception));
@@ -245,6 +247,15 @@ namespace SteamMonitor
             catch (InvalidOperationException)
             {
                 return false;
+            }
+        }
+
+        private static bool IsRunningAsAdministrator()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
         }
 
