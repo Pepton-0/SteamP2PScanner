@@ -39,7 +39,7 @@ Spsはランチャーに含まれているSteam App IDを認識しないとい�
 
 Steamのゲーム1つ1つに割り振られている固有のIDです。<br>
 基本的にはSpsが自動で取得するので問題ないですが、一部ゲームでは通用しない可能性があります。<br>
-[steamdb](https://steamdb.info/app/1888160/) などで、対象ゲームのIDを調べることができます。
+[steamdb](https://steamdb.info/app/1888160/) のApp Idという項目 などで、対象ゲームのIDを調べることができます。
 
 ## SteamP2PInfoの欠点、Spsの利点
 
