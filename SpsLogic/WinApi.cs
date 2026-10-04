@@ -176,5 +176,30 @@ namespace SpsLogic
 
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr windowHandle, int command);
+
+        /// <summary>
+        /// Gets the full exe path with the least privileged access. Returns null for protected or exited processes.
+        /// </summary>
+        public static string TryGetProcessPath(int processId)
+        {
+            IntPtr handle = OpenProcess(ProcessAccessFlags.QueryLimitedInformation, false, processId);
+            if (handle == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            try
+            {
+                var builder = new StringBuilder(1024);
+                int size = builder.Capacity;
+                return QueryFullProcessImageName(handle, 0, builder, ref size)
+                    ? builder.ToString(0, size)
+                    : null;
+            }
+            finally
+            {
+                CloseHandle(handle);
+            }
+        }
     }
 }

@@ -267,6 +267,7 @@ namespace SpsGui.Models
             {
                 if (!disposed && !childReportedExit)
                 {
+                    // TODO 3
                     Logger.Log("SteamMonitor process exited unexpectedly: code=" + process.ExitCode.ToString(CultureInfo.InvariantCulture), true);
                 }
             }

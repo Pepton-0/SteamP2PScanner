@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -339,6 +340,92 @@ namespace SpsLogic
         }
         private bool _ignoreLatest;
 
+        /// <summary>
+        /// Whether SpsLauncher starts at logon. The logon task follows this value when it is changed
+        /// and when the instance is loaded. Registering or deleting the task requires administrator privileges.
+        /// </summary>
+        [JsonIgnore]
+        public bool AutoRun
+        {
+            get { return _autoRun; }
+            set
+            {
+                if (_autoRun == value)
+                {
+                    return;
+                }
+
+                _autoRun = value;
+                Save();
+                ApplyAutoRun();
+                RaisePropertyChanged();
+            }
+        }
+        // Serialized through the field so that json deserialization does not touch the task.
+        // The task is applied once in LoadOrCreate instead.
+        [JsonProperty("auto_run")]
+        private bool _autoRun = true;
+
+        /// <summary>
+        /// Makes the logon task and the running SpsLauncher match <see cref="AutoRun"/>.
+        /// ON: register the task and start SpsLauncher if not running. OFF: delete the task and stop SpsLauncher.
+        /// Does nothing for parts that already match.
+        /// </summary>
+        private void ApplyAutoRun()
+        {
+            string launcherPath = StartupTask.DefaultLauncherPath;
+            // Only a process placed next to SpsLauncher manages the task.
+            // Others (e.g. a dev build of SpsLogic) must not delete the task registered by the real Sps directory.
+            if (!File.Exists(launcherPath))
+            {
+                return;
+            }
+
+            TimeSpan total = Logger.GetTimestamp();
+            TimeSpan step = Logger.GetTimestamp();
+            StartupTaskState state = StartupTask.GetState(launcherPath);
+            LogAutoRunStep("GetState=" + state, ref step);
+            if (_autoRun)
+            {
+                if (state != StartupTaskState.Registered)
+                {
+                    // Also re-registers when the task points to SpsLauncher in another (e.g. moved) directory.
+                    StartupTask.Register(launcherPath, runNow: false);
+                    LogAutoRunStep("Register", ref step);
+                }
+
+                bool running = StartupTask.IsLauncherRunning(launcherPath);
+                LogAutoRunStep("IsLauncherRunning=" + running, ref step);
+                if (!running)
+                {
+                    // SpsLauncher in another directory holds the single instance mutex, so stop it first.
+                    StartupTask.StopLaunchers();
+                    LogAutoRunStep("StopLaunchers", ref step);
+                    StartupTask.StartLauncher(launcherPath);
+                    LogAutoRunStep("StartLauncher", ref step);
+                }
+            }
+            else
+            {
+                if (state != StartupTaskState.NotRegistered)
+                {
+                    StartupTask.Unregister();
+                    LogAutoRunStep("Unregister", ref step);
+                }
+
+                StartupTask.StopLaunchers();
+                LogAutoRunStep("StopLaunchers", ref step);
+            }
+
+            Logger.Log("ApplyAutoRun(" + _autoRun + ") total: " + Logger.GetElapsedMillsec(total) + " ms", true);
+        }
+
+        private static void LogAutoRunStep(string stepName, ref TimeSpan stepStart)
+        {
+            Logger.Log("ApplyAutoRun " + stepName + ": " + Logger.GetElapsedMillsec(stepStart) + " ms", true);
+            stepStart = Logger.GetTimestamp();
+        }
+
         static AppConfig()
         {
             LoadOrCreate();
@@ -351,18 +438,22 @@ namespace SpsLogic
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
+            bool created;
             if (!File.Exists(path))
             {
                 Instance = new AppConfig();
                 Instance.Save();
-                return true;
+                created = true;
             }
             else
             {
                 string json = File.ReadAllText(path);
                 Instance = JsonConvert.DeserializeObject<AppConfig>(json);
-                return false;
+                created = false;
             }
+
+            Instance.ApplyAutoRun();
+            return created;
         }
 
         public void Save()

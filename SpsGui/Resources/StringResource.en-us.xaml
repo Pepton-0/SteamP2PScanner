@@ -24,6 +24,7 @@
     <sys:String x:Key="OverlayOffsetXLabel">Overlay X offset</sys:String>
     <sys:String x:Key="OverlayOffsetYLabel">Overlay Y offset</sys:String>
     <sys:String x:Key="IgnoreLatestLabel">Ignore new version notifications</sys:String>
+    <sys:String x:Key="AutoRunLabel">Run SpsLauncher at logon</sys:String>
     <sys:String x:Key="PingNameHeader">name</sys:String>
     <sys:String x:Key="PingAverageHeader">avg</sys:String>
     <sys:String x:Key="PingLossHeader">loss%</sys:String>
@@ -56,4 +57,5 @@
     <sys:String x:Key="SteamExePathManualValidStatus">Manual input has valid path: *</sys:String>
     <sys:String x:Key="SteamExePathManualInvalidStatus">Manual input has invalid path: *</sys:String>
     <sys:String x:Key="SteamExePathSaveButton">Save</sys:String>
+    <sys:String x:Key="DuplicateSpsGui">Cannot run 2 Sps at once.</sys:String>
 </ResourceDictionary>

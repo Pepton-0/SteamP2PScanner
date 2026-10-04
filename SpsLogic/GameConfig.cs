@@ -58,6 +58,27 @@ namespace SpsLogic
                 }
             }
 
+            /// <summary>
+            /// Copies registered pairs into a case-insensitive dictionary. Entries without a path or app id are skipped.
+            /// </summary>
+            internal Dictionary<string, string> CreateSnapshot()
+            {
+                EnsureArrays();
+                var snapshot = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                int count = Math.Min(processPaths.Length, steamAppIds.Length);
+                for (int i = 0; i < count; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(processPaths[i]) || string.IsNullOrWhiteSpace(steamAppIds[i]))
+                    {
+                        continue;
+                    }
+
+                    snapshot[processPaths[i]] = steamAppIds[i];
+                }
+
+                return snapshot;
+            }
+
             private void EnsureArrays()
             {
                 if (processPaths == null)
@@ -72,8 +93,41 @@ namespace SpsLogic
             }
         }
 
-        public static GameConfig Instance { get; private set; }
-        private static readonly string path = @"config\\game_config.json";
+        /// <summary>
+        /// Relative path of the production config file. It is resolved against the current directory.
+        /// </summary>
+        public const string RelativePath = @"config\game_config.json";
+
+        private static readonly string path = RelativePath;
+        private static readonly object instanceLock = new object();
+        private static GameConfig instance;
+
+        /// <summary>
+        /// Production config shared by SpsGui. It is loaded (or created) on first access and written back on change.
+        /// A process that must not touch the config file should use <see cref="LoadReadOnly"/> instead.
+        /// </summary>
+        public static GameConfig Instance
+        {
+            get
+            {
+                lock (instanceLock)
+                {
+                    if (instance == null)
+                    {
+                        LoadOrCreate();
+                    }
+
+                    return instance;
+                }
+            }
+            private set
+            {
+                lock (instanceLock)
+                {
+                    instance = value;
+                }
+            }
+        }
 
         /// <summary>
         /// process path to steam app id
@@ -85,30 +139,67 @@ namespace SpsLogic
         }
         private GameInfo _registeredGames = new GameInfo();
 
-        static GameConfig()
-        {
-            LoadOrCreate();
-        }
-
+        // No static constructor: touching LoadReadOnly must not create or write the production file.
         public static bool LoadOrCreate()
         {
-            var dir = Path.GetDirectoryName(path);
-
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            if (!File.Exists(path))
+            lock (instanceLock)
             {
-                Instance = new GameConfig();
-                Instance.Save();
-                return true;
+                var dir = Path.GetDirectoryName(path);
+
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                if (!File.Exists(path))
+                {
+                    instance = new GameConfig();
+                    instance.Save();
+                    return true;
+                }
+                else
+                {
+                    string json = File.ReadAllText(path);
+                    instance = JsonConvert.DeserializeObject<GameConfig>(json);
+                    return false;
+                }
             }
-            else
+        }
+
+        /// <summary>
+        /// Reads a config file as a detached read-only snapshot.
+        /// It never creates directories or files, never writes, and never touches <see cref="Instance"/>.
+        /// </summary>
+        /// <param name="configPath">Path to game_config.json. Relative paths are resolved against the current directory.</param>
+        /// <returns>A snapshot. It is empty when the file does not exist.</returns>
+        /// <exception cref="IOException">The file could not be read.</exception>
+        /// <exception cref="JsonException">The content is invalid, e.g. SpsGui is rewriting it right now.</exception>
+        public static ReadOnlyGameConfig LoadReadOnly(string configPath)
+        {
+            if (string.IsNullOrWhiteSpace(configPath))
             {
-                string json = File.ReadAllText(path);
-                Instance = JsonConvert.DeserializeObject<GameConfig>(json);
-                return false;
+                throw new ArgumentException("Config path must not be empty.", nameof(configPath));
             }
+
+            if (!File.Exists(configPath))
+            {
+                return ReadOnlyGameConfig.Empty;
+            }
+
+            string json;
+            // Share everything so that SpsGui can keep writing while this process reads.
+            using (var stream = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            {
+                json = reader.ReadToEnd();
+            }
+
+            // Deserialize into a detached object. Never call its indexer setter: it saves through Instance.
+            var detached = JsonConvert.DeserializeObject<GameConfig>(json);
+            if (detached == null || detached.RegisteredGames == null)
+            {
+                return ReadOnlyGameConfig.Empty;
+            }
+
+            return new ReadOnlyGameConfig(detached.RegisteredGames.CreateSnapshot());
         }
 
         public void Save()
@@ -121,6 +212,50 @@ namespace SpsLogic
         void RaisePropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    /// <summary>
+    /// Immutable snapshot of game_config.json created by <see cref="GameConfig.LoadReadOnly"/>.
+    /// It has no write path back to the file.
+    /// </summary>
+    public sealed class ReadOnlyGameConfig
+    {
+        public static readonly ReadOnlyGameConfig Empty =
+            new ReadOnlyGameConfig(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+
+        private readonly Dictionary<string, string> processPathToSteamAppId;
+
+        internal ReadOnlyGameConfig(Dictionary<string, string> processPathToSteamAppId)
+        {
+            this.processPathToSteamAppId = processPathToSteamAppId;
+        }
+
+        /// <summary>
+        /// Gets registered process paths.
+        /// </summary>
+        public IEnumerable<string> ProcessPaths
+        {
+            get { return processPathToSteamAppId.Keys; }
+        }
+
+        /// <summary>
+        /// Gets the number of registered games.
+        /// </summary>
+        public int Count
+        {
+            get { return processPathToSteamAppId.Count; }
+        }
+
+        /// <summary>
+        /// Finds the steam app id registered for the process path. The comparison ignores case.
+        /// </summary>
+        /// <param name="processPath">Full path to exe.</param>
+        /// <param name="steamAppId">Registered steam app id, or null when not found.</param>
+        public bool TryGetSteamAppId(string processPath, out string steamAppId)
+        {
+            steamAppId = null;
+            return processPath != null && processPathToSteamAppId.TryGetValue(processPath, out steamAppId);
         }
     }
 }

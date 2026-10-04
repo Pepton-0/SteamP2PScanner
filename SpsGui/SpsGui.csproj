@@ -341,6 +341,12 @@
       <Project>{6cb0f3e9-8b95-4e2f-85b5-09e18f5d49a3}</Project>
       <Name>SteamMonitor</Name>
     </ProjectReference>
+    <!-- Build order only: SpsLauncher outputs next to SpsGui.exe by itself, and SpsGui does not use its types. -->
+    <ProjectReference Include="..\SpsLauncher\SpsLauncher.csproj">
+      <Project>{a22a2631-8f05-4966-a802-048a392e6303}</Project>
+      <Name>SpsLauncher</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">

@@ -245,6 +245,19 @@ namespace SpsGui.ViewModels
             }
         }
 
+        public bool AutoRun
+        {
+            get { return AppConfig.Instance.AutoRun; }
+            set
+            {
+                if (AppConfig.Instance.AutoRun != value)
+                {
+                    AppConfig.Instance.AutoRun = value;
+                    OnPropertyChanged(nameof(AutoRun));
+                }
+            }
+        }
+
         /// <summary>
         /// Stops timers and network monitors owned by this view model.
         /// </summary>

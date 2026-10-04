@@ -62,6 +62,13 @@ namespace SpsGui
         {
             base.OnStartup(e);
 #if MVVM_APP
+            if (Process.GetProcessesByName("SpsGui").Length > 1)
+            {
+                MessageBox.Show(Resources["DuplicateSpsGui"].ToString());
+                Shutdown();
+                return;
+            }
+
             Logger.Log($"{Process.GetCurrentProcess().ProcessName} administrator privileges: {IsRunningAsAdministrator()}", true);
             Ioc.Default.GetRequiredService<IConductor>();
 
