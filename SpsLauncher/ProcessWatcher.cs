@@ -6,11 +6,7 @@ using System.Threading;
 
 namespace SpsLauncher
 {
-    /// <summary>
-    /// Detects started and exited processes by polling the process list.
-    /// Polling is used instead of WMI process traces or Process.Exited because those need
-    /// administrator privileges, or rights an elevated SpsGui does not grant to this process.
-    /// </summary>
+    /// <summary>Detects started and exited processes by polling the process list.</summary>
     internal sealed class ProcessWatcher : IDisposable
     {
         private readonly TimeSpan interval;
@@ -20,15 +16,10 @@ namespace SpsLauncher
         private int polling;
         private bool disposed;
 
-        /// <summary>
-        /// Raised on a thread pool thread for each process started after <see cref="Start"/>.
-        /// </summary>
+        /// <summary>Raised on a thread pool thread for each process started after <see cref="Start"/>.</summary>
         public event EventHandler<ProcessEventArgs> ProcessLaunched;
 
-        /// <summary>
-        /// Raised on a thread pool thread for each exited process whose path was known,
-        /// including processes already running at <see cref="Start"/>.
-        /// </summary>
+        /// <summary>Raised on a thread pool thread for each exited process whose path was known.</summary>
         public event EventHandler<ProcessEventArgs> ProcessExited;
 
         public ProcessWatcher(TimeSpan interval)
@@ -37,10 +28,7 @@ namespace SpsLauncher
             timer = new Timer(OnTick, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        /// <summary>
-        /// Takes the current process list as a baseline and starts polling.
-        /// Processes already running at this point are not reported as launched.
-        /// </summary>
+        /// <summary>Starts polling. Processes already running now are not reported as launched.</summary>
         public void Start()
         {
             knownProcesses = new Dictionary<int, string>();

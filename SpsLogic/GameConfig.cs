@@ -102,10 +102,7 @@ namespace SpsLogic
         private static readonly object instanceLock = new object();
         private static GameConfig instance;
 
-        /// <summary>
-        /// Production config shared by SpsGui. It is loaded (or created) on first access and written back on change.
-        /// A process that must not touch the config file should use <see cref="LoadReadOnly"/> instead.
-        /// </summary>
+        /// <summary>Production config. Loaded or created on first access and written back on change.</summary>
         public static GameConfig Instance
         {
             get
@@ -139,7 +136,6 @@ namespace SpsLogic
         }
         private GameInfo _registeredGames = new GameInfo();
 
-        // No static constructor: touching LoadReadOnly must not create or write the production file.
         public static bool LoadOrCreate()
         {
             lock (instanceLock)
@@ -164,14 +160,9 @@ namespace SpsLogic
             }
         }
 
-        /// <summary>
-        /// Reads a config file as a detached read-only snapshot.
-        /// It never creates directories or files, never writes, and never touches <see cref="Instance"/>.
-        /// </summary>
-        /// <param name="configPath">Path to game_config.json. Relative paths are resolved against the current directory.</param>
-        /// <returns>A snapshot. It is empty when the file does not exist.</returns>
-        /// <exception cref="IOException">The file could not be read.</exception>
-        /// <exception cref="JsonException">The content is invalid, e.g. SpsGui is rewriting it right now.</exception>
+        /// <summary>Reads a detached snapshot. Never creates or writes files, and never touches <see cref="Instance"/>.</summary>
+        /// <returns>An empty snapshot when the file does not exist.</returns>
+        /// <exception cref="JsonException">The file is invalid, e.g. SpsGui is rewriting it right now.</exception>
         public static ReadOnlyGameConfig LoadReadOnly(string configPath)
         {
             if (string.IsNullOrWhiteSpace(configPath))
@@ -215,10 +206,7 @@ namespace SpsLogic
         }
     }
 
-    /// <summary>
-    /// Immutable snapshot of game_config.json created by <see cref="GameConfig.LoadReadOnly"/>.
-    /// It has no write path back to the file.
-    /// </summary>
+    /// <summary>Immutable snapshot of game_config.json created by <see cref="GameConfig.LoadReadOnly"/>.</summary>
     public sealed class ReadOnlyGameConfig
     {
         public static readonly ReadOnlyGameConfig Empty =
@@ -247,11 +235,7 @@ namespace SpsLogic
             get { return processPathToSteamAppId.Count; }
         }
 
-        /// <summary>
-        /// Finds the steam app id registered for the process path. The comparison ignores case.
-        /// </summary>
-        /// <param name="processPath">Full path to exe.</param>
-        /// <param name="steamAppId">Registered steam app id, or null when not found.</param>
+        /// <summary>Finds the steam app id registered for the full exe path, ignoring case.</summary>
         public bool TryGetSteamAppId(string processPath, out string steamAppId)
         {
             steamAppId = null;

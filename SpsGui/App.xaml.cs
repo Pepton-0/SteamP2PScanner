@@ -70,6 +70,9 @@ namespace SpsGui
             }
 
             Logger.Log($"{Process.GetCurrentProcess().ProcessName} administrator privileges: {IsRunningAsAdministrator()}", true);
+            // Install SpsLauncher into Program Files and load WinDivert from there, before any packet scan opens it.
+            AppConfig.Instance.InstallAndSyncStartup(Ioc.Default.GetRequiredService<IVersionCheckService>().GetVersion());
+            // using PacketScanDivert should be later than installing WinDivert into Program Files
             Ioc.Default.GetRequiredService<IConductor>();
 
             Logger.Log("Loaded background models", true);

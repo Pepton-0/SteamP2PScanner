@@ -24,11 +24,11 @@ namespace SpsLauncher
         private readonly EventWaitHandle exitEvent;
         private readonly RegisteredWaitHandle exitWait;
 
-        public ResidentContext(string baseDirectory)
+        public ResidentContext(string spsDirectory)
         {
-            configWatcher = new GameConfigWatcher(Path.Combine(baseDirectory, SpsLogic.GameConfig.RelativePath));
+            configWatcher = new GameConfigWatcher(Path.Combine(spsDirectory, SpsLogic.GameConfig.RelativePath));
             configWatcher.Refresh(force: true);
-            spsGuiPath = Path.Combine(baseDirectory, SpsGuiExeName);
+            spsGuiPath = Path.Combine(spsDirectory, SpsGuiExeName);
 
             processWatcher = new ProcessWatcher(PollingInterval);
             processWatcher.ProcessLaunched += OnProcessLaunched;
@@ -74,7 +74,7 @@ namespace SpsLauncher
                 return;
             }
 
-            // Step 2: only report. Launching SpsGui comes later.
+            // TODO: launch SpsGui for the steam app id.
             LauncherLog.Write(
                 "Registered game launched: steamAppId=" + steamAppId +
                 ", pid=" + e.ProcessId +

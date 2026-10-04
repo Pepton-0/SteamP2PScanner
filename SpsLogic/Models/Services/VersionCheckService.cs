@@ -1,11 +1,9 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.RightsManagement;
 using Newtonsoft.Json.Linq;
-using SpsLogic;
 
-namespace SpsGui.Models.Services
+namespace SpsLogic
 {
     public interface IVersionCheckService
     {

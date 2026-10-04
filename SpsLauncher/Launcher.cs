@@ -9,46 +9,19 @@ namespace SpsLauncher
     {
         private const string SingleInstanceMutexName = "SpsLauncher_SingleInstance";
 
-        private const int Success = 0;
-        private const int Failure = 1;
-
         [STAThread]
-        private static int Main(string[] args)
+        private static void Main(string[] args)
         {
-            // Started from Task Scheduler etc., the current directory is not the exe directory.
-            // Logger writes relative to the current directory, so align it with SpsGui.
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            Environment.CurrentDirectory = baseDirectory;
-
-            if (args.Length > 0)
+            // SpsLauncher runs from Program Files; the Sps directory to watch is passed as an argument.
+            // Keep the current directory at the exe directory so logs go next to SpsLauncher.exe.
+            Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string spsDirectory = GetSpsDirectory(args);
+            if (spsDirectory == null)
             {
-                return RunCommand(args[0]);
+                LauncherLog.Write("Exit because " + StartupTask.SpsDirArgument + " is missing.");
+                return;
             }
 
-            RunResident(baseDirectory);
-            return Success;
-        }
-
-        /// <summary>
-        /// --register: register the logon task and start it. --unregister: delete the logon task.
-        /// </summary>
-        private static int RunCommand(string command)
-        {
-            switch (command)
-            {
-                case "--register":
-                    // StartupTask logs the result.
-                    return StartupTask.Register(StartupTask.DefaultLauncherPath, runNow: true) ? Success : Failure;
-                case "--unregister":
-                    return StartupTask.Unregister() ? Success : Failure;
-                default:
-                    LauncherLog.Write("Unknown command: " + command);
-                    return Failure;
-            }
-        }
-
-        private static void RunResident(string baseDirectory)
-        {
             bool createdNew;
             using (var mutex = new Mutex(true, SingleInstanceMutexName, out createdNew))
             {
@@ -59,14 +32,28 @@ namespace SpsLauncher
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new ResidentContext(baseDirectory));
+                Application.Run(new ResidentContext(spsDirectory));
             }
+        }
+
+        /// <summary>
+        /// Reads the Sps directory passed as <c>--sps-dir &lt;path&gt;</c>. Returns null when absent.
+        /// </summary>
+        private static string GetSpsDirectory(string[] args)
+        {
+            for (int i = 0; i < args.Length - 1; i++)
+            {
+                if (string.Equals(args[i], StartupTask.SpsDirArgument, StringComparison.OrdinalIgnoreCase))
+                {
+                    return args[i + 1];
+                }
+            }
+
+            return null;
         }
     }
 
-    /// <summary>
-    /// Wraps <see cref="Logger"/>. The log file is shared with SpsGui, so a write collision must not crash this app.
-    /// </summary>
+    /// <summary>Wraps <see cref="Logger"/> so that a failed log write never crashes the resident app.</summary>
     internal static class LauncherLog
     {
         // Logger keeps a static writer, so serialize the thread pool (polling) and UI thread writes.
@@ -78,12 +65,11 @@ namespace SpsLauncher
             {
                 try
                 {
-                    // The file line has no caller name, so the prefix tells it apart from SpsGui lines.
                     Logger.Log("[SpsLauncher] " + message, true);
                 }
                 catch (Exception)
                 {
-                    // Ignore: the file is probably held by SpsGui at this moment.
+                    // Logging is best effort.
                 }
             }
         }

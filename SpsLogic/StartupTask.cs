@@ -2,155 +2,202 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 
 namespace SpsLogic
 {
-    public enum StartupTaskState
-    {
-        NotRegistered,
-        /// <summary>Registered for the given SpsLauncher.exe.</summary>
-        Registered,
-        /// <summary>Registered for SpsLauncher.exe in another directory (e.g. the Sps directory was moved).</summary>
-        RegisteredForOtherPath,
-    }
-
-    /// <summary>
-    /// Registers SpsLauncher as a logon task of Task Scheduler.
-    /// A task with "run with highest privileges" is the only way to auto start an elevated app without a UAC prompt.
-    /// </summary>
-    /// <remarks>
-    /// The task does not start SpsLauncher.exe directly. It runs a headless cmd that starts SpsLauncher.exe
-    /// if it still exists, and otherwise deletes the task itself. So deleting the Sps directory also
-    /// removes the logon task on the next logon, without placing any file outside the Sps directory.
-    /// The Task Scheduler COM API is used instead of schtasks.exe output, which is encoded with the console code page.
-    /// </remarks>
+    /// <summary>Installs SpsLauncher and WinDivert into Program Files so that the Sps directory can be deleted as a whole,
+    /// and manages the logon task that starts SpsLauncher or uninstalls it once SpsGui.exe is gone.</summary>
     public static class StartupTask
     {
         public const string LauncherFileName = "SpsLauncher.exe";
+        public const string SpsGuiExeName = "SpsGui.exe";
 
-        /// <summary>
-        /// Named event that SpsLauncher waits on. Setting it asks SpsLauncher to exit gracefully.
-        /// </summary>
+        /// <summary>Named event that SpsLauncher waits on. Setting it asks SpsLauncher to exit gracefully.</summary>
         public const string LauncherExitEventName = "SpsLauncher_Exit";
 
+        /// <summary>Argument that tells SpsLauncher which Sps directory to watch.</summary>
+        public const string SpsDirArgument = "--sps-dir";
+
         public const int LauncherExitTimeoutMilliseconds = 3000;
+
+        private const string WinDivertDllName = "WinDivert.dll";
+        private const string WinDivertSysName = "WinDivert64.sys";
         private const string TaskName = "SteamP2PScanner SpsLauncher";
         private const string TaskNamespace = "http://schemas.microsoft.com/windows/2004/02/mit/task";
         private const int TASK_CREATE_OR_UPDATE = 6;
         private const int TASK_LOGON_INTERACTIVE_TOKEN = 3;
 
-        /// <summary>
-        /// Gets SpsLauncher.exe next to the running exe.
-        /// </summary>
-        public static string DefaultLauncherPath
+        // Files SpsLauncher needs to run on its own, copied from the Sps directory.
+        private static readonly string[] LauncherFiles =
         {
-            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LauncherFileName); }
+            LauncherFileName,
+            LauncherFileName + ".config",
+            "SpsLogic.exe",
+            "Newtonsoft.Json.dll",
+        };
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
+
+        /// <summary>Directory where SpsLauncher and its copy of WinDivert are installed.</summary>
+        public static string InstallDirectory
+        {
+            get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "SpsLauncher"); }
         }
 
-        /// <summary>
-        /// Checks the logon task. Never throws; returns <see cref="StartupTaskState.NotRegistered"/> on failure.
-        /// </summary>
-        /// <param name="launcherPath">Full path to SpsLauncher.exe to compare with the registered one.</param>
-        public static StartupTaskState GetState(string launcherPath)
+        /// <summary>Full path to the installed SpsLauncher.exe.</summary>
+        public static string InstalledLauncherPath
+        {
+            get { return Path.Combine(InstallDirectory, LauncherFileName); }
+        }
+
+        /// <summary>Copies SpsLauncher and WinDivert from the Sps directory unless the installed version equals
+        /// <paramref name="version"/>. Requires administrator privileges.</summary>
+        /// <returns>True when the launcher files are in place after the call.</returns>
+        public static bool Install(string spsDirectory, string version)
         {
             try
             {
-                dynamic task = GetRootFolder().GetTask(TaskName);
-                XDocument definition = XDocument.Parse((string)task.Xml);
-                XNamespace ns = TaskNamespace;
-                bool isSamePath = definition.Descendants(ns + "Arguments").Any(arguments =>
-                    arguments.Value.IndexOf("\"" + launcherPath + "\"", StringComparison.OrdinalIgnoreCase) >= 0);
-                return isSamePath ? StartupTaskState.Registered : StartupTaskState.RegisteredForOtherPath;
-            }
-            catch (FileNotFoundException)
-            {
-                return StartupTaskState.NotRegistered;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("Failed to query the logon task: " + ex.GetType().Name + ": " + ex.Message, true);
-                return StartupTaskState.NotRegistered;
-            }
-        }
-
-        /// <summary>
-        /// Creates or overwrites the logon task for the current user. Requires administrator privileges.
-        /// </summary>
-        /// <param name="launcherPath">Full path to SpsLauncher.exe.</param>
-        /// <param name="runNow">Start the task right after registration, as it runs at logon.</param>
-        public static bool Register(string launcherPath, bool runNow)
-        {
-            if (!File.Exists(launcherPath))
-            {
-                Logger.Log("Cannot register the logon task because SpsLauncher is missing: " + launcherPath, true);
-                return false;
-            }
-
-            if (launcherPath.IndexOf('"') >= 0 || launcherPath.IndexOf('%') >= 0)
-            {
-                // These characters cannot be passed through cmd safely.
-                Logger.Log("Cannot register the logon task because the path has '\"' or '%': " + launcherPath, true);
-                return false;
-            }
-
-            try
-            {
-                dynamic task = GetRootFolder().RegisterTask(
-                    TaskName, CreateTaskXml(launcherPath), TASK_CREATE_OR_UPDATE, null, null, TASK_LOGON_INTERACTIVE_TOKEN, null);
-                Logger.Log("Registered the logon task: " + launcherPath, true);
-                if (runNow)
+                if (ReadInstalledVersion() == version && File.Exists(InstalledLauncherPath))
                 {
-                    task.Run(null);
+                    Logger.Log("SpsLauncher " + version + " is already installed.", true);
+                    return true;
                 }
 
-                return true;
+                string installDir = InstallDirectory;
+                Directory.CreateDirectory(installDir);
+
+                // The launcher exe cannot be overwritten while it is running.
+                StopLaunchers();
+
+                foreach (string fileName in LauncherFiles)
+                {
+                    CopyIfExists(Path.Combine(spsDirectory, fileName), Path.Combine(installDir, fileName), required: true);
+                }
+
+                // Without the version file, the next startup retries the WinDivert copy.
+                if (CopyWinDivert(spsDirectory, installDir))
+                {
+                    File.WriteAllText(VersionFilePath, version);
+                }
+
+                Logger.Log("Installed SpsLauncher " + version + " into " + installDir, true);
+                return File.Exists(InstalledLauncherPath);
             }
             catch (Exception ex)
             {
-                Logger.Log("Failed to register the logon task: " + ex.GetType().Name + ": " + ex.Message, true);
+                Logger.Log("Failed to install SpsLauncher, fall back to the Sps directory: " + ex.GetType().Name + ": " + ex.Message, true);
                 return false;
             }
         }
 
-        /// <summary>
-        /// Deletes the logon task. Requires administrator privileges. Succeeds when the task does not exist.
-        /// </summary>
-        public static bool Unregister()
+        /// <summary>Loads WinDivert.dll from the install directory, so its driver is loaded from there too.
+        /// Call before the first WinDivertOpen; otherwise the Sps directory copy is used.</summary>
+        public static void PreloadWinDivert()
+        {
+            string dllPath = Path.Combine(InstallDirectory, WinDivertDllName);
+            if (!File.Exists(dllPath))
+            {
+                return;
+            }
+
+            if (LoadLibrary(dllPath) == IntPtr.Zero)
+            {
+                Logger.Log("Failed to preload WinDivert from the install directory (error " + Marshal.GetLastWin32Error() + ").", true);
+            }
+            else
+            {
+                Logger.Log("Preloaded WinDivert from " + dllPath, true);
+            }
+        }
+
+        private static string VersionFilePath
+        {
+            get { return Path.Combine(InstallDirectory, "version"); }
+        }
+
+        /// <summary>Returns null when SpsLauncher is not installed or the version file cannot be read.</summary>
+        private static string ReadInstalledVersion()
         {
             try
             {
-                GetRootFolder().DeleteTask(TaskName, 0);
-                Logger.Log("Unregistered the logon task.", true);
+                return File.Exists(VersionFilePath) ? File.ReadAllText(VersionFilePath).Trim() : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <returns>False when the installed WinDivert was kept because it could not be replaced.</returns>
+        private static bool CopyWinDivert(string spsDirectory, string installDir)
+        {
+            string destSys = Path.Combine(installDir, WinDivertSysName);
+            try
+            {
+                CopyIfExists(Path.Combine(spsDirectory, WinDivertDllName), Path.Combine(installDir, WinDivertDllName), required: false);
+                CopyIfExists(Path.Combine(spsDirectory, WinDivertSysName), destSys, required: false);
                 return true;
             }
-            catch (FileNotFoundException)
+            catch (IOException)
             {
-                return true;
+                // The driver is loaded from this file. Keep the installed version until the driver is unloaded.
+                Logger.Log("WinDivert is in use in the install directory. Keeping the current copy.", true);
+                return false;
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException)
             {
-                Logger.Log("Failed to unregister the logon task: " + ex.GetType().Name + ": " + ex.Message, true);
+                Logger.Log("WinDivert in the install directory could not be replaced. Keeping the current copy.", true);
                 return false;
             }
         }
 
-        /// <summary>
-        /// Checks whether SpsLauncher at the path is running.
-        /// </summary>
-        public static bool IsLauncherRunning(string launcherPath)
+        private static void CopyIfExists(string source, string destination, bool required)
         {
-            return FindLauncherProcessIds(path => string.Equals(path, launcherPath, StringComparison.OrdinalIgnoreCase)).Length > 0;
+            if (!File.Exists(source))
+            {
+                if (required)
+                {
+                    throw new FileNotFoundException("Required file is missing.", source);
+                }
+
+                return;
+            }
+
+            File.Copy(source, destination, overwrite: true);
         }
 
-        /// <summary>
-        /// Starts SpsLauncher through the logon task so that it runs exactly as it does at logon.
-        /// Falls back to starting the exe directly when the task cannot be run.
-        /// </summary>
-        public static bool StartLauncher(string launcherPath)
+        /// <summary>Creates or updates the logon task. Requires administrator privileges.</summary>
+        public static bool SyncTask(string spsDirectory, bool autoRun)
+        {
+            try
+            {
+                GetRootFolder().RegisterTask(
+                    TaskName, CreateTaskXml(spsDirectory, autoRun), TASK_CREATE_OR_UPDATE, null, null, TASK_LOGON_INTERACTIVE_TOKEN, null);
+                Logger.Log("Synced the logon task (autoRun=" + autoRun + ", spsDir=" + spsDirectory + ").", true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Failed to sync the logon task: " + ex.GetType().Name + ": " + ex.Message, true);
+                return false;
+            }
+        }
+
+        /// <summary>Checks whether the installed SpsLauncher is running.</summary>
+        public static bool IsLauncherRunning()
+        {
+            string installed = InstalledLauncherPath;
+            return FindLauncherProcessIds(path => string.Equals(path, installed, StringComparison.OrdinalIgnoreCase)).Length > 0;
+        }
+
+        /// <summary>Starts the installed SpsLauncher, through the logon task when possible.</summary>
+        public static bool StartLauncher(string spsDirectory)
         {
             try
             {
@@ -165,12 +212,13 @@ namespace SpsLogic
 
             try
             {
-                Process.Start(new ProcessStartInfo(launcherPath)
+                Process.Start(new ProcessStartInfo(InstalledLauncherPath)
                 {
                     UseShellExecute = true,
-                    WorkingDirectory = Path.GetDirectoryName(launcherPath),
+                    WorkingDirectory = InstallDirectory,
+                    Arguments = CreateLauncherArguments(spsDirectory),
                 }).Dispose();
-                Logger.Log("Started SpsLauncher directly: " + launcherPath, true);
+                Logger.Log("Started SpsLauncher directly: " + InstalledLauncherPath, true);
                 return true;
             }
             catch (Exception ex)
@@ -181,23 +229,18 @@ namespace SpsLogic
         }
 
         /// <summary>
-        /// Asks every running SpsLauncher (in any directory) to exit, and kills ones that do not exit in time.
-        /// Blocks the caller for up to <see cref="LauncherExitTimeoutMilliseconds"/>.
+        /// Asks every running SpsLauncher to exit, and kills ones that do not exit within <see cref="LauncherExitTimeoutMilliseconds"/>.
         /// </summary>
         public static void StopLaunchers()
         {
-            TimeSpan step = Logger.GetTimestamp();
             int[] processIds = FindLauncherProcessIds(path => true);
-            Logger.Log("StopLaunchers found " + processIds.Length + " process(es): " + Logger.GetElapsedMillsec(step) + " ms", true);
             if (processIds.Length == 0)
             {
                 return;
             }
 
             // Graceful exit removes the tray icon. Killing leaves a ghost icon until the mouse hovers it.
-            step = Logger.GetTimestamp();
             EventWaitHandle exitEvent;
-            bool signaled = false;
             try
             {
                 if (EventWaitHandle.TryOpenExisting(LauncherExitEventName, out exitEvent))
@@ -205,22 +248,16 @@ namespace SpsLogic
                     using (exitEvent)
                     {
                         exitEvent.Set();
-                        signaled = true;
                     }
                 }
             }
             catch (Exception ex)
             {
-                // e.g. UnauthorizedAccessException when the event was created with a different integrity level.
                 Logger.Log("Failed to open the SpsLauncher exit event: " + ex.GetType().Name + ": " + ex.Message, true);
             }
 
-            // Not signaled means SpsLauncher (e.g. an old build) does not listen. Each process then waits for the full timeout.
-            Logger.Log("StopLaunchers exit event signaled=" + signaled + ": " + Logger.GetElapsedMillsec(step) + " ms", true);
-
             foreach (int processId in processIds)
             {
-                step = Logger.GetTimestamp();
                 try
                 {
                     using (Process process = Process.GetProcessById(processId))
@@ -228,11 +265,11 @@ namespace SpsLogic
                         if (!process.WaitForExit(LauncherExitTimeoutMilliseconds))
                         {
                             process.Kill();
-                            Logger.Log("Killed SpsLauncher because it did not exit: pid=" + processId + ", " + Logger.GetElapsedMillsec(step) + " ms", true);
+                            Logger.Log("Killed SpsLauncher because it did not exit: pid=" + processId, true);
                         }
                         else
                         {
-                            Logger.Log("Stopped SpsLauncher: pid=" + processId + ", " + Logger.GetElapsedMillsec(step) + " ms", true);
+                            Logger.Log("Stopped SpsLauncher: pid=" + processId, true);
                         }
                     }
                 }
@@ -273,26 +310,19 @@ namespace SpsLogic
             return service.GetFolder("\\");
         }
 
-        private static string CreateTaskXml(string launcherPath)
+        private static string CreateTaskXml(string spsDirectory, bool autoRun)
         {
-            string directory = Path.GetDirectoryName(launcherPath);
             string systemDirectory = Environment.SystemDirectory;
             string userId = WindowsIdentity.GetCurrent().Name;
-
-            // if exist "<exe>" ( start "" /d "<dir>" "<exe>" ) else ( schtasks /delete /tn "<task>" /f )
-            // conhost --headless splits and re-quotes the arguments for cmd, so every quoted part must be
-            // a separate token. Keep spaces around the parentheses.
-            string script =
-                "if exist \"" + launcherPath + "\" " +
-                "( start \"\" /d \"" + directory + "\" \"" + launcherPath + "\" ) " +
-                "else ( \"" + Path.Combine(systemDirectory, "schtasks.exe") + "\" /delete /tn \"" + TaskName + "\" /f )";
+            string powershell = Path.Combine(systemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
+            string encodedScript = Convert.ToBase64String(Encoding.Unicode.GetBytes(CreateTaskScript(spsDirectory, autoRun)));
 
             XNamespace ns = TaskNamespace;
             var task = new XElement(ns + "Task",
                 new XAttribute("version", "1.2"),
                 new XElement(ns + "RegistrationInfo",
                     new XElement(ns + "Description",
-                        "Starts SpsLauncher at logon. Deletes itself when " + launcherPath + " no longer exists.")),
+                        "Starts SpsLauncher at logon while SpsGui exists; otherwise uninstalls it and deletes this task.")),
                 new XElement(ns + "Triggers",
                     new XElement(ns + "LogonTrigger",
                         new XElement(ns + "Enabled", "true"),
@@ -307,18 +337,62 @@ namespace SpsLogic
                     new XElement(ns + "MultipleInstancesPolicy", "IgnoreNew"),
                     new XElement(ns + "DisallowStartIfOnBatteries", "false"),
                     new XElement(ns + "StopIfGoingOnBatteries", "false"),
-                    // The default limit is 72 hours. Never stop the resident app.
-                    new XElement(ns + "ExecutionTimeLimit", "PT0S"),
+                    new XElement(ns + "ExecutionTimeLimit", "PT1H"),
                     new XElement(ns + "Enabled", "true")),
                 new XElement(ns + "Actions",
                     new XAttribute("Context", "Author"),
                     new XElement(ns + "Exec",
-                        // conhost --headless runs cmd without flashing a console window at logon.
+                        // conhost --headless hides the console window; -EncodedCommand needs no quoting of the script.
                         new XElement(ns + "Command", Path.Combine(systemDirectory, "conhost.exe")),
                         new XElement(ns + "Arguments",
-                            "--headless \"" + Path.Combine(systemDirectory, "cmd.exe") + "\" /d /c " + script))));
+                            "--headless \"" + powershell + "\" -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand " + encodedScript))));
 
             return task.ToString();
+        }
+
+        private static string CreateTaskScript(string spsDirectory, bool autoRun)
+        {
+            string spsGui = Path.Combine(spsDirectory, SpsGuiExeName);
+            string installDir = InstallDirectory;
+            string launcher = InstalledLauncherPath;
+
+            // While SpsGui exists, start SpsLauncher (AutoRun only). Otherwise stop WinDivert if loaded from here,
+            // remove the install directory, and delete this task once the directory is gone.
+            return
+                "$ErrorActionPreference='SilentlyContinue'\n" +
+                "$spsGui=" + PsLiteral(spsGui) + "\n" +
+                "$installDir=" + PsLiteral(installDir) + "\n" +
+                "$launcher=" + PsLiteral(launcher) + "\n" +
+                "$launcherArgs=" + PsLiteral(CreateLauncherArguments(spsDirectory)) + "\n" +
+                "$task=" + PsLiteral(TaskName) + "\n" +
+                "$autoRun=$" + (autoRun ? "true" : "false") + "\n" +
+                "if (Test-Path -LiteralPath $spsGui) {\n" +
+                "  if ($autoRun) { Start-Process -FilePath $launcher -WorkingDirectory $installDir -ArgumentList $launcherArgs }\n" +
+                "} else {\n" +
+                "  $d = Get-CimInstance Win32_SystemDriver -Filter \"Name='WinDivert'\"\n" +
+                "  if ($d -and $d.PathName -like ('*'+$installDir+'*')) { & sc.exe stop WinDivert | Out-Null }\n" +
+                "  Get-Process SpsLauncher | Where-Object { $_.Path -and $_.Path.StartsWith($installDir) } | Stop-Process -Force\n" +
+                "  Remove-Item -LiteralPath $installDir -Recurse -Force\n" +
+                "  if (-not (Test-Path -LiteralPath $installDir)) { & schtasks.exe /delete /tn $task /f | Out-Null }\n" +
+                "}\n";
+        }
+
+        private static string CreateLauncherArguments(string spsDirectory)
+        {
+            return SpsDirArgument + " " + QuoteArgument(spsDirectory);
+        }
+
+        /// <summary>Quotes a command line argument. Backslashes before the closing quote are doubled, as Windows requires.</summary>
+        private static string QuoteArgument(string value)
+        {
+            string trailingBackslashes = value.Substring(value.TrimEnd('\\').Length);
+            return "\"" + value + trailingBackslashes + "\"";
+        }
+
+        private static string PsLiteral(string value)
+        {
+            // PowerShell single-quoted literal: only ' needs escaping, by doubling it.
+            return "'" + value.Replace("'", "''") + "'";
         }
     }
 }

@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -340,10 +341,7 @@ namespace SpsLogic
         }
         private bool _ignoreLatest;
 
-        /// <summary>
-        /// Whether SpsLauncher starts at logon. The logon task follows this value when it is changed
-        /// and when the instance is loaded. Registering or deleting the task requires administrator privileges.
-        /// </summary>
+        /// <summary>Whether SpsLauncher starts at logon. Changing it updates the logon task and starts or stops SpsLauncher.</summary>
         [JsonIgnore]
         public bool AutoRun
         {
@@ -357,73 +355,68 @@ namespace SpsLogic
 
                 _autoRun = value;
                 Save();
-                ApplyAutoRun();
+                string spsDirectory;
+                if (TryGetManagedSpsDirectory(out spsDirectory))
+                {
+                    SyncTaskAndLauncher(spsDirectory);
+                }
+
                 RaisePropertyChanged();
             }
         }
-        // Serialized through the field so that json deserialization does not touch the task.
-        // The task is applied once in LoadOrCreate instead.
+        // Serialized through the field so that json deserialization does not touch the task or launcher.
         [JsonProperty("auto_run")]
         private bool _autoRun = true;
 
-        /// <summary>
-        /// Makes the logon task and the running SpsLauncher match <see cref="AutoRun"/>.
-        /// ON: register the task and start SpsLauncher if not running. OFF: delete the task and stop SpsLauncher.
-        /// Does nothing for parts that already match.
-        /// </summary>
-        private void ApplyAutoRun()
+        /// <summary>Installs SpsLauncher and WinDivert into Program Files and syncs the logon task and SpsLauncher.
+        /// Call once at SpsGui startup, before WinDivert is first opened.</summary>
+        public void InstallAndSyncStartup(string version)
         {
-            string launcherPath = StartupTask.DefaultLauncherPath;
-            // Only a process placed next to SpsLauncher manages the task.
-            // Others (e.g. a dev build of SpsLogic) must not delete the task registered by the real Sps directory.
-            if (!File.Exists(launcherPath))
+            string spsDirectory;
+            if (!TryGetManagedSpsDirectory(out spsDirectory))
             {
                 return;
             }
 
-            TimeSpan total = Logger.GetTimestamp();
-            TimeSpan step = Logger.GetTimestamp();
-            StartupTaskState state = StartupTask.GetState(launcherPath);
-            LogAutoRunStep("GetState=" + state, ref step);
+            TimeSpan start = Logger.GetTimestamp();
+            if (StartupTask.Install(spsDirectory, version))
+            {
+                // WinDivert then loads from Program Files, so the Sps directory can be deleted as a whole.
+                StartupTask.PreloadWinDivert();
+            }
+
+            SyncTaskAndLauncher(spsDirectory);
+            Logger.Log("InstallAndSyncStartup total: " + Logger.GetElapsedMillsec(start) + " ms", true);
+        }
+
+        /// <summary>Updates the logon task mode and starts or stops SpsLauncher to match <see cref="AutoRun"/>.</summary>
+        private void SyncTaskAndLauncher(string spsDirectory)
+        {
+            StartupTask.SyncTask(spsDirectory, _autoRun);
             if (_autoRun)
             {
-                if (state != StartupTaskState.Registered)
+                if (!StartupTask.IsLauncherRunning())
                 {
-                    // Also re-registers when the task points to SpsLauncher in another (e.g. moved) directory.
-                    StartupTask.Register(launcherPath, runNow: false);
-                    LogAutoRunStep("Register", ref step);
-                }
-
-                bool running = StartupTask.IsLauncherRunning(launcherPath);
-                LogAutoRunStep("IsLauncherRunning=" + running, ref step);
-                if (!running)
-                {
-                    // SpsLauncher in another directory holds the single instance mutex, so stop it first.
+                    // Another SpsLauncher holding the single-instance mutex would make the new one exit at once.
                     StartupTask.StopLaunchers();
-                    LogAutoRunStep("StopLaunchers", ref step);
-                    StartupTask.StartLauncher(launcherPath);
-                    LogAutoRunStep("StartLauncher", ref step);
+                    StartupTask.StartLauncher(spsDirectory);
                 }
             }
             else
             {
-                if (state != StartupTaskState.NotRegistered)
-                {
-                    StartupTask.Unregister();
-                    LogAutoRunStep("Unregister", ref step);
-                }
-
                 StartupTask.StopLaunchers();
-                LogAutoRunStep("StopLaunchers", ref step);
             }
-
-            Logger.Log("ApplyAutoRun(" + _autoRun + ") total: " + Logger.GetElapsedMillsec(total) + " ms", true);
         }
 
-        private static void LogAutoRunStep(string stepName, ref TimeSpan stepStart)
+        /// <summary>Only SpsGui manages SpsLauncher. SteamMonitor and dev builds also load AppConfig, but get false.</summary>
+        private static bool TryGetManagedSpsDirectory(out string spsDirectory)
         {
-            Logger.Log("ApplyAutoRun " + stepName + ": " + Logger.GetElapsedMillsec(stepStart) + " ms", true);
-            stepStart = Logger.GetTimestamp();
+            spsDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            using (Process process = Process.GetCurrentProcess())
+            {
+                return string.Equals(process.ProcessName, "SpsGui", StringComparison.OrdinalIgnoreCase)
+                    && File.Exists(Path.Combine(spsDirectory, StartupTask.SpsGuiExeName));
+            }
         }
 
         static AppConfig()
@@ -438,22 +431,18 @@ namespace SpsLogic
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            bool created;
             if (!File.Exists(path))
             {
                 Instance = new AppConfig();
                 Instance.Save();
-                created = true;
+                return true;
             }
             else
             {
                 string json = File.ReadAllText(path);
                 Instance = JsonConvert.DeserializeObject<AppConfig>(json);
-                created = false;
+                return false;
             }
-
-            Instance.ApplyAutoRun();
-            return created;
         }
 
         public void Save()

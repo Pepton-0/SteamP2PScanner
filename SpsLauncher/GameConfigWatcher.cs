@@ -4,10 +4,7 @@ using System.IO;
 
 namespace SpsLauncher
 {
-    /// <summary>
-    /// Keeps a read-only snapshot of SpsGui's game_config.json and reloads it when the file changes.
-    /// It never writes the file and never touches <see cref="GameConfig.Instance"/>.
-    /// </summary>
+    /// <summary>Keeps a read-only snapshot of SpsGui's game_config.json.</summary>
     internal sealed class GameConfigWatcher
     {
         private readonly string configPath;
@@ -46,10 +43,7 @@ namespace SpsLauncher
             }
         }
 
-        /// <summary>
-        /// Reloads the snapshot if the file was changed since the last successful load.
-        /// On failure the previous snapshot is kept and the next call retries.
-        /// </summary>
+        /// <summary>Reloads the snapshot if the file changed. On failure the previous snapshot is kept.</summary>
         /// <param name="force">Reload even if the file looks unchanged.</param>
         public void Refresh(bool force = false)
         {
