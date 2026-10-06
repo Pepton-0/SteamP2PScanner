@@ -1,5 +1,6 @@
 ﻿//#define INJECT_SPECIFIED_LANG
 
+using SpsGui.Models.Services;
 using SpsLogic;
 using System;
 using System.Collections.Generic;
@@ -59,10 +60,12 @@ namespace SpsGui.Models
         private const int SW_RESTORE = 9;
         private static readonly string[] SteamProcessNames = { "steam", "steamwebhelper" };
         private readonly IPacketScan packetScan;
+        private readonly ISteamRelayService steamRelayService;
 
-        public Conductor(IPacketScan packetScan)
+        public Conductor(IPacketScan packetScan, ISteamRelayService steamRelayService)
         {
             this.packetScan = packetScan ?? throw new ArgumentNullException(nameof(packetScan));
+            this.steamRelayService = steamRelayService ?? throw new ArgumentNullException(nameof(steamRelayService));
 
             string culture = CultureInfo.CurrentCulture.Name;
             try
@@ -122,7 +125,9 @@ namespace SpsGui.Models
                 throw new ArgumentNullException(nameof(info));
             }
 
-            return new SpsSteamMonitorInterpreter(packetScan, info);
+            // P2P sessions start well after this, so the relay lists are loaded in the background.
+            Task.Run(() => steamRelayService.LoadAsync(info.SteamAppId));
+            return new SpsSteamMonitorInterpreter(packetScan, steamRelayService, info);
         }
         
         public async Task<bool> AutoSteamConsoleAsync()

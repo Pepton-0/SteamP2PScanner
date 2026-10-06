@@ -15,14 +15,16 @@ namespace SteamMonitor
             this.output = output ?? throw new ArgumentNullException(nameof(output));
         }
 
-        public void Register(ulong netId, string name, ulong id)
+        public void Register(ulong netId, string name, ulong id, string remoteIp, bool usingRelay)
         {
             Write(new SteamMonitorMessage
             {
                 Type = SteamMonitorMessageType.Register,
                 NetId = netId,
                 Name = name,
-                Id = id
+                Id = id,
+                RemoteIp = remoteIp,
+                UsingRelay = usingRelay
             });
         }
 

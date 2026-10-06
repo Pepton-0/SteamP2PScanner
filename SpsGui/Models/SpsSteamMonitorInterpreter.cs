@@ -1,9 +1,11 @@
 using Newtonsoft.Json;
+using SpsGui.Models.Services;
 using SpsLogic;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Text;
 
 namespace SpsGui.Models
@@ -16,6 +18,7 @@ namespace SpsGui.Models
         private const int ShutdownWaitMilliseconds = 2000;
 
         private readonly IPacketScan packetScan;
+        private readonly ISteamRelayService steamRelayService;
         private readonly object inputLock = new object();
         private readonly Process process;
         private int requestIndex;
@@ -23,9 +26,10 @@ namespace SpsGui.Models
         private bool childReportedExit;
         private bool communicationClosed;
 
-        public SpsSteamMonitorInterpreter(IPacketScan packetScan, SteamAppInfo appInfo)
+        public SpsSteamMonitorInterpreter(IPacketScan packetScan, ISteamRelayService steamRelayService, SteamAppInfo appInfo)
         {
             this.packetScan = packetScan ?? throw new ArgumentNullException(nameof(packetScan));
+            this.steamRelayService = steamRelayService ?? throw new ArgumentNullException(nameof(steamRelayService));
             if (appInfo == null)
             {
                 throw new ArgumentNullException(nameof(appInfo));
@@ -226,7 +230,10 @@ namespace SpsGui.Models
         {
             if (message.Type == SteamMonitorMessageType.Register)
             {
-                packetScan.Register(message.NetId, message.Name, message.Id);
+                // Steam may report a direct session to an SDR relay, so the relay lists are checked too.
+                bool inRelayRange = IPAddress.TryParse(message.RemoteIp, out IPAddress address) &&
+                    steamRelayService.IsRelayAddress(address);
+                packetScan.Register(message.NetId, message.Name, message.Id, message.UsingRelay || inRelayRange);
             }
             else if (message.Type == SteamMonitorMessageType.Unregister)
             {

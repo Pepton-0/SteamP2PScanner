@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using Steamworks;
 
 namespace SpsLogic
@@ -54,7 +55,7 @@ namespace SpsLogic
                 byte[] ipBytes = BitConverter.GetBytes(mSessionState.m_nRemoteIP).Reverse().ToArray();
                 mNetIdentity = ((ulong)mSessionState.m_nRemotePort << 32) | BitConverter.ToUInt32(ipBytes, 0);
 
-                Interpreter.Register(mNetIdentity, Name, SteamID.m_SteamID);
+                Interpreter.Register(mNetIdentity, Name, SteamID.m_SteamID, new IPAddress(ipBytes).ToString(), UsingRelay);
             }
 
             return true;

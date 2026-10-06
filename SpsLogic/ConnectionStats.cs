@@ -23,6 +23,16 @@ namespace SpsLogic
         /// </summary>
         public readonly ulong Id;
 
+        private bool _usingRelay;
+        /// <summary>
+        /// True if the connection goes through a Steam relay server
+        /// </summary>
+        public bool UsingRelay
+        {
+            get { lock (syncRoot) { return _usingRelay; } }
+            set { lock (syncRoot) { _usingRelay = value; } }
+        }
+
         private double _min = -1;
         /// <summary>
         /// Min value among pings

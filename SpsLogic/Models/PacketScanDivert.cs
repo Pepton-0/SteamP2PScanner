@@ -182,12 +182,14 @@ namespace SpsLogic
             }
         }
 
-        public void Register(ulong netId, string name, ulong id)
+        public void Register(ulong netId, string name, ulong id, bool usingRelay = false)
         {
             lock (registries)
             {
                 Logger.DebugLog($"Registered new net id to scan by WinDivert: {netId}");
-                registries[netId] = new PlayerPingHistoryDivert(patienceLimitMs, name, id);
+                var history = new PlayerPingHistoryDivert(patienceLimitMs, name, id);
+                history.Stats.UsingRelay = usingRelay;
+                registries[netId] = history;
             }
         }
 

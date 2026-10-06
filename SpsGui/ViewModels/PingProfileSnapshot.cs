@@ -79,7 +79,6 @@ namespace SpsGui.ViewModels
             snapshot.State = string.IsNullOrWhiteSpace(state) ? "-" : state;
             snapshot.NetIdValue = netId;
             snapshot.PacketArchive = history.Archive;
-            snapshot.UsingRelay = false;
             snapshot.UsingDns = false;
             snapshot.RefreshFromStats();
             return snapshot;
@@ -390,6 +389,7 @@ namespace SpsGui.ViewModels
         /// </summary>
         public void RefreshFromStats()
         {
+            UsingRelay = sourceStats.UsingRelay;
             sourceStats.ReadValues((nameValue, startedAtValue, minValue, maxValue, avgValue, lossValue, q1Value, medValue, q3Value, recentPingsValue) =>
             {
                 Name = nameValue;

@@ -13,7 +13,7 @@ namespace SpsLogic
     {
         bool IsArchiveUsable();
         void Update();
-        void Register(ulong netId, string name, ulong id);
+        void Register(ulong netId, string name, ulong id, bool usingRelay = false);
         void Unregister(ulong netId);
         void ForEachActiveHistory(Action<string, ulong?, BasePlayerPingHistory> action);
         BasePlayerPingHistory[] TakeUnseenOldHistories();

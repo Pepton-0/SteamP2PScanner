@@ -293,12 +293,14 @@ namespace SpsLogic
         /// <param name="netId"></param>
         /// <param name="name"></param>
         /// <param name="id">CSteamID</param>
-        public void Register(ulong netId, string name, ulong id)
+        public void Register(ulong netId, string name, ulong id, bool usingRelay = false)
         {
             lock (Registries)
             {
                 Logger.DebugLog($"Registered new net id to scan: {netId}");
-                Registries[netId] = new PlayerPingHistoryNpcap(PatienceLimitMs, name, id);
+                var history = new PlayerPingHistoryNpcap(PatienceLimitMs, name, id);
+                history.Stats.UsingRelay = usingRelay;
+                Registries[netId] = history;
             }
         }
 

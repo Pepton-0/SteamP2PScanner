@@ -7,7 +7,9 @@ namespace SpsLogic
     /// </summary>
     public interface ISteamPeerInterpreter
     {
-        void Register(ulong netId, string name, ulong id);
+        /// <param name="remoteIp">IPv4 address of the peer endpoint, which may be a relay server.</param>
+        /// <param name="usingRelay">True when Steam reports that the session goes through a relay.</param>
+        void Register(ulong netId, string name, ulong id, string remoteIp, bool usingRelay);
         void Unregister(ulong netId);
     }
 
@@ -32,9 +34,9 @@ namespace SpsLogic
             this.packetScan = packetScan ?? throw new ArgumentNullException(nameof(packetScan));
         }
 
-        public void Register(ulong netId, string name, ulong id)
+        public void Register(ulong netId, string name, ulong id, string remoteIp, bool usingRelay)
         {
-            packetScan.Register(netId, name, id);
+            packetScan.Register(netId, name, id, usingRelay);
         }
 
         public void Unregister(ulong netId)
@@ -71,6 +73,8 @@ namespace SpsLogic
         public ulong NetId { get; set; }
         public string Name { get; set; }
         public ulong Id { get; set; }
+        public string RemoteIp { get; set; }
+        public bool UsingRelay { get; set; }
         public string Message { get; set; }
         public string Reason { get; set; }
         public bool LeaveToFile { get; set; }
