@@ -31,7 +31,9 @@ namespace SpsGui
 
             // Prepare MVVM application
 #if MVVM_APP
+            var startupOptions = SpsGuiStartupOptions.Parse(Environment.GetCommandLineArgs().Skip(1).ToArray());
             Ioc.Default.ConfigureServices(new ServiceCollection()
+                .AddSingleton<IStartupOptionsProvider>(new StartupOptionsProvider(startupOptions))
                 .AddSingleton<IConductor, Conductor>()
                 .AddSingleton<IApplicationTitleService, ApplicationTitleService>()
                 .AddSingleton<IDialogService, DialogService>()
@@ -65,7 +67,14 @@ namespace SpsGui
 #if MVVM_APP
             if (Process.GetProcessesByName("SpsGui").Length > 1)
             {
-                MessageBox.Show(Resources["DuplicateSpsGui"].ToString());
+                // A start by SpsLauncher is not the user's action, so it quits silently.
+                SpsGuiStartupOptions startupOptions = Ioc.Default.GetRequiredService<IStartupOptionsProvider>().Options;
+                Logger.Log("Quit because SpsGui is already running. " + startupOptions, true);
+                if (!startupOptions.HasTarget)
+                {
+                    MessageBox.Show(Resources["DuplicateSpsGui"].ToString());
+                }
+
                 Shutdown();
                 return;
             }

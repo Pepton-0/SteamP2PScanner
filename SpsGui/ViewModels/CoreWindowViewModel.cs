@@ -4,9 +4,11 @@ using SpsGui.Models;
 using SpsGui.Models.Services;
 using SpsLogic;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace SpsGui.ViewModels
 {
@@ -42,7 +44,8 @@ namespace SpsGui.ViewModels
             IDialogService dialogService,
             IOverlayService overlayService,
             IVersionCheckService verCheckService,
-            IFindSteamExeService findSteamExeService)
+            IFindSteamExeService findSteamExeService,
+            IStartupOptionsProvider startupOptionsProvider)
         {
             Conductor = conductor ?? throw new ArgumentNullException(nameof(conductor));
             if (applicationTitleService == null)
@@ -63,6 +66,15 @@ namespace SpsGui.ViewModels
             var initialScreen = new InitialScreenViewModel(steamAppFinder, dialogService);
             initialScreen.ProfileRequested += OnProfileRequested;
             CurrentViewModel = initialScreen;
+
+            SpsGuiStartupOptions startupOptions = startupOptionsProvider.Options;
+            if (startupOptions.HasTarget)
+            {
+                // Profiling may show dialogs, so it starts after the window is shown.
+                App.Current.Dispatcher.BeginInvoke(
+                    DispatcherPriority.Loaded,
+                    new Action(() => RequestStartupProfile(initialScreen, startupOptions)));
+            }
             ExitCommand = new RelayCommand<object>(OnExit);
             TestCommand = new RelayCommand<object>((d) => Logger.Log("something"));
 
@@ -133,6 +145,25 @@ namespace SpsGui.ViewModels
             private set { SetProperty(ref currentProcessName, value); }
         }
         private string currentProcessName = string.Empty;
+
+        private static void RequestStartupProfile(InitialScreenViewModel initialScreen, SpsGuiStartupOptions options)
+        {
+            uint ownProcessId;
+            using (Process process = Process.GetCurrentProcess())
+            {
+                ownProcessId = (uint)process.Id;
+            }
+
+            WindowInfo window;
+            if (!AppWindowFilter.TryFindProcessWindow(options.ProcessId, options.WindowHandle, ownProcessId, out window))
+            {
+                Logger.Log("No window was found for the startup target, so wait for auto detection. " + options, true);
+                return;
+            }
+
+            Logger.Log("Start profiling the startup target. " + options + ", window=0x" + window.Handle.ToInt64().ToString("X"), true);
+            initialScreen.RequestProfile(new SteamAppInfo(window, options.SteamAppId, true));
+        }
 
         private void OnProfileRequested(object sender, SteamAppInfo appInfo)
         {

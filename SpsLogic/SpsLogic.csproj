@@ -76,6 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
+    <Compile Include="AppWindowFilter.cs" />
+    <Compile Include="CommandLine.cs" />
     <Compile Include="ConnectionStats.cs" />
     <Compile Include="DnsPing.cs" />
     <Compile Include="GameConfig.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="SteamPeerBase.cs" />
     <Compile Include="SteamPeerInfo.cs" />
     <Compile Include="SteamPeerManager.cs" />
+    <Compile Include="SpsGuiStartupOptions.cs" />
     <Compile Include="SteamMonitorContracts.cs" />
     <Compile Include="SteamPeerNewAPI.cs" />
     <Compile Include="SteamPeerOldAPI.cs" />

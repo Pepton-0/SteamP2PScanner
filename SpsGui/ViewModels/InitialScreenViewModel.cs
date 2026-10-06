@@ -277,7 +277,8 @@ namespace SpsGui.ViewModels
             return matched == null ? string.Empty : matched.SteamAppId;
         }
 
-        private void RequestProfile(SteamAppInfo appInfo)
+        /// <summary>Stops auto detection and starts profiling the application.</summary>
+        public void RequestProfile(SteamAppInfo appInfo)
         {
             autoDetectTimer.Stop();
             ProfileRequested?.Invoke(this, appInfo);

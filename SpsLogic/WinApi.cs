@@ -190,7 +190,7 @@ namespace SpsLogic
 
             try
             {
-                var builder = new StringBuilder(1024);
+                var builder = new StringBuilder(32768);
                 int size = builder.Capacity;
                 return QueryFullProcessImageName(handle, 0, builder, ref size)
                     ? builder.ToString(0, size)

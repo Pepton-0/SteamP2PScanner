@@ -379,14 +379,7 @@ namespace SpsLogic
 
         private static string CreateLauncherArguments(string spsDirectory)
         {
-            return SpsDirArgument + " " + QuoteArgument(spsDirectory);
-        }
-
-        /// <summary>Quotes a command line argument. Backslashes before the closing quote are doubled, as Windows requires.</summary>
-        private static string QuoteArgument(string value)
-        {
-            string trailingBackslashes = value.Substring(value.TrimEnd('\\').Length);
-            return "\"" + value + trailingBackslashes + "\"";
+            return SpsDirArgument + " " + CommandLine.Quote(spsDirectory);
         }
 
         private static string PsLiteral(string value)
