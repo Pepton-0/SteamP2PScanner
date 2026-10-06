@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -40,9 +39,6 @@ namespace SpsLogic
             "SpsLogic.exe",
             "Newtonsoft.Json.dll",
         };
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern IntPtr LoadLibrary(string lpFileName);
 
         /// <summary>Directory where SpsLauncher and its copy of WinDivert are installed.</summary>
         public static string InstallDirectory
@@ -93,26 +89,6 @@ namespace SpsLogic
             {
                 Logger.Log("Failed to install SpsLauncher, fall back to the Sps directory: " + ex.GetType().Name + ": " + ex.Message, true);
                 return false;
-            }
-        }
-
-        /// <summary>Loads WinDivert.dll from the install directory, so its driver is loaded from there too.
-        /// Call before the first WinDivertOpen; otherwise the Sps directory copy is used.</summary>
-        public static void PreloadWinDivert()
-        {
-            string dllPath = Path.Combine(InstallDirectory, WinDivertDllName);
-            if (!File.Exists(dllPath))
-            {
-                return;
-            }
-
-            if (LoadLibrary(dllPath) == IntPtr.Zero)
-            {
-                Logger.Log("Failed to preload WinDivert from the install directory (error " + Marshal.GetLastWin32Error() + ").", true);
-            }
-            else
-            {
-                Logger.Log("Preloaded WinDivert from " + dllPath, true);
             }
         }
 

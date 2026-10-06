@@ -89,6 +89,7 @@
     <Compile Include="Models\PacketScanNcap.cs" />
     <Compile Include="Models\PacketScanDivert.cs" />
     <Compile Include="Models\SteamAppFinder.cs" />
+    <Compile Include="Models\WinDivertLoader.cs" />
     <Compile Include="ReverseTextReader.cs" />
     <Compile Include="StartupTask.cs" />
     <Compile Include="SteamPeerBase.cs" />

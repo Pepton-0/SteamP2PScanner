@@ -379,11 +379,7 @@ namespace SpsLogic
             }
 
             TimeSpan start = Logger.GetTimestamp();
-            if (StartupTask.Install(spsDirectory, version))
-            {
-                // WinDivert then loads from Program Files, so the Sps directory can be deleted as a whole.
-                StartupTask.PreloadWinDivert();
-            }
+            StartupTask.Install(spsDirectory, version);
 
             SyncTaskAndLauncher(spsDirectory);
             Logger.Log("InstallAndSyncStartup total: " + Logger.GetElapsedMillsec(start) + " ms", true);

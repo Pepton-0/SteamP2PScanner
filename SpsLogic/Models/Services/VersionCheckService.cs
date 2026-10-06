@@ -16,7 +16,7 @@ namespace SpsLogic
     public class VersionCheckService : IVersionCheckService
     {
         private static readonly bool IgnoreLatestForDebug = false;
-        private static readonly string CurrentVersion = "1.3";
+        private static readonly string CurrentVersion = "1.4";
         private static readonly string repositoryName = "Pepton-0/SteamP2PScanner";
         private static JObject LatestRelease;
 

@@ -142,6 +142,7 @@ namespace SpsLogic
             unseenOldHistories = new List<PlayerPingHistoryDivert>();
 
             Logger.Log("Setting up WinDivert packet listener", true);
+            WinDivertLoader.EnsureLoaded();
 
             try
             {
@@ -429,9 +430,11 @@ namespace SpsLogic
             return $"{exception.NativeErrorCode} : { exception.Message }";
         }
 
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("WinDivert.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true, CharSet = CharSet.Ansi)]
         private static extern IntPtr WinDivertOpen(string filter, int layer, short priority, ulong flags);
 
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("WinDivert.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
         private static extern bool WinDivertRecv(
             IntPtr handle,
@@ -440,6 +443,7 @@ namespace SpsLogic
             out uint readLen,
             byte[] address);
 
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [DllImport("WinDivert.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
         private static extern bool WinDivertClose(IntPtr handle);
     }
