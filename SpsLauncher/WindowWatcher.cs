@@ -114,6 +114,13 @@ namespace SpsLauncher
             }
         }
 
+        /// <summary>True if a known or pending window belongs to the exe. Call from the event handlers.</summary>
+        public bool HasWindowOf(string processPath)
+        {
+            return knownWindows.Values.Concat(pendingWindows.Values).Any(window =>
+                string.Equals(window.ProcessPath, processPath, StringComparison.OrdinalIgnoreCase));
+        }
+
         private Dictionary<IntPtr, WindowInfo> SnapshotWindows()
         {
             var windows = new Dictionary<IntPtr, WindowInfo>();

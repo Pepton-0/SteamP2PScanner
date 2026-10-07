@@ -15,6 +15,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\Assets\SteamP2PScanner.ico</ApplicationIcon>
     <RuntimeIdentifiers>win;win-x64</RuntimeIdentifiers>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -109,6 +110,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="NotificationServiceTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="FindSteamExeServiceTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -200,6 +205,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="NotificationServiceTest.xaml.cs">
+      <DependentUpon>NotificationServiceTest.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="FindSteamExeServiceTest.xaml.cs">
       <DependentUpon>FindSteamExeServiceTest.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -210,6 +219,7 @@
     <Compile Include="Models\Services\DialogService.cs" />
     <Compile Include="Models\Services\OverlayService.cs" />
     <Compile Include="Models\Services\SteamRelayService.cs" />
+    <Compile Include="Models\Services\NotificationService.cs" />
     <Compile Include="Models\Services\StartupOptionsProvider.cs" />
     <Compile Include="PingOverlayTest.xaml.cs">
       <DependentUpon>PingOverlayTest.xaml</DependentUpon>

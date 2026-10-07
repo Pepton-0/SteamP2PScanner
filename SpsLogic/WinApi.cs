@@ -177,6 +177,24 @@ namespace SpsLogic
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr windowHandle, int command);
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FLASHWINFO
+        {
+            public uint cbSize;
+            public IntPtr hwnd;
+            public uint dwFlags;
+            public uint uCount;
+            public uint dwTimeout;
+        }
+
+        public const uint FLASHW_ALL = 0x3;
+        /// <summary>Flash until the window comes to the foreground.</summary>
+        public const uint FLASHW_TIMERNOFG = 0xC;
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+
         /// <summary>
         /// Gets the full exe path with the least privileged access. Returns null for protected or exited processes.
         /// </summary>

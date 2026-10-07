@@ -39,6 +39,7 @@
     <sys:String x:Key="CopyButton">コピー</sys:String>
     <sys:String x:Key="CloseButton">閉じる</sys:String>
     <sys:String x:Key="SteamConsoleCommandTitle">Steam console コマンド</sys:String>
+    <sys:String x:Key="SteamConsoleNotificationMessage">Steam コンソールを開きました。 Spsに表示されるコマンドを入力してください</sys:String>
     <sys:String x:Key="WindowSelectTitle">ウィンドウの選択</sys:String>
     <sys:String x:Key="SteamAppIdTitle">Steam AppID</sys:String>
     <sys:String x:Key="NewVersionDownload">ダウンロード</sys:String>

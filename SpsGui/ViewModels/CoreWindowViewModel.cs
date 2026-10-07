@@ -22,6 +22,7 @@ namespace SpsGui.ViewModels
         private readonly IDialogService dialogService;
         private readonly IOverlayService overlayService;
         private readonly IFindSteamExeService findSteamExeService;
+        private readonly INotificationService notificationService;
         private bool isExiting;
 
         public IRelayCommand<object> ExitCommand { get; private set; }
@@ -45,7 +46,8 @@ namespace SpsGui.ViewModels
             IOverlayService overlayService,
             IVersionCheckService verCheckService,
             IFindSteamExeService findSteamExeService,
-            IStartupOptionsProvider startupOptionsProvider)
+            IStartupOptionsProvider startupOptionsProvider,
+            INotificationService notificationService)
         {
             Conductor = conductor ?? throw new ArgumentNullException(nameof(conductor));
             if (applicationTitleService == null)
@@ -54,6 +56,7 @@ namespace SpsGui.ViewModels
             }
 
             this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
             this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
             this.findSteamExeService = findSteamExeService ?? throw new ArgumentNullException(nameof(findSteamExeService));
             if (verCheckService == null)
@@ -146,7 +149,7 @@ namespace SpsGui.ViewModels
         }
         private string currentProcessName = string.Empty;
 
-        private static void RequestStartupProfile(InitialScreenViewModel initialScreen, SpsGuiStartupOptions options)
+        private void RequestStartupProfile(InitialScreenViewModel initialScreen, SpsGuiStartupOptions options)
         {
             uint ownProcessId;
             using (Process process = Process.GetCurrentProcess())
@@ -157,16 +160,17 @@ namespace SpsGui.ViewModels
             WindowInfo window;
             if (!AppWindowFilter.TryFindProcessWindow(options.ProcessId, options.WindowHandle, ownProcessId, out window))
             {
-                Logger.Log("No window was found for the startup target, so wait for auto detection. " + options, true);
+                Logger.Log("No window was found for the target hwnd, so wait for auto detection. " + options, true);
                 return;
             }
 
-            Logger.Log("Start profiling the startup target. " + options + ", window=0x" + window.Handle.ToInt64().ToString("X"), true);
-            initialScreen.RequestProfile(new SteamAppInfo(window, options.SteamAppId, true));
+            Logger.Log("Start profiling the target hwnd given in exe arguments " + options, true);
+            initialScreen.RequestProfile(new SteamAppInfo(window, options.SteamAppId, true), isRequestedByLauncher: true);
         }
 
-        private void OnProfileRequested(object sender, SteamAppInfo appInfo)
+        private void OnProfileRequested(object sender, ProfileRequestEventArgs request)
         {
+            SteamAppInfo appInfo = request.AppInfo;
             // Check steam paths faster than steam command and manager
             LogSteamPathDiagnostics();
             if (!File.Exists(AppConfig.Instance.SteamExe))
@@ -188,7 +192,7 @@ namespace SpsGui.ViewModels
 
             //maybe requesting the command faster than manager resolves
             //the problem that manager cannot load ipc file somehow.
-            RequestManualSteamConsoleCommand();
+            RequestManualSteamConsoleCommand(request.IsRequestedByLauncher);
 
             ISteamMonitorInterpreter monitor = null;
             try
@@ -227,11 +231,23 @@ namespace SpsGui.ViewModels
             overlayService.Show(appInfo.Info);
         }
 
-        private int RequestManualSteamConsoleCommand()
+        private void NotifySteamConsoleOpened()
+        {
+            notificationService.Notify(
+                App.Current.Resources["SteamConsoleCommandTitle"].ToString(),
+                App.Current.Resources["SteamConsoleNotificationMessage"].ToString());
+        }
+
+        private int RequestManualSteamConsoleCommand(bool notifyUser)
         {
             int result = Conductor.RequestSteamConsole();
             if (result == 1)
             {
+                if (notifyUser)
+                {
+                    NotifySteamConsoleOpened();
+                }
+
                 dialogService.ShowSteamConsoleCommandDialog(Conductor.SteamConsoleCommand);
             }
             else if(result == -1)

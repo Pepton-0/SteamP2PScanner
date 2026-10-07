@@ -57,6 +57,7 @@
       <HintPath>.\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -76,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
+    <Compile Include="AppIcon.cs" />
     <Compile Include="AppWindowFilter.cs" />
     <Compile Include="CommandLine.cs" />
     <Compile Include="ConnectionStats.cs" />
@@ -107,6 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="..\Assets\SteamP2PScanner.ico">
+      <LogicalName>SteamP2PScanner.ico</LogicalName>
+    </EmbeddedResource>
     <None Include="app.manifest" />
     <Content Include="WinDivert64.sys">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

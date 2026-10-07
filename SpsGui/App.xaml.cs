@@ -39,6 +39,7 @@ namespace SpsGui
                 .AddSingleton<IDialogService, DialogService>()
                 .AddSingleton<IOverlayService, OverlayService>()
                 .AddSingleton<ISteamRelayService, SteamRelayService>()
+                .AddSingleton<INotificationService, NotificationService>()
                 .AddSingleton<IVersionCheckService, VersionCheckService>()
                 .AddSingleton<ISteamAppFinder, SteamAppFinder>()
                 .AddSingleton<IFindSteamExeService, FindSteamExeService>()
@@ -58,6 +59,7 @@ namespace SpsGui
             // new SnapshotChartDemoTest().Show();
             //new FindSteamExeServiceTest().Show();
             //new OverlayWindowTest().Show();
+            new NotificationServiceTest().Show();
 #endif
         }
 
@@ -110,6 +112,7 @@ namespace SpsGui
             Logger.Log("Exit the app", true);
 #if MVVM_APP
             Ioc.Default.GetRequiredService<IOverlayService>().Close();
+            Ioc.Default.GetRequiredService<INotificationService>().Close();
             Ioc.Default.GetRequiredService<IPacketScan>().Dispose();
 #endif
             AppConfig.Instance.Save();

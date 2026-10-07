@@ -28,7 +28,7 @@ namespace SpsGui.ViewModels
         /// <summary>
         /// Raised when the user selected a Steam application and profiling should start.
         /// </summary>
-        public event EventHandler<SteamAppInfo> ProfileRequested;
+        public event EventHandler<ProfileRequestEventArgs> ProfileRequested;
 
         /// <summary>
         /// Initializes the startup screen and starts periodic automatic Steam app detection.
@@ -278,10 +278,10 @@ namespace SpsGui.ViewModels
         }
 
         /// <summary>Stops auto detection and starts profiling the application.</summary>
-        public void RequestProfile(SteamAppInfo appInfo)
+        public void RequestProfile(SteamAppInfo appInfo, bool isRequestedByLauncher = false)
         {
             autoDetectTimer.Stop();
-            ProfileRequested?.Invoke(this, appInfo);
+            ProfileRequested?.Invoke(this, new ProfileRequestEventArgs(appInfo, isRequestedByLauncher));
         }
 
         private static void LogSelectedCandidate(SteamAppCandidateViewModel candidate)
@@ -317,6 +317,19 @@ namespace SpsGui.ViewModels
 
             return window.Title + " (" + window.ProcessName + ")";
         }
+    }
+
+    public sealed class ProfileRequestEventArgs : EventArgs
+    {
+        public ProfileRequestEventArgs(SteamAppInfo appInfo, bool isRequestedByLauncher)
+        {
+            AppInfo = appInfo;
+            IsRequestedByLauncher = isRequestedByLauncher;
+        }
+
+        public SteamAppInfo AppInfo { get; }
+
+        public bool IsRequestedByLauncher { get; }
     }
 
     /// <summary>

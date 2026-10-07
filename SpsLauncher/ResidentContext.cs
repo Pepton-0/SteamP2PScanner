@@ -16,6 +16,7 @@ namespace SpsLauncher
         private static readonly TimeSpan PollingInterval = TimeSpan.FromSeconds(2); // TODO change this value if its too long.
 
         private const string SpsGuiExeName = "SpsGui.exe";
+        private const string TrayTitle = "SteamP2PScanner - Auto Monitoring";
 
         private readonly NotifyIcon notifyIcon;
         private readonly GameConfigWatcher configWatcher;
@@ -24,6 +25,8 @@ namespace SpsLauncher
         private readonly string spsGuiPath;
         // Games SpsGui was started for. A game may show several windows.
         private readonly HashSet<uint> launchedProcessIds = new HashSet<uint>();
+        // Set when config was refreshed for the last SpsGui exit, until a SpsGui window appears again.
+        private bool spsGuiExitHandled;
         // Marshals the exit request from the thread pool to the UI thread.
         private readonly Control uiInvoker;
         private readonly EventWaitHandle exitEvent;
@@ -42,12 +45,14 @@ namespace SpsLauncher
             windowWatcher.Start();
 
             var menu = new ContextMenuStrip();
-            menu.Items.Add("Exit", null, (s, e) => ExitThread());
+            menu.Items.Add(new ToolStripLabel(TrayTitle) { Font = new Font(menu.Font, FontStyle.Bold) });
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add("Exit Auto Monitor", null, (s, e) => ExitThread());
 
             notifyIcon = new NotifyIcon
             {
-                Icon = SystemIcons.Application,
-                Text = "SpsLauncher",
+                Icon = AppIcon.Load(SystemInformation.SmallIconSize),
+                Text = TrayTitle,
                 ContextMenuStrip = menu,
                 Visible = true,
             };
@@ -74,6 +79,12 @@ namespace SpsLauncher
 
         private void OnWindowAppeared(object sender, WindowInfo window)
         {
+            if (IsSpsGuiWindow(window))
+            {
+                spsGuiExitHandled = false;
+                return;
+            }
+
             string steamAppId;
             if (!configWatcher.Current.TryGetSteamAppId(window.ProcessPath, out steamAppId))
             {
@@ -112,14 +123,20 @@ namespace SpsLauncher
 
         private void OnWindowDisappeared(object sender, WindowInfo window)
         {
-            // Only SpsGui writes game_config.json, so its exit is the moment to pick up registrations.
-            if (!string.Equals(window.ProcessPath, spsGuiPath, StringComparison.OrdinalIgnoreCase))
+            // Only SpsGui writes game_config.json, so its exit (no SpsGui window left) is the moment to pick up registrations.
+            if (!IsSpsGuiWindow(window) || spsGuiExitHandled || windowWatcher.HasWindowOf(spsGuiPath))
             {
                 return;
             }
 
-            LauncherLog.Write("Refreshed observation because a SpsGui window closed.");
+            spsGuiExitHandled = true;
+            LauncherLog.Write("Refreshed observation because SpsGui exited.");
             configWatcher.Refresh();
+        }
+
+        private bool IsSpsGuiWindow(WindowInfo window)
+        {
+            return string.Equals(window.ProcessPath, spsGuiPath, StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsProcessRunning(uint processId)
@@ -140,14 +157,14 @@ namespace SpsLauncher
         protected override void ExitThreadCore()
         {
             LauncherLog.Write("Exit.");
-            TimeSpan exitStart = SpsLogic.Logger.GetTimestamp();
+            TimeSpan exitStart = Logger.GetTimestamp();
             windowWatcher.Dispose();
             exitWait.Unregister(null);
             exitEvent.Dispose();
             uiInvoker.Dispose();
             notifyIcon.Visible = false;
             notifyIcon.Dispose();
-            LauncherLog.Write("Exit cleanup: " + SpsLogic.Logger.GetElapsedMillsec(exitStart) + " ms");
+            LauncherLog.Write("Exit cleanup: " + Logger.GetElapsedMillsec(exitStart) + " ms");
             base.ExitThreadCore();
         }
     }
