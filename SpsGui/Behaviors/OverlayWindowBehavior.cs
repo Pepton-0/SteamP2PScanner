@@ -20,6 +20,7 @@ namespace SpsGui.Behaviors
         private const uint EventSystemForeground = 0x0003;
         private const uint EventObjectLocationChange = 0x800B;
         private const uint SwpNoActivate = 0x0010;
+        private const uint GwHwndPrev = 3;
         private static readonly IntPtr HwndTopmost = new IntPtr(-1);
 
         private WindowInteropHelper interopHelper;
@@ -280,8 +281,10 @@ namespace SpsGui.Behaviors
             int exStyle = WinApi.GetWindowLongPtr(interopHelper.Handle, GwlExStyle).ToInt32();
             bool isTopmost = (exStyle & WsExTopmost) != 0;
 
-            if (shouldTopmost && !isTopmost)
+            IntPtr zOrderTarget = foregroundTargetHandle != IntPtr.Zero ? foregroundTargetHandle : TargetWindowInfo.Handle;
+            if (shouldTopmost && (!isTopmost || !IsAbove(interopHelper.Handle, zOrderTarget)))
             {
+                // A topmost full screen game can still cover a topmost overlay, so raise it only when it is below.
                 WinApi.SetWindowZOrder(interopHelper.Handle, HwndTopmost, SwpNoActivate);
             }
             else if (!shouldTopmost && isTopmost)
@@ -378,6 +381,19 @@ namespace SpsGui.Behaviors
             }
 
             return foreground;
+        }
+
+        private static bool IsAbove(IntPtr window, IntPtr other)
+        {
+            for (IntPtr above = WinApi.GetWindow(other, GwHwndPrev); above != IntPtr.Zero; above = WinApi.GetWindow(above, GwHwndPrev))
+            {
+                if (above == window)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private IntPtr GetPositionTargetHandle()
