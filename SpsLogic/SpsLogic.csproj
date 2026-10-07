@@ -72,6 +72,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm">
       <Version>8.4.2</Version>
     </PackageReference>
+    <!-- Same version as SpsGui: SteamMonitor and SpsLauncher output into SpsGui's directory and copy this assembly too. -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SharpPcap" Version="6.3.1" />
   </ItemGroup>

@@ -13,7 +13,6 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>..\Assets\SteamP2PScanner.ico</ApplicationIcon>
   </PropertyGroup>
   <!-- Output next to SpsGui.exe; SpsGui installs it into Program Files from there. -->
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
